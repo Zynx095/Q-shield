@@ -1,0 +1,25 @@
+........................................................................ [ 41%]
+........................................................................ [ 62%]
+........................................................................ [ 82%]
+...........................................................              [100%]
+347 passed in 33.97s
+tests collected per file (pytest --collect-only):
+   5  tests/ai/test_inference.py
+  48  tests/ai/test_observation_schema.py
+  15  tests/ai/test_pipeline.py
+   6  tests/ai/test_sinks_and_runner.py
+  34  tests/ai/test_zones_and_config.py
+  15  tests/integration/test_observation_ingest.py
+   5  tests/integration/test_phase1_flow.py
+  10  tests/integration/test_vision_signed_sink.py
+   8  tests/pqc/test_conformance_acvp.py
+   6  tests/pqc/test_interop_reference.py
+  51  tests/pqc/test_mlkem768_mldsa65_behaviour.py
+   9  tests/pqc/test_pqc_interface.py
+  11  tests/security/test_credential_store.py
+  17  tests/security/test_device_auth.py
+  17  tests/security/test_operator_auth.py
+  18  tests/security/test_pqc_keystore.py
+  26  tests/security/test_pqc_session.py
+  46  tests/security/test_signed_observations.py
+ 347  TOTAL

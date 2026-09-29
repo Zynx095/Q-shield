@@ -1,0 +1,19 @@
+Recorded 2026-09-24
+Python 3.12.0 | Windows-11-10.0.26200-SP0 | AMD64
+pqcrypto         1.0.0
+kyber-py         1.2.0
+dilithium-py     1.4.0
+cryptography     47.0.0
+fastapi          0.136.1
+pydantic         2.13.5
+uvicorn          0.30.6
+httpx            0.28.1
+ultralytics      8.4.50
+torch            2.13.0+cpu
+opencv-python    4.13.0.92
+numpy            2.5.2
+python-pptx      1.0.2
+matplotlib       3.10.9
+platformio       6.2.0
+Benchmark CPU: 13th Gen Intel(R) Core(TM) i7-13700HX | logical CPUs: 24
+Slides rendered/exported with: Microsoft PowerPoint (Office16) via COM automation

@@ -1,0 +1,15 @@
+Recorded output of `python scripts/demo_forgery.py --db <live-run db> --gateway http://127.0.0.1:8767`, run on 2026-09-24
+against the gateway holding the recorded Phase 3 live run (about 20 minutes after those observations were signed).
+
+stored observation ea56d4e2-81ea-4c81-a85b-ecea903822fd signed by vision-1 (ML-DSA-65)
+1. payload altered, original signature kept -> 401 (expected 401)
+2. exact replay of the stored envelope      -> 401 (expected 409)      <- stale: older than the 300 s freshness window
+
+Non-local target check (must refuse):
+refusing: this demo only targets a local gateway            (exit code 2)
+
+Notes
+- During the original run, minutes after signing, the exact replay returned HTTP 409 (see live-run-phase3.json,
+  http_post_status_sequence and the pqc_observation_replay event).
+- Here the replay returned 401 because the stored envelope was already older than the 300 s freshness window
+  (stale timestamp). Both are rejections; the script's expectation text was updated afterwards to say so.

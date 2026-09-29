@@ -1,0 +1,37 @@
+{
+  "frames_measured": 100,
+  "frames_dropped": 0,
+  "warmup_frames": 10,
+  "frame_shape": [
+    480,
+    640,
+    3
+  ],
+  "capture_ms": {
+    "mean": 7.9,
+    "median": 7.76,
+    "p95": 9.67,
+    "min": 4.8,
+    "max": 12.09
+  },
+  "inference_ms": {
+    "mean": 39.8,
+    "median": 39.61,
+    "p95": 45.13,
+    "min": 31.27,
+    "max": 46.3
+  },
+  "end_to_end_fps": 20.96,
+  "inference_only_fps": 25.13,
+  "total_detections": 0,
+  "model": "yolo11n",
+  "model_version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76",
+  "environment": {
+    "python": "3.12.0",
+    "machine": "AMD64",
+    "cpu": "Intel64 Family 6 Model 191 Stepping 2, GenuineIntel",
+    "os": "Windows-11-10.0.26200-SP0",
+    "torch": "2.13.0+cpu",
+    "cuda_available": false
+  }
+}

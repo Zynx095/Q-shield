@@ -1,0 +1,1307 @@
+[
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 1",
+  "snippet": "Quantum-Resilient Self-Healing AIoT Security Architecture"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 1",
+  "snippet": "Quantum-Resilient Self-Healing AIoT Security Architecture"
+ },
+ {
+  "term": "self-healing",
+  "where": "Q-SHIELD_full_deck.pptx slide 1",
+  "snippet": "Quantum-Resilient Self-Healing AIoT Security Architecture"
+ },
+ {
+  "term": "quantum proof",
+  "where": "Q-SHIELD_full_deck.pptx slide 1 NOTES",
+  "snippet": "TERMINOLOGY: Say 'post-quantum cryptography' and 'prototype'. Never 'quantum-proof'. ACKNOWLEDGE: State early that the ESP32 is not post-quantum and th"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 1 NOTES",
+  "snippet": "ce. - Today we have built and tested the observation and post-quantum security layer; trust, quarantine and recovery are the next phase. TERMINOLOG"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 2",
+  "snippet": "cation establishes identity once, not that a device stays trustworthy AIoT adds attack surface: physical tampering, sensor manipulation, abnorma"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 3",
+  "snippet": "Why existing IoT security is fragmented"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 3",
+  "snippet": "AI detection"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 3",
+  "snippet": "AI detection"
+ },
+ {
+  "term": "protected",
+  "where": "Q-SHIELD_full_deck.pptx slide 3",
+  "snippet": "answers: is the channel protected? cannot tell if the device behaves correctly"
+ },
+ {
+  "term": "novel",
+  "where": "Q-SHIELD_full_deck.pptx slide 3 NOTES",
+  "snippet": "-art.md is empty: the survey is future work. SOURCES: docs/hackathon/novelty.md; docs/implementation-roadmap.md (R2)"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_full_deck.pptx slide 3 NOTES",
+  "snippet": "fragmented'. We have not completed a prior-art survey, so we make no 'first' claim. TERMINOLOGY: 'Often fragmented' is the wording; never 'nothi"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 4 NOTES",
+  "snippet": "re any code. LIKELY JUDGE QUESTIONS: Q: Why does the loop matter? A: Detection alone does not change what a device may do; the loop connects evid"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 5",
+  "snippet": "ML-KEM and ML-DSA (NIST FIPS 203 / 204) YOLO object detection Anomaly detection, trust scoring Hash-chained logs, digital twins"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 5",
+  "snippet": "ML-KEM and ML-DSA (NIST FIPS 203 / 204) YOLO object detection Anomaly detection, trust scoring Hash-chained logs, digital twins"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 5",
+  "snippet": "inuous trust, not one-time authentication BUILT: PQC-backed software security components BUILT + PLANNED: cyber + visual signals now, physical/sen"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 5",
+  "snippet": "physical/sensor next PLANNED: explainable trust decisions DESIGNED: security-state model, tamper-evident evidence chain PLANNED: quarantine and r"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_full_deck.pptx slide 5",
+  "snippet": "y the observation + PQC layer of this composition is built today. No 'first' claim: prior-art survey not done."
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 5 NOTES",
+  "snippet": "The proposed contribution is composing them into one loop for a small AIoT endpoint, with explainable decisions. LIKELY JUDGE QUESTIONS: Q: Wha"
+ },
+ {
+  "term": "novel",
+  "where": "Q-SHIELD_full_deck.pptx slide 5 NOTES",
+  "snippet": "oint, with explainable decisions. LIKELY JUDGE QUESTIONS: Q: What is novel? A: The integration and the closed loop, proposed. We have not survey"
+ },
+ {
+  "term": "novel",
+  "where": "Q-SHIELD_full_deck.pptx slide 5 NOTES",
+  "snippet": "MINOLOGY: 'Proposed integration', 'architectural composition'. Never 'novel algorithm'. ACKNOWLEDGE: Six of the seven elements are not fully bui"
+ },
+ {
+  "term": "novel",
+  "where": "Q-SHIELD_full_deck.pptx slide 5 NOTES",
+  "snippet": "are not fully built; the slide labels each. SOURCES: docs/hackathon/novelty.md; docs/technical-decisions.md"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_full_deck.pptx slide 5 NOTES",
+  "snippet": "roposed. We have not surveyed prior art, so we do not claim it is the first such system. TERMINOLOGY: 'Proposed integration', 'architectural com"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 6 NOTES",
+  "snippet": "uilt: laptop gateway, vision service, device path, observation store, security events. SAY: - The laptop is the compute hub: gateway, AI, PQC, data"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 6 NOTES",
+  "snippet": "ore, security events. SAY: - The laptop is the compute hub: gateway, AI, PQC, database. - The ESP32 is the physical endpoint; so far the devi"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 7",
+  "snippet": "Two different security profiles today"
+ },
+ {
+  "term": "protected",
+  "where": "Q-SHIELD_full_deck.pptx slide 7",
+  "snippet": "Replay protection"
+ },
+ {
+  "term": "quantum safe",
+  "where": "Q-SHIELD_full_deck.pptx slide 7 NOTES",
+  "snippet": "service, not to the webcam. LIKELY JUDGE QUESTIONS: Q: Is the ESP32 quantum-safe? A: No. It uses HMAC-SHA256. ESP32-side PQC is an untested research q"
+ },
+ {
+  "term": "quantum safe",
+  "where": "Q-SHIELD_full_deck.pptx slide 7 NOTES",
+  "snippet": "c authentication', 'ML-DSA-65 service identity'. Never 'the device is quantum-safe'. ACKNOWLEDGE: Nothing cryptographically binds the webcam to the ESP"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 7 NOTES",
+  "snippet": "WHAT THIS SLIDE PROVES: The two components have different, explicit security profiles; PQC is not applied to the ESP32. SAY: - The ESP32 uses HMA"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 8 NOTES",
+  "snippet": "ns no forward secrecy against its later compromise. SOURCES: backend/security/session.py; pqc/README.md"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 8 NOTES",
+  "snippet": "nature before decapsulating. - A key-confirmation tag lets the client detect a wrong gateway key or a corrupted ciphertext. LIKELY JUDGE QUESTION"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 9 NOTES",
+  "snippet": "the window. SOURCES: backend/protocol/signed_observation.py; backend/security/pqc_gateway.py"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 11 NOTES",
+  "snippet": "n. Q: Was a person in the restricted zone? A: No. Nobody was in view; detections were chairs and a plant, no anomaly flagged. That path is covered"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 11 NOTES",
+  "snippet": "plant, no anomaly flagged. That path is covered by tests with a fake detector only. TERMINOLOGY: 'Recorded run', 'controlled local run'. ACKNOW"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "nterface and its AGPL-3.0 licence is disclosed. Q: How do you prevent AI false positives? A: We do not claim to. Observations carry confidence"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "rocessing with detections is not represented; one run each. SOURCES: ai/README.md"
+ },
+ {
+  "term": "prevent",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "ceable interface and its AGPL-3.0 licence is disclosed. Q: How do you prevent AI false positives? A: We do not claim to. Observations carry confide"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "ll or false-positive rate. Q: Why YOLO? A: A lightweight, widely used detector that runs on a laptop CPU; it is behind a replaceable interface and"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "LEDGE: No person was in view during the runs, so post-processing with detections is not represented; one run each. SOURCES: ai/README.md"
+ },
+ {
+  "term": "accuracy",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "PS and 21.0 end-to-end. - At 320: 51.4 and 30.0. - This is speed, not accuracy. LIKELY JUDGE QUESTIONS: Q: How accurate is it? A: Not measured. W"
+ },
+ {
+  "term": "accuracy",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "30.0. - This is speed, not accuracy. LIKELY JUDGE QUESTIONS: Q: How accurate is it? A: Not measured. We claim no accuracy, precision, recall or"
+ },
+ {
+  "term": "accuracy",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "JUDGE QUESTIONS: Q: How accurate is it? A: Not measured. We claim no accuracy, precision, recall or false-positive rate. Q: Why YOLO? A: A lightw"
+ },
+ {
+  "term": "accuracy",
+  "where": "Q-SHIELD_full_deck.pptx slide 13 NOTES",
+  "snippet": "nticity. TERMINOLOGY: 'Inference-only FPS', 'end-to-end FPS'. Never 'accuracy benchmark'. ACKNOWLEDGE: No person was in view during the runs, so"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 16 NOTES",
+  "snippet": "ency, visual anomalies, network behaviour, integrity state and recent security events. - Green inputs already produce data; amber ones are schema fi"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 16 NOTES",
+  "snippet": "ode, and every change will carry machine-readable reasons. Q: What if AI confidence is low? A: Detection confidence and cryptographic authenti"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 16 NOTES",
+  "snippet": "l carry machine-readable reasons. Q: What if AI confidence is low? A: Detection confidence and cryptographic authenticity are separate; low confid"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_full_deck.pptx slide 16 NOTES",
+  "snippet": ". - We have not chosen weights or thresholds: the specification comes first. LIKELY JUDGE QUESTIONS: Q: How is the trust score calculated? A: It"
+ },
+ {
+  "term": "trust score",
+  "where": "Q-SHIELD_full_deck.pptx slide 16 NOTES",
+  "snippet": "the specification comes first. LIKELY JUDGE QUESTIONS: Q: How is the trust score calculated? A: It is not yet. We will specify inputs, formula, caps,"
+ },
+ {
+  "term": "self-healing",
+  "where": "Q-SHIELD_full_deck.pptx slide 17",
+  "snippet": "Self-healing architecture: roadmap"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 17",
+  "snippet": "Recovery for defined software / security compromise classes, not physical repair"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 17 NOTES",
+  "snippet": "SAY: - Self-healing here means recovering from defined software and security compromises, not repairing hardware. - A reboot alone never marks a d"
+ },
+ {
+  "term": "self-healing",
+  "where": "Q-SHIELD_full_deck.pptx slide 17 NOTES",
+  "snippet": "SLIDE PROVES: The intended recovery model and its boundaries. SAY: - Self-healing here means recovering from defined software and security compromis"
+ },
+ {
+  "term": "self-healing",
+  "where": "Q-SHIELD_full_deck.pptx slide 17 NOTES",
+  "snippet": "cks leave it quarantined. LIKELY JUDGE QUESTIONS: Q: What exactly is self-healing? A: A planned, checked sequence for compromise classes we define:"
+ },
+ {
+  "term": "quantum safe",
+  "where": "Q-SHIELD_full_deck.pptx slide 19 NOTES",
+  "snippet": "t of scope for the prototype and we say so. Q: Is the system actually quantum-safe? A: No system-wide claim. Post-quantum cryptography is used on the vi"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 19 NOTES",
+  "snippet": "'prototype'. ACKNOWLEDGE: This whole slide. SOURCES: pqc/README.md; ai/README.md; backend/README.md"
+ },
+ {
+  "term": "protected",
+  "where": "Q-SHIELD_full_deck.pptx slide 19 NOTES",
+  "snippet": "QUESTIONS: Q: What happens if the gateway is compromised? A: Then the protections end: it holds the master key, the database and the verification l"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_full_deck.pptx slide 20 NOTES",
+  "snippet": "S: Where the project goes next, in order. SAY: - Trust specification first, then the trust engine, attack simulation, quarantine, recovery, evid"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_full_deck.pptx slide 20 NOTES",
+  "snippet": "ware, run experiment R1. LIKELY JUDGE QUESTIONS: Q: What will you do first? A: Write the trust-model specification and its deterministic test ma"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 21 NOTES",
+  "snippet": "RMINOLOGY: Thesis: 'Continuous cyber-physical trust with post-quantum security and a planned recovery loop.' ACKNOWLEDGE: Trust and recovery are ne"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 22",
+  "snippet": "Backup slides: authenticity vs trust, test counts, security domains, threat model, further limitations"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 23 NOTES",
+  "snippet": "ised. LIKELY JUDGE QUESTIONS: Q: Why keep authenticity separate from AI confidence? A: So a confident detector can never bypass a failed sign"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 23 NOTES",
+  "snippet": "Why keep authenticity separate from AI confidence? A: So a confident detector can never bypass a failed signature, and a valid signature can neve"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_full_deck.pptx slide 25 NOTES",
+  "snippet": "[IMPLEMENTED] WHAT THIS SLIDE PROVES: Security domains at a glance. SAY: - Operator and ingest tokens are classical"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 26",
+  "snippet": "impersonation possible; not detectable yet"
+ },
+ {
+  "term": "protected",
+  "where": "Q-SHIELD_full_deck.pptx slide 26",
+  "snippet": "not protected (out of scope)"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 26",
+  "snippet": "AI false positives / negatives"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_full_deck.pptx slide 26 NOTES",
+  "snippet": "E QUESTIONS: Q: Does the trust engine fix these? A: Some it will help detect; others (gateway compromise) remain out of scope. TERMINOLOGY: 'Defi"
+ },
+ {
+  "term": "accuracy",
+  "where": "Q-SHIELD_full_deck.pptx slide 27",
+  "snippet": "Camera-obstruction thresholds are unvalidated defaults; no accuracy or false-positive measurement"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_full_deck.pptx slide 27 NOTES",
+  "snippet": "dge asks about. ACKNOWLEDGE: All of it. SOURCES: backend/README.md; ai/README.md; pqc/README.md"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 1",
+  "snippet": "MINI HACKATHON \u00b7 23 SEPTEMBER 2026 \u00b7 NVIDIA AI LAB"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 1",
+  "snippet": "CYBERSECURITY \u00d7 AI"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_idea_submission.pptx slide 1",
+  "snippet": "Q-SHIELD: QUANTUM-RESILIENT AIOT SECURITY"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 1",
+  "snippet": "Q-SHIELD: QUANTUM-RESILIENT AIOT SECURITY"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 2",
+  "snippet": "CYBERSECURITY \u00d7 AI \u00b7 THE DIGITAL MISSION 2026 \u00b7 PRESIDENCY UNIVERSITY \u00d7 ISACA BANGAL"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 2",
+  "snippet": "Q-SHIELD: CONTINUOUS TRUST FOR AIoT, WITH A POST-QUANTUM LAYER"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 3",
+  "snippet": "CYBERSECURITY \u00d7 AI \u00b7 THE DIGITAL MISSION 2026 \u00b7 PRESIDENCY UNIVERSITY \u00d7 ISACA BANGAL"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_idea_submission.pptx slide 3",
+  "snippet": "Vertical slices: device, vision, PQC, then trust Observations first; trust decisions later Validate: NIST ACVP vectors, 347 tests, real r"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 4",
+  "snippet": "CYBERSECURITY \u00d7 AI \u00b7 THE DIGITAL MISSION 2026 \u00b7 PRESIDENCY UNIVERSITY \u00d7 ISACA BANGAL"
+ },
+ {
+  "term": "detect",
+  "where": "Q-SHIELD_idea_submission.pptx slide 4",
+  "snippet": "Software device agent keeps work unblocked Swappable detector and crypto interfaces Specify trust model before code; dashboard cu"
+ },
+ {
+  "term": "first",
+  "where": "Q-SHIELD_idea_submission.pptx slide 4",
+  "snippet": "and crypto interfaces Specify trust model before code; dashboard cut first"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 5",
+  "snippet": "CYBERSECURITY \u00d7 AI \u00b7 THE DIGITAL MISSION 2026 \u00b7 PRESIDENCY UNIVERSITY \u00d7 ISACA BANGAL"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 5",
+  "snippet": "Operators of camera + sensor AIoT deployments Long-lived devices facing future quantum threats"
+ },
+ {
+  "term": "secure",
+  "where": "Q-SHIELD_idea_submission.pptx slide 5",
+  "snippet": "Security: forged, modified, replayed observations rejected (tested) Operationa"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 6",
+  "snippet": "CYBERSECURITY \u00d7 AI \u00b7 THE DIGITAL MISSION 2026 \u00b7 PRESIDENCY UNIVERSITY \u00d7 ISACA BANGAL"
+ },
+ {
+  "term": "AI",
+  "where": "Q-SHIELD_idea_submission.pptx slide 6",
+  "snippet": "ed or transmitted Attack demos run only against our own local gateway AI false positives / negatives possible; not yet measured"
+ },
+ {
+  "term": "AI",
+  "where": "make_figures.py:1",
+  "snippet": "e tests pytest --collect-only test counts per area ai/README.md vision throughput table (asserted b"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:109",
+  "snippet": "Security events"
+ },
+ {
+  "term": "first",
+  "where": "make_figures.py:137",
+  "snippet": "PLANNED (trust engine spec comes first)"
+ },
+ {
+  "term": "detect",
+  "where": "make_figures.py:172",
+  "snippet": "Scene note: no person was in view; detections were chairs and a plant (no anomaly flagged). The person-in-zone"
+ },
+ {
+  "term": "quantum safe",
+  "where": "make_figures.py:193",
+  "snippet": "We do not claim the ESP32 is quantum-safe. ESP32-side PQC feasibility is a separate, unfinished research item ("
+ },
+ {
+  "term": "accuracy",
+  "where": "make_figures.py:254",
+  "snippet": "This is speed, not accuracy."
+ },
+ {
+  "term": "detect",
+  "where": "make_figures.py:255",
+  "snippet": "No detection accuracy or false-positive rate has been measured. No person was"
+ },
+ {
+  "term": "detect",
+  "where": "make_figures.py:255",
+  "snippet": "ive rate has been measured. No person was in view during the runs (0 detections), so post-processing with detections is not represented. Inferen"
+ },
+ {
+  "term": "detect",
+  "where": "make_figures.py:255",
+  "snippet": "n was in view during the runs (0 detections), so post-processing with detections is not represented. Inference mean: 39.8 ms (640), 19.5 ms (320)"
+ },
+ {
+  "term": "accuracy",
+  "where": "make_figures.py:255",
+  "snippet": "No detection accuracy or false-positive rate has been measured. No person was in view du"
+ },
+ {
+  "term": "detect",
+  "where": "make_figures.py:337",
+  "snippet": "ical device is uncompromised, the sensor is not being spoofed, or the detected scene is benign"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:340",
+  "snippet": "recent security events"
+ },
+ {
+  "term": "AI",
+  "where": "make_figures.py:340",
+  "snippet": "AI confidence: separate from authenticity"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:361",
+  "snippet": "Security events"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:179",
+  "snippet": "Security domains: what is post-quantum, and what is not"
+ },
+ {
+  "term": "AI",
+  "where": "make_figures.py:237",
+  "snippet": "ai/README.md no longer contains"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:299",
+  "snippet": "tests/security/test_device_auth.py"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:300",
+  "snippet": "tests/security/test_credential_store.py"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:300",
+  "snippet": "tests/security/test_operator_auth.py"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:303",
+  "snippet": "tests/security/test_signed_observations.py"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:303",
+  "snippet": "tests/security/test_pqc_session.py"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:303",
+  "snippet": "tests/security/test_pqc_keystore.py"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:349",
+  "snippet": "Security architecture: built path and planned trust loop"
+ },
+ {
+  "term": "protected",
+  "where": "make_figures.py:181",
+  "snippet": "counter replay protection"
+ },
+ {
+  "term": "AI",
+  "where": "make_figures.py:234",
+  "snippet": "ai/README.md"
+ },
+ {
+  "term": "secure",
+  "where": "make_figures.py:161",
+  "snippet": "/api/v1/observations/secure -> 200"
+ },
+ {
+  "term": "AI",
+  "where": "make_figures.py:301",
+  "snippet": "tests/ai/"
+ },
+ {
+  "term": "secure",
+  "where": "figures_more.py:82",
+  "snippet": "Every rejection is reason-coded in the security-event log;"
+ },
+ {
+  "term": "trust score",
+  "where": "figures_more.py:185",
+  "snippet": "TRUST SCORE"
+ },
+ {
+  "term": "first",
+  "where": "figures_more.py:239",
+  "snippet": "mentation-roadmap.md. Cut order under time pressure: dashboard polish first."
+ },
+ {
+  "term": "secure",
+  "where": "figures_more.py:261",
+  "snippet": "Observations + security events"
+ },
+ {
+  "term": "first",
+  "where": "figures_more.py:43",
+  "snippet": "3 gateway verifies signature FIRST, then freshness, then ML-KEM.Decaps"
+ },
+ {
+  "term": "secure",
+  "where": "figures_more.py:142",
+  "snippet": "Security validation flow"
+ },
+ {
+  "term": "first",
+  "where": "figures_more.py:168",
+  "snippet": "Phase 4: next implementation. Specification first, code second. Nothing on this slide is implemented."
+ },
+ {
+  "term": "secure",
+  "where": "figures_more.py:172",
+  "snippet": "recent security events"
+ },
+ {
+  "term": "protected",
+  "where": "figures_more.py:201",
+  "snippet": "HMAC-SHA256 device profile: gateway verification + replay protection, tested with a software agent"
+ },
+ {
+  "term": "secure",
+  "where": "figures_more.py:140",
+  "snippet": "tests/security/test_signed_observations.py"
+ },
+ {
+  "term": "secure",
+  "where": "figures_more.py:140",
+  "snippet": "tests/security/test_pqc_session.py"
+ },
+ {
+  "term": "secure",
+  "where": "figures_more.py:141",
+  "snippet": "tests/security/test_pqc_keystore.py"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:8",
+  "snippet": "- Quantum-Resilient Self-Healing AIoT Security Architecture"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\slide-content.md:8",
+  "snippet": "- Quantum-Resilient Self-Healing AIoT Security Architecture"
+ },
+ {
+  "term": "self-healing",
+  "where": "ppt\\slide-content.md:8",
+  "snippet": "- Quantum-Resilient Self-Healing AIoT Security Architecture"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\slide-content.md:14",
+  "snippet": "- AIoT adds attack surface: physical tampering, sensor manipulation, abnorma"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:19",
+  "snippet": "## Slide 3: Why existing IoT security is fragmented [CONTEXT]"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\slide-content.md:22",
+  "snippet": "- **AI detection**: answers: does the scene look wrong?; cannot tell who pro"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\slide-content.md:22",
+  "snippet": "- **AI detection**: answers: does the scene look wrong?; cannot tell who produced t"
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\slide-content.md:23",
+  "snippet": "- **Cryptography**: answers: is the channel protected?; cannot tell if the device behaves correctly"
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\slide-content.md:25",
+  "snippet": "- Sources: docs/hackathon/novelty.md, docs/implementation-roadmap.md (R2)"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\slide-content.md:32",
+  "snippet": "ot our claim)**: ML-KEM and ML-DSA (NIST FIPS 203 / 204); YOLO object detection; Anomaly detection, trust scoring; Hash-chained logs, digital twin"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\slide-content.md:32",
+  "snippet": "-KEM and ML-DSA (NIST FIPS 203 / 204); YOLO object detection; Anomaly detection, trust scoring; Hash-chained logs, digital twins"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:33",
+  "snippet": "inuous trust, not one-time authentication; BUILT: PQC-backed software security components; BUILT + PLANNED: cyber + visual signals now, physical/sen"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:33",
+  "snippet": "physical/sensor next; PLANNED: explainable trust decisions; DESIGNED: security-state model, tamper-evident evidence chain; PLANNED: quarantine and r"
+ },
+ {
+  "term": "first",
+  "where": "ppt\\slide-content.md:34",
+  "snippet": "y the observation + PQC layer of this composition is built today. No 'first' claim: prior-art survey not done."
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\slide-content.md:35",
+  "snippet": "- Sources: docs/hackathon/novelty.md, docs/technical-decisions.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:41",
+  "snippet": "## Slide 7: Two different security profiles today [MIXED]"
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\slide-content.md:48",
+  "snippet": "| Replay protection | strictly increasing counter | freshness window + unique observat"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:55",
+  "snippet": "- Sources: backend/security/session.py, pqc/README.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:59",
+  "snippet": "- Sources: backend/protocol/signed_observation.py, backend/security/pqc_gateway.py"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\slide-content.md:75",
+  "snippet": "- Sources: ai/README.md"
+ },
+ {
+  "term": "self-healing",
+  "where": "ppt\\slide-content.md:89",
+  "snippet": "## Slide 17: Self-healing architecture: roadmap [PLANNED]"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:90",
+  "snippet": "- Recovery for defined software / security compromise classes, not physical repair"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\slide-content.md:113",
+  "snippet": "- Sources: pqc/README.md, ai/README.md, backend/README.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\slide-content.md:135",
+  "snippet": "## Slide A3: 04 security domains [IMPLEMENTED]"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\slide-content.md:145",
+  "snippet": "| Stolen device HMAC secret | impersonation possible; not detectable yet |"
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\slide-content.md:147",
+  "snippet": "| Compromised gateway host | not protected (out of scope) |"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\slide-content.md:149",
+  "snippet": "| AI false positives / negatives | possible; not measured |"
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\slide-content.md:156",
+  "snippet": "- Camera-obstruction thresholds are unvalidated defaults; no accuracy or false-positive measurement"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\slide-content.md:159",
+  "snippet": "- Sources: backend/README.md, ai/README.md, pqc/README.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:12",
+  "snippet": "- Today we have built and tested the observation and post-quantum security layer; trust, quarantine and recovery are the next phase."
+ },
+ {
+  "term": "quantum proof",
+  "where": "ppt\\speaker-notes.md:14",
+  "snippet": "TERMINOLOGY: Say 'post-quantum cryptography' and 'prototype'. Never 'quantum-proof'."
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:41",
+  "snippet": "## Slide 3: Why existing IoT security is fragmented"
+ },
+ {
+  "term": "first",
+  "where": "ppt\\speaker-notes.md:52",
+  "snippet": "fragmented'. We have not completed a prior-art survey, so we make no 'first' claim."
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\speaker-notes.md:58",
+  "snippet": "SOURCES: docs/hackathon/novelty.md; docs/implementation-roadmap.md (R2)"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:72",
+  "snippet": "A: Detection alone does not change what a device may do; the loop connects evid"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:88",
+  "snippet": "The proposed contribution is composing them into one loop for a small AIoT endpoint, with explainable decisions."
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\speaker-notes.md:91",
+  "snippet": "Q: What is novel?"
+ },
+ {
+  "term": "first",
+  "where": "ppt\\speaker-notes.md:92",
+  "snippet": "roposed. We have not surveyed prior art, so we do not claim it is the first such system."
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\speaker-notes.md:94",
+  "snippet": "MINOLOGY: 'Proposed integration', 'architectural composition'. Never 'novel algorithm'."
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\speaker-notes.md:98",
+  "snippet": "SOURCES: docs/hackathon/novelty.md; docs/technical-decisions.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:104",
+  "snippet": "uilt: laptop gateway, vision service, device path, observation store, security events."
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:107",
+  "snippet": "- The laptop is the compute hub: gateway, AI, PQC, database."
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:122",
+  "snippet": "## Slide 7: Two different security profiles today"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:125",
+  "snippet": "WHAT THIS SLIDE PROVES: The two components have different, explicit security profiles; PQC is not applied to the ESP32."
+ },
+ {
+  "term": "quantum safe",
+  "where": "ppt\\speaker-notes.md:133",
+  "snippet": "Q: Is the ESP32 quantum-safe?"
+ },
+ {
+  "term": "quantum safe",
+  "where": "ppt\\speaker-notes.md:136",
+  "snippet": "c authentication', 'ML-DSA-65 service identity'. Never 'the device is quantum-safe'."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:151",
+  "snippet": "- A key-confirmation tag lets the client detect a wrong gateway key or a corrupted ciphertext."
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:163",
+  "snippet": "SOURCES: backend/security/session.py; pqc/README.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:184",
+  "snippet": "SOURCES: backend/protocol/signed_observation.py; backend/security/pqc_gateway.py"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:222",
+  "snippet": "A: No. Nobody was in view; detections were chairs and a plant, no anomaly flagged. That path is covered"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:222",
+  "snippet": "plant, no anomaly flagged. That path is covered by tests with a fake detector only."
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\speaker-notes.md:262",
+  "snippet": "- This is speed, not accuracy."
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\speaker-notes.md:265",
+  "snippet": "Q: How accurate is it?"
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\speaker-notes.md:266",
+  "snippet": "A: Not measured. We claim no accuracy, precision, recall or false-positive rate."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:268",
+  "snippet": "A: A lightweight, widely used detector that runs on a laptop CPU; it is behind a replaceable interface and"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:269",
+  "snippet": "Q: How do you prevent AI false positives?"
+ },
+ {
+  "term": "prevent",
+  "where": "ppt\\speaker-notes.md:269",
+  "snippet": "Q: How do you prevent AI false positives?"
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\speaker-notes.md:272",
+  "snippet": "TERMINOLOGY: 'Inference-only FPS', 'end-to-end FPS'. Never 'accuracy benchmark'."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:274",
+  "snippet": "LEDGE: No person was in view during the runs, so post-processing with detections is not represented; one run each."
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:276",
+  "snippet": "SOURCES: ai/README.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:325",
+  "snippet": "ency, visual anomalies, network behaviour, integrity state and recent security events."
+ },
+ {
+  "term": "first",
+  "where": "ppt\\speaker-notes.md:327",
+  "snippet": "- We have not chosen weights or thresholds: the specification comes first."
+ },
+ {
+  "term": "trust score",
+  "where": "ppt\\speaker-notes.md:330",
+  "snippet": "Q: How is the trust score calculated?"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:332",
+  "snippet": "Q: What if AI confidence is low?"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:333",
+  "snippet": "A: Detection confidence and cryptographic authenticity are separate; low confid"
+ },
+ {
+  "term": "self-healing",
+  "where": "ppt\\speaker-notes.md:342",
+  "snippet": "## Slide 8: Self-healing architecture: roadmap"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:348",
+  "snippet": "- Self-healing here means recovering from defined software and security compromises, not repairing hardware."
+ },
+ {
+  "term": "self-healing",
+  "where": "ppt\\speaker-notes.md:348",
+  "snippet": "- Self-healing here means recovering from defined software and security compromis"
+ },
+ {
+  "term": "self-healing",
+  "where": "ppt\\speaker-notes.md:352",
+  "snippet": "Q: What exactly is self-healing?"
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\speaker-notes.md:394",
+  "snippet": "A: Then the protections end: it holds the master key, the database and the verification l"
+ },
+ {
+  "term": "quantum safe",
+  "where": "ppt\\speaker-notes.md:395",
+  "snippet": "Q: Is the system actually quantum-safe?"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:402",
+  "snippet": "SOURCES: pqc/README.md; ai/README.md; backend/README.md"
+ },
+ {
+  "term": "first",
+  "where": "ppt\\speaker-notes.md:411",
+  "snippet": "- Trust specification first, then the trust engine, attack simulation, quarantine, recovery, evid"
+ },
+ {
+  "term": "first",
+  "where": "ppt\\speaker-notes.md:415",
+  "snippet": "Q: What will you do first?"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:434",
+  "snippet": "RMINOLOGY: Thesis: 'Continuous cyber-physical trust with post-quantum security and a planned recovery loop.'"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:450",
+  "snippet": "Q: Why keep authenticity separate from AI confidence?"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:451",
+  "snippet": "A: So a confident detector can never bypass a failed signature, and a valid signature can neve"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:475",
+  "snippet": "## Slide A3: 04 security domains"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\speaker-notes.md:478",
+  "snippet": "[IMPLEMENTED] WHAT THIS SLIDE PROVES: Security domains at a glance."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\speaker-notes.md:500",
+  "snippet": "A: Some it will help detect; others (gateway compromise) remain out of scope."
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\speaker-notes.md:519",
+  "snippet": "SOURCES: backend/README.md; ai/README.md; pqc/README.md"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\judge-qa.md:17",
+  "snippet": "input and keeps collecting evidence (camera observations, telemetry, security events) that a trust engine will use to decide continuously. What is"
+ },
+ {
+  "term": "quantum safe",
+  "where": "ppt\\judge-qa.md:19",
+  "snippet": "**Is the system actually quantum-safe?**"
+ },
+ {
+  "term": "quantum safe",
+  "where": "ppt\\judge-qa.md:20",
+  "snippet": "layers do not exist yet. We say \"post-quantum security layer\", never \"quantum-safe\" or \"quantum-proof\"."
+ },
+ {
+  "term": "quantum proof",
+  "where": "ppt\\judge-qa.md:20",
+  "snippet": "t yet. We say \"post-quantum security layer\", never \"quantum-safe\" or \"quantum-proof\"."
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\judge-qa.md:20",
+  "snippet": "The trust and recovery layers do not exist yet. We say \"post-quantum security layer\", never \"quantum-safe\" or \"quantum-proof\"."
+ },
+ {
+  "term": "trust score",
+  "where": "ppt\\judge-qa.md:39",
+  "snippet": "**How is the trust score calculated?**"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\judge-qa.md:40",
+  "snippet": "e, every change will carry machine-readable reasons, authenticity and AI confidence stay separate, and no weight or threshold is shown until i"
+ },
+ {
+  "term": "self-healing",
+  "where": "ppt\\judge-qa.md:45",
+  "snippet": "**What exactly is self-healing?**"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\judge-qa.md:46",
+  "snippet": "A planned, checked recovery sequence for defined software and security compromise classes: revoke the session, preserve evidence, enter safe"
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\judge-qa.md:48",
+  "snippet": "**What does the trust engine protect against, and what not?**"
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\judge-qa.md:49",
+  "snippet": "Not yet specified, so no protection is claimed. Known limits already: a stolen device credential used"
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\judge-qa.md:52",
+  "snippet": "The protections end: it holds the master key, database and verification logic. Th"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\judge-qa.md:55",
+  "snippet": "radius (one source, a listed device set, revocable signer) but cannot detect a compromised signer by itself."
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\judge-qa.md:57",
+  "snippet": "## Vision and AI"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\judge-qa.md:60",
+  "snippet": "A lightweight, widely used object detector that runs on a laptop CPU (25.1 inference-only FPS at 640 input, 51"
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\judge-qa.md:62",
+  "snippet": "**How accurate is it?**"
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\judge-qa.md:63",
+  "snippet": "Not measured. We claim no accuracy, precision, recall or false-positive rate; the FPS figures are spee"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\judge-qa.md:65",
+  "snippet": "**How do you prevent AI false positives?**"
+ },
+ {
+  "term": "prevent",
+  "where": "ppt\\judge-qa.md:65",
+  "snippet": "**How do you prevent AI false positives?**"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\judge-qa.md:66",
+  "snippet": "ence, lower impact), correlate them with other signals, and never let detection confidence override cryptographic authenticity."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\judge-qa.md:75",
+  "snippet": "No. The recorded run had no person in view (detections were chairs and a plant, no anomaly flagged). The person-in-zone"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\judge-qa.md:75",
+  "snippet": "d). The person-in-zone path is covered by automated tests with a fake detector only."
+ },
+ {
+  "term": "protected",
+  "where": "ppt\\judge-qa.md:80",
+  "snippet": "evice path (register, heartbeat, telemetry, HMAC verification, replay protection) is tested with a software device agent. The ESP32 firmware is a p"
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\judge-qa.md:88",
+  "snippet": "## Novelty"
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\judge-qa.md:90",
+  "snippet": "**What is novel here?**"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\judge-qa.md:91",
+  "snippet": "s. The proposal is their integration into one closed loop for a small AIoT endpoint: continuous trust, cyber + visual (+ physical, planned) sign"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\judge-qa.md:91",
+  "snippet": "ithms: ML-KEM, ML-DSA and YOLO are existing technologies, and anomaly detection, trust scoring and hash-chained logs are established ideas. The pr"
+ },
+ {
+  "term": "first",
+  "where": "ppt\\judge-qa.md:91",
+  "snippet": "on is built. We have not completed a prior-art survey, so we make no \"first\" claim."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\demo-script.md:3",
+  "snippet": "n-restricted-zone case in particular has only been tested with a fake detector, never live."
+ },
+ {
+  "term": "trust score",
+  "where": "ppt\\demo-script.md:3",
+  "snippet": "repository and were run in this form during Phases 1-3. **There is no trust score, quarantine or recovery demo, because those are not implemented. Do n"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\demo-script.md:15",
+  "snippet": "- Webcam works: `python -m ai.vision probe` -> prints frame shape 480x640 and brightness/texture va"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\demo-script.md:16",
+  "snippet": "- `ai/models/yolo11n.pt` exists (5,613,764 bytes)."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\demo-script.md:42",
+  "snippet": "Default config detects only `person`, with the right half of the frame as `restricted_zone`"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\demo-script.md:44",
+  "snippet": "ai.vision run --gateway http://127.0.0.1:8000 --signer-id vision-1 --secure --max-frames 75"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\demo-script.md:44",
+  "snippet": "python -m ai.vision run --gateway http://127.0.0.1:8000 --signer-id vision-1 --sec"
+ },
+ {
+  "term": "first",
+  "where": "ppt\\demo-script.md:46",
+  "snippet": "rue`, `anomaly_reason: restricted_class_in_restricted_zone` (rehearse first; not yet exercised live)."
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\demo-script.md:80",
+  "snippet": "ults/live-run-phase3.json` and figure 03; run `python -m pytest tests/security/test_signed_observations.py tests/security/test_pqc_session.py -q` (n"
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\demo-script.md:80",
+  "snippet": "un `python -m pytest tests/security/test_signed_observations.py tests/security/test_pqc_session.py -q` (no camera needed) |"
+ },
+ {
+  "term": "AI",
+  "where": "ppt\\demo-script.md:81",
+  "snippet": "del weights missing | `python -c \"from ultralytics import YOLO; YOLO('ai/models/yolo11n.pt')\"` (needs internet once) |"
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\demo-script.md:85",
+  "snippet": "| Nothing detected | widen classes (step 4) and say why |"
+ },
+ {
+  "term": "trust score",
+  "where": "ppt\\demo-script.md:88",
+  "snippet": "- Do not show or describe a trust score, states, quarantine, recovery, evidence chain or dashboard as working"
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\demo-script.md:90",
+  "snippet": "- Do not present FPS numbers as accuracy."
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\README.md:24",
+  "snippet": "rams (PNG + SVG): architecture, closed loop, signed-observation flow, security domains, PQC session flow, observation-authentication flow, implement"
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\README.md:42",
+  "snippet": "6. **Decide on the novelty wording.** The decks say \"proposed integration\" and make no \"first\""
+ },
+ {
+  "term": "first",
+  "where": "ppt\\README.md:42",
+  "snippet": "novelty wording.** The decks say \"proposed integration\" and make no \"first\" claim, because no prior-art survey exists (`docs/research/prior-art."
+ },
+ {
+  "term": "detect",
+  "where": "ppt\\README.md:48",
+  "snippet": "ne with `anomaly: true`.** This path has only been tested with a fake detector; it must be rehearsed live before it is shown or claimed."
+ },
+ {
+  "term": "quantum safe",
+  "where": "ppt\\README.md:54",
+  "snippet": "h is **not** post-quantum. Never say the ESP32 or the whole system is quantum-safe."
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\README.md:55",
+  "snippet": "3. No fabricated screenshots, graphs, accuracy values or benchmarks. FPS is speed, not accuracy."
+ },
+ {
+  "term": "accuracy",
+  "where": "ppt\\README.md:55",
+  "snippet": "screenshots, graphs, accuracy values or benchmarks. FPS is speed, not accuracy."
+ },
+ {
+  "term": "quantum proof",
+  "where": "ppt\\README.md:56",
+  "snippet": "4. No \"first\", \"quantum-proof\", \"unhackable\", \"100% secure\". Novelty = proposed integration."
+ },
+ {
+  "term": "secure",
+  "where": "ppt\\README.md:56",
+  "snippet": "4. No \"first\", \"quantum-proof\", \"unhackable\", \"100% secure\". Novelty = proposed integration."
+ },
+ {
+  "term": "novel",
+  "where": "ppt\\README.md:56",
+  "snippet": "4. No \"first\", \"quantum-proof\", \"unhackable\", \"100% secure\". Novelty = proposed integration."
+ },
+ {
+  "term": "unhackable/100%",
+  "where": "ppt\\README.md:56",
+  "snippet": "4. No \"first\", \"quantum-proof\", \"unhackable\", \"100% secure\". Novelty = proposed integration."
+ },
+ {
+  "term": "unhackable/100%",
+  "where": "ppt\\README.md:56",
+  "snippet": "4. No \"first\", \"quantum-proof\", \"unhackable\", \"100% secure\". Novelty = proposed integration."
+ },
+ {
+  "term": "first",
+  "where": "ppt\\README.md:56",
+  "snippet": "4. No \"first\", \"quantum-proof\", \"unhackable\", \"100% secure\". Novelty = proposed in"
+ }
+]

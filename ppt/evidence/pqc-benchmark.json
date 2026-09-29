@@ -1,0 +1,160 @@
+{
+  "measured_utc": "2026-09-24T07:46:44+00:00",
+  "scope": "laptop-class CPU, single process, Python bindings. NOT ESP32 / embedded performance.",
+  "environment": {
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13700HX",
+    "machine": "AMD64",
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.0",
+    "cpu_count_logical": 24,
+    "note": "no CPU pinning; other processes were running; power plan not controlled"
+  },
+  "crypto": {
+    "library": "pqcrypto",
+    "library_version": "1.0.0",
+    "kem_algorithm": "ML-KEM-768",
+    "sig_algorithm": "ML-DSA-65",
+    "sizes_bytes": {
+      "kem_public_key": 1184,
+      "kem_secret_key": 2400,
+      "kem_ciphertext": 1088,
+      "kem_shared_secret": 32,
+      "sig_public_key": 1952,
+      "sig_secret_key": 4032,
+      "signature": 3309
+    }
+  },
+  "method": {
+    "iterations_per_round": 300,
+    "rounds": 5,
+    "warmup_calls": 20,
+    "timer": "perf_counter_ns",
+    "signed_message_bytes": 598,
+    "handshake_iterations_per_round": 60
+  },
+  "sizes_bytes": {
+    "kem_public_key": 1184,
+    "kem_secret_key": 2400,
+    "kem_ciphertext": 1088,
+    "kem_shared_secret": 32,
+    "sig_public_key": 1952,
+    "sig_secret_key": 4032,
+    "signature": 3309,
+    "signed_observation_envelope_json": 5160,
+    "signature_base64_in_envelope": 4412
+  },
+  "latency_ms": {
+    "ml_kem_768_keygen": {
+      "n": 1500,
+      "mean": 0.0614,
+      "median": 0.0601,
+      "p95": 0.0661,
+      "min": 0.0584,
+      "max": 0.2916,
+      "stdev": 0.0087,
+      "median_per_round_ms": [
+        0.0617,
+        0.0603,
+        0.06,
+        0.0596,
+        0.0597
+      ]
+    },
+    "ml_kem_768_encapsulate": {
+      "n": 1500,
+      "mean": 0.0728,
+      "median": 0.069,
+      "p95": 0.0757,
+      "min": 0.068,
+      "max": 0.8882,
+      "stdev": 0.0314,
+      "median_per_round_ms": [
+        0.0693,
+        0.0691,
+        0.0689,
+        0.0689,
+        0.0689
+      ]
+    },
+    "ml_kem_768_decapsulate": {
+      "n": 1500,
+      "mean": 0.0953,
+      "median": 0.0912,
+      "p95": 0.1012,
+      "min": 0.0898,
+      "max": 0.801,
+      "stdev": 0.0291,
+      "median_per_round_ms": [
+        0.0914,
+        0.0913,
+        0.0912,
+        0.0911,
+        0.091
+      ]
+    },
+    "ml_dsa_65_keygen": {
+      "n": 1500,
+      "mean": 0.2397,
+      "median": 0.2321,
+      "p95": 0.2588,
+      "min": 0.2274,
+      "max": 1.1831,
+      "stdev": 0.038,
+      "median_per_round_ms": [
+        0.2328,
+        0.232,
+        0.2356,
+        0.2315,
+        0.2313
+      ]
+    },
+    "ml_dsa_65_sign": {
+      "n": 1500,
+      "mean": 9.4132,
+      "median": 9.4235,
+      "p95": 10.1455,
+      "min": 8.7062,
+      "max": 12.814,
+      "stdev": 0.4322,
+      "median_per_round_ms": [
+        9.3072,
+        9.4765,
+        9.3932,
+        9.4229,
+        9.4382
+      ]
+    },
+    "ml_dsa_65_verify": {
+      "n": 1500,
+      "mean": 0.204,
+      "median": 0.1883,
+      "p95": 0.3231,
+      "min": 0.1855,
+      "max": 0.7538,
+      "stdev": 0.0587,
+      "median_per_round_ms": [
+        0.1882,
+        0.188,
+        0.189,
+        0.1884,
+        0.1879
+      ]
+    },
+    "full_session_handshake_client_and_server": {
+      "n": 300,
+      "mean": 10.0601,
+      "median": 10.0133,
+      "p95": 10.7978,
+      "min": 9.293,
+      "max": 11.38,
+      "stdev": 0.3989,
+      "median_per_round_ms": [
+        10.1637,
+        10.0101,
+        10.0384,
+        9.9883,
+        9.9558
+      ]
+    }
+  }
+}
