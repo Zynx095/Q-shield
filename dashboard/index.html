@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Q-SHIELD Command Center</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <span class="mark">Q</span>
+    <div>
+      <div class="name">Q-SHIELD</div>
+      <div class="sub">Security Command Center</div>
+    </div>
+  </div>
+  <div class="controls">
+    <select id="device" aria-label="Device"></select>
+    <input id="token" type="password" placeholder="operator token" aria-label="Operator token" autocomplete="off">
+    <button id="connect">Connect</button>
+    <span id="conn" class="conn off">offline</span>
+  </div>
+</header>
+
+<main id="app" class="grid">
+  <section class="card overview">
+    <h2>Device</h2>
+    <div class="ov-row">
+      <div class="score-block">
+        <div id="score" class="score">--</div>
+        <div class="score-label">TRUST SCORE</div>
+      </div>
+      <div class="ov-meta">
+        <div id="devid" class="devid">—</div>
+        <div id="state" class="pill">NO DATA</div>
+        <dl>
+          <dt>Last seen</dt><dd id="lastseen">—</dd>
+          <dt>Normal access</dt><dd id="access-normal">—</dd>
+          <dt>Recovery channel</dt><dd id="access-recovery">—</dd>
+          <dt>Coverage</dt><dd id="coverage">—</dd>
+          <dt>Active caps</dt><dd id="caps">—</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="trustbar" aria-label="Trust scale">
+      <div class="zone q">QUARANTINED</div><div class="zone s">SUSPICIOUS</div><div class="zone t">TRUSTED</div>
+      <div id="marker" class="marker" style="left:0%"></div>
+    </div>
+    <div class="scale"><span>0</span><span>50</span><span>80</span><span>100</span></div>
+  </section>
+
+  <section class="card factors">
+    <h2>Trust factors <span class="hint">penalty · effective weight</span></h2>
+    <div id="factors"></div>
+  </section>
+
+  <section class="card recovery">
+    <h2>Recovery</h2>
+    <div id="recovery-steps" class="steps"></div>
+    <div id="recovery-detail" class="rec-detail muted">No recovery started.</div>
+  </section>
+
+  <section class="card timeline">
+    <h2>State timeline</h2>
+    <div id="timeline" class="tl"></div>
+  </section>
+
+
+  <section class="card twin">
+    <h2>Digital twin <span class="hint">expected vs self-reported</span></h2>
+    <table id="twin"><thead><tr><th>Field</th><th>Expected</th><th>Observed</th><th>Status</th></tr></thead><tbody></tbody></table>
+    <div class="note">Observed values are self-reported by the device: evidence, not attestation.</div>
+  </section>
+
+  <section class="card events">
+    <h2>Event stream</h2>
+    <table id="events"><thead><tr><th>Time</th><th>Event</th><th>Severity</th><th>Score</th><th>State</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <section class="card evidence">
+    <h2>Evidence chain <span id="chain-badge" class="badge">—</span></h2>
+    <div id="chain-head" class="mono muted"></div>
+    <table id="evidence"><thead><tr><th>#</th><th>Event</th><th>Hash</th><th>Prev</th><th>ML-DSA sig</th><th>Check</th></tr></thead><tbody></tbody></table>
+  </section>
+</main>
+
+<footer class="foot">
+  Reads the live gateway API only (operator token). Device data from the software agent is SIMULATED;
+  the ESP32 path is HMAC-SHA256, not post-quantum.
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
