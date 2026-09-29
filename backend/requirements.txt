@@ -1,0 +1,17 @@
+# Versions the prototype was developed/tested against (Python 3.12, Windows x86-64).
+fastapi==0.136.1
+uvicorn==0.30.6
+pydantic==2.13.5
+httpx==0.28.1
+python-dotenv==1.0.1
+pqcrypto==1.0.0
+cryptography==47.0.0   # AES-GCM for the credential store (HKDF in Phase 3); its own ML-KEM/ML-DSA are NOT used (unsupported by backend here)
+pytest==9.1.1
+# Vision (Phase 2). ultralytics and its weights are AGPL-3.0: see ai/README.md.
+numpy==2.5.2
+opencv-python==4.13.0.92
+ultralytics==8.4.50
+torch==2.13.0   # CPU build used in development (2.13.0+cpu)
+# Test-only cross-checks (pure Python, not for production): PQC interoperability tests.
+kyber-py==1.2.0
+dilithium-py==1.4.0
