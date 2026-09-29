@@ -1,0 +1,78 @@
+# Environments and secrets
+.env
+.env.*
+!.env.example
+keys/
+.qshield/
+secrets.h
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.secret
+
+# Node
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Databases and runtime artifacts
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+logs/
+*.log
+evidence/runtime/
+evidence/sample/*.json
+captures/
+
+# Model weights and ML artifacts (downloaded/trained locally)
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.tflite
+*.engine
+ai/models/*
+!ai/models/.gitkeep
+
+# C++ / ESP-IDF / PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+build/
+*.bin
+*.elf
+*.map
+sdkconfig.old
+sdkconfig
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
