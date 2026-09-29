@@ -1,0 +1,252 @@
+{
+  "what": "Real run: USB webcam -> YOLO11n -> vision service (ML-DSA-65 identity) -> ML-KEM-768 session -> gateway",
+  "notes": [
+    "Run 2026-09-24 ~13:17 local. Real USB webcam (index 0, 640x480), YOLO11n, imgsz 640, gateway on 127.0.0.1, PQC provisioned via scripts/pqc_provision.py, vision service run with --signer-id vision-1 --secure.",
+    "No person was in view. To obtain real detections the run used a scratch vision config widening classes_of_interest (chair, laptop, cup, ...) with conf_threshold 0.3; none of those classes are in restricted_classes, so no anomaly was flagged. The person-in-restricted-zone path has NOT been exercised live.",
+    "After the run, one stored envelope was altered (payload) and re-POSTed to /observations/signed -> 401; the original envelope re-POSTed unchanged -> 409 (replay)."
+  ],
+  "signers": [
+    {
+      "signer_id": "vision-1",
+      "algorithm": "ML-DSA-65",
+      "source": "usb_webcam",
+      "allowed_devices": [
+        "DEVICE-001"
+      ],
+      "status": "active"
+    }
+  ],
+  "observations_stored": 11,
+  "auth_labels": {
+    "ML-DSA-65:vision-1": 11
+  },
+  "objects": {
+    "chair": 8,
+    "potted plant": 3
+  },
+  "anomalies_flagged": 0,
+  "confidence_range": [
+    0.318,
+    0.618
+  ],
+  "offline_reverification": {
+    "envelopes_checked": 11,
+    "valid": 11,
+    "altered_copies_rejected": 11
+  },
+  "security_events": [
+    {
+      "event_type": "pqc_invalid_signature",
+      "severity": "high",
+      "details": {
+        "via": "signed",
+        "claimed_signer_id": "vision-1",
+        "observation_id": "c478954a-814d-4d4c-8146-b601b71859e5"
+      }
+    },
+    {
+      "event_type": "pqc_observation_replay",
+      "severity": "medium",
+      "details": {
+        "via": "signed",
+        "claimed_signer_id": "vision-1",
+        "observation_id": "c478954a-814d-4d4c-8146-b601b71859e5"
+      }
+    }
+  ],
+  "http_post_status_sequence": {
+    "/api/v1/pqc/session -> 200": 1,
+    "/api/v1/observations/secure -> 200": 11,
+    "/api/v1/observations/signed -> 401": 1,
+    "/api/v1/observations/signed -> 409": 1
+  },
+  "observations": [
+    {
+      "observation_id": "c478954a-814d-4d4c-8146-b601b71859e5",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.5231724977493286,
+      "zone": "restricted_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:21.796189Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "7bc81feb-b4e6-4619-bd97-cfcd92b501df",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.4319394826889038,
+      "zone": "monitored_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:21.796189Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "8bb0f166-f47f-4388-84a4-46fc15884b60",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "potted plant",
+      "confidence": 0.31781432032585144,
+      "zone": "restricted_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:21.796189Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "d11a2e77-5e56-452f-ab98-f82286636643",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "potted plant",
+      "confidence": 0.6175697445869446,
+      "zone": "restricted_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:24.875855Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "15238b9e-c60e-460b-bb97-3aeb8ceac3a6",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.5173878073692322,
+      "zone": "restricted_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:24.875855Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "87a7af59-bdd4-4b72-b55f-fc3ed0cccded",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.4636203646659851,
+      "zone": "monitored_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:24.875855Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "70b0726b-c745-41fa-a2c1-ff350a970bcb",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.5684766173362732,
+      "zone": "restricted_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:28.079297Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "17b6e130-f59c-4c48-b7f7-9085b848401f",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "potted plant",
+      "confidence": 0.461118221282959,
+      "zone": "restricted_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:28.079297Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "840d8853-aea7-4c36-8b49-dc7538efba99",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.45533105731010437,
+      "zone": "monitored_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:28.079297Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "d9345bc7-4703-4d34-97da-f712d242dd47",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.5917351841926575,
+      "zone": "restricted_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:31.272357Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    },
+    {
+      "observation_id": "ea56d4e2-81ea-4c81-a85b-ecea903822fd",
+      "auth": "ML-DSA-65:vision-1",
+      "event_type": "visual_observation",
+      "object": "chair",
+      "confidence": 0.4151013493537903,
+      "zone": "monitored_zone",
+      "anomaly": false,
+      "timestamp": "2026-09-24T07:47:31.272357Z",
+      "model": {
+        "name": "yolo11n",
+        "version": "ultralytics-8.4.50+weights-sha256:0ebbc80d4a76"
+      },
+      "signature_bytes": 3309,
+      "offline_reverification": "valid",
+      "altered_copy_reverification": "rejected"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+Q-SHIELD — integrated demonstration
+SIMULATED device data (software agent, not ESP32) · attacks from attack_simulation/ · ESP32 path is HMAC-SHA256, not PQC
+   gateway http://127.0.0.1:8765   scratch state C:\Users\YUKITH~1\AppData\Local\Temp\qshield-demo-xgzjxbcv
+   dashboard http://127.0.0.1:8765/dashboard/#token=<redacted>
+
+━━ STEP 01 Clean device joins: authenticated (HMAC-SHA256) and registered against its known-good digital twin
+   register  -> HTTP 200
+   TRUST 100  STATE TRUSTED   caps: none
+
+━━ STEP 02 Authenticated telemetry
+   telemetry -> HTTP 200  (SIMULATED values)
+   digital twin: MATCH  (fw_version=MATCH, cfg_hash=MATCH, capabilities=MATCH, sensor:temperature_c=MATCH)
+   TRUST 100  STATE TRUSTED   caps: none
+
+━━ STEP 03 Signed vision observation (webcam step skipped: run with --webcam for the real camera)
+
+━━ STEP 04 Attack 1: forged observation (payload altered, original ML-DSA signature kept)
+   gateway -> HTTP 401  REJECTED
+   TRUST  90  STATE TRUSTED   caps: none
+
+━━ STEP 05 Attack 2: replay of a valid signed observation
+   original -> HTTP 200, replay -> HTTP 409  REJECTED
+   TRUST  82  STATE TRUSTED   caps: none
+   forged traffic only adds bounded pressure (<= 25): it can never quarantine a device by itself
+
+━━ STEP 06 Compromised device reports its enclosure tamper switch OPEN (authentic message, abnormal content)
+   TRUST  55  STATE SUSPICIOUS   caps: physical_tamper
+   reason: physical_tamper -20.0 (physical) event TC-DEVICE-001-4
+
+━━ STEP 07 Corroborating evidence: signed visual rule violation within the correlation window
+   TRUST  30  STATE QUARANTINED   caps: confirmed_incident, physical_tamper
+   incident INC-DEVICE-001-1: confirmed_incident (PHYSICAL + VISUAL)
+
+━━ STEP 08 Quarantine is ENFORCED at the gateway
+   device normal telemetry -> HTTP 403   forged 'all clear' -> HTTP 401
+   access: normal=BLOCKED  recovery channel=open
+   TRUST  30  STATE QUARANTINED   caps: confirmed_incident, physical_tamper
+
+━━ STEP 09 Forensic evidence chain (SHA-256 linked, ML-DSA-65 signed)
+   chain VERIFIED  entries=7  signed=ML-DSA-65  head=6240d999707e7cd9…
+     #5   trust_state_transition   64e2b19978ba… prev 8a8f1e5241d5…
+     #6   trust_state_transition   eeb46ba8282a… prev 64e2b19978ba…
+     #7   quarantine_access_blocked 6240d999707e… prev eeb46ba8282a…
+
+━━ STEP 10 Recovery started by the operator (security control channel)
+   REC-58ee1ee4421d  stage=remediation_pending  command=apply_known_good_config -> cfg cfg-good-1
+   TRUST  30  STATE RECOVERING   caps: confirmed_incident, physical_tamper
+
+━━ STEP 11 Remediation -> health checks -> digital state verification
+   [  0 min, TIME-LAPSE] stage=remediation_pending    state=RECOVERING  score= 30  (recovery channel HTTP 200)
+   [  0 min, TIME-LAPSE] stage=health_checks          state=RECOVERING  score= 30  (recovery channel HTTP 200)
+      remediation acknowledged; twin now MATCH
+   [  0 min, TIME-LAPSE] stage=trust_ramp             state=VERIFIED    score= 30  (recovery channel HTTP 200)
+      health checks ✔ ✔ ✔ -> VERIFIED; trust must still be rebuilt from evidence
+   [ 30 min, TIME-LAPSE] stage=restoring              state=RECOVERED   score= 80  (normal channel HTTP 200)
+      ACCESS RESTORED (RECOVERED): device back on the normal channel
+   [ 41 min, TIME-LAPSE] stage=completed              state=TRUSTED     score= 85  (normal channel HTTP 200)
+
+━━ STEP 12 Result
+   TRUST  85  STATE TRUSTED   caps: none
+   state path: TRUSTED → SUSPICIOUS → QUARANTINED → RECOVERING → VERIFIED → RECOVERED → TRUSTED
+   chain VERIFIED  entries=23  signed=ML-DSA-65  head=c925e97d6dec4d22…
+     #21  trust_score_change       846e296f0e17… prev 228e81875658…
+     #22  trust_state_transition   61f31e92c3bf… prev 846e296f0e17…
+     #23  recovery_completed       c925e97d6dec… prev 61f31e92c3bf…
+   dashboard http://127.0.0.1:8765/dashboard/#token=<redacted>

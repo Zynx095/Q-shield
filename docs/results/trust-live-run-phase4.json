@@ -1,0 +1,283 @@
+{
+  "phase": 4,
+  "what": "Process-level run: real gateway process, real webcam + YOLO11n, ML-DSA-signed observations over an ML-KEM session, HMAC device telemetry from the SOFTWARE agent, then one controlled local forgery/replay (scripts/demo_forgery.py).",
+  "honesty": [
+    "Device telemetry is produced by device_agent (hw=software-agent): SIMULATED, not the ESP32.",
+    "No physical tamper was performed or fabricated.",
+    "Visual anomalies are real detections of objects in front of the laptop webcam (scratch config: any of several object classes in a whole-frame restricted zone); the anomaly rule is configuration, not a threat verdict.",
+    "Scratch database and keys; nothing committed."
+  ],
+  "final_snapshot": {
+    "device_id": "DEVICE-001",
+    "status": "TRACKED",
+    "state": "SUSPICIOUS",
+    "score": 73,
+    "score_exact": 73.14865812201461,
+    "recommended_action": "increase monitoring",
+    "coverage": 0.7,
+    "unavailable": [
+      "config_integrity",
+      "sensor_consistency"
+    ],
+    "factors": {
+      "identity_crypto": {
+        "available": true,
+        "nominal_weight": 0.25,
+        "effective_weight": 0.35714285714285715,
+        "penalty": 0.0
+      },
+      "physical": {
+        "available": true,
+        "nominal_weight": 0.2,
+        "effective_weight": 0.28571428571428575,
+        "penalty": 0.0
+      },
+      "config_integrity": {
+        "available": false,
+        "nominal_weight": 0.15,
+        "effective_weight": null,
+        "penalty": null
+      },
+      "sensor_consistency": {
+        "available": false,
+        "nominal_weight": 0.15,
+        "effective_weight": null,
+        "penalty": null
+      },
+      "visual": {
+        "available": true,
+        "nominal_weight": 0.15,
+        "effective_weight": 0.2142857142857143,
+        "penalty": 42.502384315687756
+      },
+      "network": {
+        "available": true,
+        "nominal_weight": 0.1,
+        "effective_weight": 0.14285714285714288,
+        "penalty": 0.0
+      }
+    },
+    "pressure": 17.7436880960523,
+    "raw": 90.8923462180669,
+    "uncapped": 73.14865812201461,
+    "caps": [],
+    "revoked": false,
+    "tamper_active": false,
+    "incident": null,
+    "provenance": {
+      "device_evidence": "simulated by software-agent",
+      "physical_tamper": "simulated by software-agent"
+    },
+    "last_device_evidence_age_s": 1.8114259243011475,
+    "credit_clock_s": 32.73449993133545,
+    "duplicates_ignored": 0,
+    "notes": "score reflects only available signals; see coverage and unavailable"
+  },
+  "trust_history_oldest_first": [
+    {
+      "event_id": "TC-DEVICE-001-1",
+      "device_id": "DEVICE-001",
+      "timestamp": 1790305230.152639,
+      "kind": "created",
+      "previous_score": 100,
+      "new_score": 100,
+      "delta": 0,
+      "previous_exact": 100.0,
+      "new_exact": 100.0,
+      "previous_state": null,
+      "new_state": "TRUSTED",
+      "trigger_signals": [
+        "msg:1"
+      ],
+      "reasons": [],
+      "caps_active": [],
+      "incident": null,
+      "coverage": 0.35,
+      "unavailable": [
+        "physical",
+        "config_integrity",
+        "sensor_consistency",
+        "visual"
+      ]
+    },
+    {
+      "event_id": "TC-DEVICE-001-2",
+      "device_id": "DEVICE-001",
+      "timestamp": 1790305243.8044004,
+      "kind": "score_change",
+      "previous_score": 100,
+      "new_score": 95,
+      "delta": -5,
+      "previous_exact": 100.0,
+      "new_exact": 95.42974489406964,
+      "previous_state": "TRUSTED",
+      "new_state": "TRUSTED",
+      "trigger_signals": [
+        "obs:9aa09108-14fe-40e6-926e-35fb206935cd"
+      ],
+      "reasons": [
+        {
+          "signal": "visual_anomaly",
+          "impact": -4.570255105930363,
+          "factor": "visual",
+          "authenticity": "SIGNER_MLDSA",
+          "source_ref": "observation:9aa09108-14fe-40e6-926e-35fb206935cd",
+          "confidence": 0.46182093024253845,
+          "impact_points": 21.327857
+        }
+      ],
+      "caps_active": [],
+      "incident": null,
+      "coverage": 0.7,
+      "unavailable": [
+        "config_integrity",
+        "sensor_consistency"
+      ]
+    },
+    {
+      "event_id": "TC-DEVICE-001-3",
+      "device_id": "DEVICE-001",
+      "timestamp": 1790305248.9874492,
+      "kind": "score_change",
+      "previous_score": 95,
+      "new_score": 93,
+      "delta": -2,
+      "previous_exact": 95.44573071777401,
+      "new_exact": 93.10449859464926,
+      "previous_state": "TRUSTED",
+      "new_state": "TRUSTED",
+      "trigger_signals": [
+        "obs:a780b7e6-010d-4706-b908-449cd124982e"
+      ],
+      "reasons": [
+        {
+          "signal": "visual_anomaly",
+          "impact": -2.341232123124757,
+          "factor": "visual",
+          "authenticity": "SIGNER_MLDSA",
+          "source_ref": "observation:a780b7e6-010d-4706-b908-449cd124982e",
+          "confidence": 0.5679225921630859,
+          "impact_points": 32.253607
+        }
+      ],
+      "caps_active": [],
+      "incident": null,
+      "coverage": 0.7,
+      "unavailable": [
+        "config_integrity",
+        "sensor_consistency"
+      ]
+    },
+    {
+      "event_id": "TC-DEVICE-001-4",
+      "device_id": "DEVICE-001",
+      "timestamp": 1790305254.1767094,
+      "kind": "score_change",
+      "previous_score": 93,
+      "new_score": 91,
+      "delta": -2,
+      "previous_exact": 93.1225247634811,
+      "new_exact": 90.80326161687687,
+      "previous_state": "TRUSTED",
+      "new_state": "TRUSTED",
+      "trigger_signals": [
+        "obs:a6142502-3b23-4f19-9181-97d1ac29ca21"
+      ],
+      "reasons": [
+        {
+          "signal": "visual_anomaly",
+          "impact": -2.319263146604226,
+          "factor": "visual",
+          "authenticity": "SIGNER_MLDSA",
+          "source_ref": "observation:a6142502-3b23-4f19-9181-97d1ac29ca21",
+          "confidence": 0.6563294529914856,
+          "impact_points": 43.076835
+        }
+      ],
+      "caps_active": [],
+      "incident": null,
+      "coverage": 0.7,
+      "unavailable": [
+        "config_integrity",
+        "sensor_consistency"
+      ]
+    },
+    {
+      "event_id": "TC-DEVICE-001-5",
+      "device_id": "DEVICE-001",
+      "timestamp": 1790305256.1542382,
+      "kind": "score_change",
+      "previous_score": 91,
+      "new_score": 81,
+      "delta": -10,
+      "previous_exact": 90.80484784732147,
+      "new_exact": 80.80484784732147,
+      "previous_state": "TRUSTED",
+      "new_state": "TRUSTED",
+      "trigger_signals": [
+        "event:1"
+      ],
+      "reasons": [
+        {
+          "signal": "invalid_signature",
+          "impact": -10.0,
+          "factor": "pressure",
+          "authenticity": "UNAUTHENTICATED",
+          "source_ref": "security_event:1"
+        }
+      ],
+      "caps_active": [],
+      "incident": null,
+      "coverage": 0.7,
+      "unavailable": [
+        "config_integrity",
+        "sensor_consistency"
+      ]
+    },
+    {
+      "event_id": "TC-DEVICE-001-6",
+      "device_id": "DEVICE-001",
+      "timestamp": 1790305256.1611433,
+      "kind": "score_change",
+      "previous_score": 81,
+      "new_score": 73,
+      "delta": -8,
+      "previous_exact": 80.80484784732147,
+      "new_exact": 72.80484784732147,
+      "previous_state": "TRUSTED",
+      "new_state": "SUSPICIOUS",
+      "trigger_signals": [
+        "event:2"
+      ],
+      "reasons": [
+        {
+          "signal": "observation_replay",
+          "impact": -8.0,
+          "factor": "pressure",
+          "authenticity": "UNAUTHENTICATED",
+          "source_ref": "security_event:2"
+        }
+      ],
+      "caps_active": [],
+      "incident": null,
+      "coverage": 0.7,
+      "unavailable": [
+        "config_integrity",
+        "sensor_consistency"
+      ]
+    }
+  ],
+  "gateway_security_events": [
+    {
+      "device_id": "DEVICE-001",
+      "event_type": "pqc_observation_replay",
+      "severity": "medium"
+    },
+    {
+      "device_id": null,
+      "event_type": "pqc_invalid_signature",
+      "severity": "high"
+    }
+  ],
+  "trust_diagnostics": []
+}

@@ -1,0 +1,29 @@
+{
+  "host": {
+    "python": "3.12.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64"
+  },
+  "engine_apply": {
+    "n": 20000,
+    "mean_us": 52.6,
+    "p50_us": 52.3,
+    "p95_us": 60.3,
+    "p99_us": 73.2,
+    "max_us": 1458.1
+  },
+  "service": {
+    "batch_rows": 2100,
+    "batch_seconds": 0.3124,
+    "batch_rows_per_s": 6723,
+    "incremental_process_pending": {
+      "n": 300,
+      "mean_us": 742.99,
+      "p50_us": 687.3,
+      "p95_us": 1063.4,
+      "p99_us": 1330.8,
+      "max_us": 3583.0
+    }
+  },
+  "caveat": "Single-process, single-device laptop measurement; SQLite in memory. Not a real-time or deployment-latency claim."
+}
