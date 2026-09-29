@@ -1,0 +1,22 @@
+{
+  "device_id": "DEVICE-001",
+  "camera": { "source": 0, "backend": "auto", "width": 640, "height": 480, "target_fps": 5 },
+  "model": {
+    "path": "ai/models/yolo11n.pt",
+    "name": "yolo11n",
+    "conf_threshold": 0.4,
+    "imgsz": 640,
+    "device": "cpu",
+    "classes_of_interest": ["person"]
+  },
+  "zone_anchor": "bottom_center",
+  "restricted_classes": ["person"],
+  "zones": [
+    { "name": "restricted_zone", "kind": "restricted",
+      "polygon": [[0.5, 0.0], [1.0, 0.0], [1.0, 1.0], [0.5, 1.0]] },
+    { "name": "monitored_zone", "kind": "monitored",
+      "polygon": [[0.0, 0.0], [0.5, 0.0], [0.5, 1.0], [0.0, 1.0]] }
+  ],
+  "health": { "dark_mean_below": 12, "flat_texture_below": 1.5, "consecutive_frames": 5, "source_lost_after_failures": 10 },
+  "emit": { "repeat_interval_s": 5, "absence_gap_s": 2, "outside_zones": true }
+}
