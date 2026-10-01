@@ -48,7 +48,7 @@ const SIGNALS = {
   device_revoked: "Device credential revoked",
   device_evidence: "Authenticated device evidence",
   healthy_evidence: "Clean authenticated evidence",
-  healthy_evidence_recovery: "Clean evidence rebuilt trust",
+  healthy_evidence_recovery: "Trust rebuilt from clean evidence",
   network_liveness: "Liveness changed",
   state_transition_request: "Explicit state transition",
   coverage_change: "Evidence coverage changed",
