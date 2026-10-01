@@ -2,6 +2,7 @@
 // gateway at /dashboard. All data comes from the operator API through store.js.
 import { html } from "./lib/html.js";
 import { render } from "./lib/morph.js";
+import { createRevealer } from "./lib/reveal.js";
 import { explain } from "./lib/api.js";
 import { stateMeta } from "./lib/copy.js";
 import { clock } from "./lib/format.js";
@@ -35,6 +36,7 @@ const PAGES = {
 
 const app = document.getElementById("app");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const revealer = createRevealer();
 
 // ---------------------------------------------------------------------------------------------- routing
 function parseRoute() {
@@ -88,6 +90,7 @@ function paint() {
   const key = `${route.name}/${JSON.stringify(route.params)}`;
   if (key !== lastRouteKey) {
     lastRouteKey = key;
+    revealer.reset();                                   // each page gets its own entrance
     document.title = `${route.name === "device" ? route.params.id : title} – Q-SHIELD`;
     UI.menuOpen = false;
     window.scrollTo(0, 0);
@@ -103,6 +106,7 @@ function paint() {
 // ---------------------------------------------------------------------------------------------- post-render effects
 const shown = new Map();     // tween element key -> last displayed number
 function afterRender() {
+  revealer.scan();
   // score tween: animate the number when it really changes
   app.querySelectorAll("[data-tween]").forEach((el) => {
     const k = `${location.hash}|${el.dataset.tween}`;
