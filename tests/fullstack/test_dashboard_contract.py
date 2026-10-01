@@ -71,6 +71,16 @@ def test_dashboard_never_injects_unescaped_markup_or_invents_data():
     assert "raw(" not in MODULES["src/pages/overview.js"], "pages must not bypass escaping"
 
 
+def test_ambient_background_cannot_see_live_data():
+    """The decorative background is built from constants only: no store, no API, so no token or key can reach it."""
+    src = MODULES["src/components/ambient.js"]
+    assert not re.search(r"^\s*import\b", src, re.M), "ambient.js must stay self-contained"
+    for banned in ("fetch(", "XMLHttpRequest", "WebSocket", "qshield_operator_token"):
+        assert banned not in src, banned
+    index = (DASH / "index.html").read_text(encoding="utf-8")
+    assert '<div id="ambient" aria-hidden="true"></div>' in index
+
+
 def test_dashboard_action_sequence_against_the_gateway(stack):
     """Replays exactly the requests the dashboard's operator dialogs send (same paths, bodies, bearer header)."""
     quarantine_by_correlated_attack(stack)
