@@ -24,13 +24,22 @@ export function cameraLabel(device, index) {
 
 // ---------------------------------------------------------------------------------------------- controller (no DOM)
 const NAV = globalThis.navigator;
+const PREF = "qshield_camera";                      // the chosen camera, per tab (sessionStorage, like the session)
+
+function storageOf(storage) {
+  return {
+    get: () => { try { return storage ? storage.getItem(PREF) : null; } catch { return null; } },
+    set: (v) => { try { if (!storage) return; if (v) storage.setItem(PREF, v); else storage.removeItem(PREF); } catch { /* memory only */ } },
+  };
+}
 
 export function createCameraController({
   media = NAV && NAV.mediaDevices, permissions = NAV && NAV.permissions, secure = globalThis.isSecureContext !== false,
-  onChange = () => {},
+  storage = globalThis.sessionStorage, onChange = () => {},
 } = {}) {
+  const pref = storageOf(storage);
   // permission: "granted" | "prompt" | "denied" | null (unknown). The camera is only ever opened by start().
-  const st = { status: "idle", stream: null, error: null, info: null, devices: [], chosen: null, permission: null };
+  const st = { status: "idle", stream: null, error: null, info: null, devices: [], chosen: pref.get(), permission: null };
   let seq = 0;                                      // a newer start()/stop() supersedes a pending request
 
   const snapshot = () => ({ status: st.status, error: st.error, info: st.info, stream: st.stream, devices: st.devices,
@@ -49,6 +58,8 @@ export function createCameraController({
     try {
       const all = await media.enumerateDevices();
       st.devices = all.filter((d) => d.kind === "videoinput").map((d, i) => ({ deviceId: d.deviceId, label: cameraLabel(d, i) }));
+      // a remembered camera that is no longer attached: fall back to the browser's default
+      if (st.chosen && st.devices.length && st.devices.every((d) => d.deviceId && d.deviceId !== st.chosen)) { st.chosen = null; pref.set(null); }
     } catch { st.devices = []; }
     emit();
   }
@@ -67,10 +78,13 @@ export function createCameraController({
     }, () => {});                                   // "camera" not queryable in this browser: stay unknown
   }
 
-  /** Choose the camera for the next start (by deviceId from the list). */
+  /** Choose a camera. While the preview runs this switches: the old stream is stopped before the new one opens,
+   *  because most webcams (on Windows especially) serve one program at a time. */
   function choose(deviceId) {
     st.chosen = deviceId || null;
-    emit();
+    pref.set(st.chosen);
+    if (st.status === "live" || st.status === "requesting") start();
+    else emit();
   }
 
   async function start() {
