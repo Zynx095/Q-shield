@@ -25,12 +25,12 @@ projector: **Presentation mode** in the sidebar, or `#/live`. Press Escape to le
 | `#/devices`, `#/devices/<id>` | Every device; a full security profile per device (identity, factors, enforcement, recovery, digital twin, incidents, timeline, evidence). |
 | `#/incidents` | Correlated incidents: the evidence (with its authentication and provenance), trust before/after, the enforcement and the resolution. |
 | `#/recovery` | The eight-step recovery path, deadlines, remediation command, health checks, and the operator controls. |
-| `#/evidence`, `#/evidence/<seq>` | The forensic ledger: each entry's SHA-256 hash, the previous hash it commits to, its ML-DSA signature; gateway verification. |
-| `#/twin` | Known-good (expected) state against the device's self-reported state, field by field. |
+| `#/evidence`, `#/evidence/<seq>` | The forensic ledger: each entry's SHA-256 hash, the previous hash it commits to, its ML-DSA signature; gateway verification. A **case file** reads the latest quarantine from the chain: what happened, why, the evidence that proved it, what the gateway did and how the device recovered, each line citing its entry (`#seq`). |
+| `#/twin` | Known-good (expected) state against the device's self-reported state, field by field, plus the enclosure tamper switch (closed is required by the health checks). A value missing from the latest report is marked with when it was last reported. |
 | `#/crypto` | Which path is protected by what: ML-KEM-768 / ML-DSA-65 for vision, HMAC-SHA256 for the device path, the evidence chain, and the operator transport. Live rejection counts. |
 | `#/vision` | Camera & vision: a **local** live preview from this browser's camera beside the **signed** observations the Python vision service sent the gateway. See "Camera preview" below. |
 | `#/settings` | Signed-in operator, gateway connection, display (ambient background on/off), operator roster (admins). |
-| `#/live` | Presentation mode: the story at three metres. |
+| `#/live` | Presentation mode: the story at three metres. While trusted it shows what is verified continuously: the age of the last HMAC-authenticated message, the latest signed vision observation and its transport, and the twin verdict. |
 
 ## Operator actions
 
@@ -45,7 +45,10 @@ precondition. Viewers see the controls disabled with the reason.
   not analysed, recorded, signed or sent. Nothing is drawn over it (no boxes, detections, confidence or frame rate).
   The signed observations beside it come from the separate Python vision service (`python -m ai.vision`, or
   `demo_full.py --webcam`) and are shown exactly as the gateway stored them, with its ML-DSA-65 verdict label;
-  synthetic attack-simulation detections are tagged **Simulated**.
+  synthetic attack-simulation detections are tagged **Simulated**. The pipeline strip shows the path the latest
+  observation actually took (inside an ML-KEM-768 session, a direct signed POST, or an unsigned ingest-token post),
+  as recorded by the gateway, together with when the last observation arrived and the service's last camera-health
+  report.
 - **Nothing starts on its own.** The camera opens only on **Start preview**; it is released on Stop, when you leave the
   page, sign out or close the tab, and while the tab is hidden (it resumes when you return).
 - **Choosing a camera.** Integrated, USB and virtual cameras are listed (names appear after permission is granted);
