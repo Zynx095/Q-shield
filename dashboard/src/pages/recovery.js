@@ -29,13 +29,13 @@ function currentPanel(m) {
   const r = m.recovery;
   const state = m.snapshot && m.snapshot.state;
   if (!r || (r.status === "completed" && state === "QUARANTINED")) {
-    return html`<section class="panel">${state === "QUARANTINED"
+    return html`<section class="panel" data-reveal>${state === "QUARANTINED"
       ? empty({ title: "Ready to recover", text: "The device is quarantined. Starting recovery opens remediation over the recovery channel; normal access stays blocked until it is verified and trusted again.", iconName: "refresh" })
       : empty({ title: "No recovery needed", text: `Recovery cannot be started while the device is not quarantined. It is currently ${stateMeta(state).label.toLowerCase()}.`, iconName: "shieldCheck", ok: state === "TRUSTED" })}</section>`;
   }
   const [tone, ic, word] = STATUS[r.status] || STATUS.active;
   const cmd = r.command || {};
-  return html`<section class="panel" aria-labelledby="rc-title">
+  return html`<section class="panel" aria-labelledby="rc-title" data-reveal>
     <div class="panel-head"><h2 class="panel-title" id="rc-title">${icon("refresh")}<span class="mono">${r.recovery_id}</span></h2><span class="badge tone-${tone}">${icon(ic)}${word}</span></div>
     <div class="panel-body stack">
       ${r.status === "failed" ? banner("crit", "xCircle", "Recovery failed.", failureLabel(r.failure_reason)) : ""}
@@ -69,13 +69,13 @@ export function render() {
   const past = (m.recoveries || []).filter((r) => !m.recovery || r.recovery_id !== m.recovery.recovery_id || r.status !== "active");
   return html`${head(id)}
     <div class="grid split-5-7">
-      <section class="panel" aria-labelledby="steps-title">
+      <section class="panel" aria-labelledby="steps-title" data-reveal>
         <div class="panel-head"><h2 class="panel-title" id="steps-title">${icon("refresh")}${id}: path back to trusted</h2></div>
         <div class="panel-body">${stepper(m.steps)}</div>
       </section>
       ${currentPanel(m)}
     </div>
-    ${past.length ? html`<section class="panel section"><div class="panel-head"><h2 class="panel-title">${icon("clock")}Recovery history</h2></div>
+    ${past.length ? html`<section class="panel section" data-reveal><div class="panel-head"><h2 class="panel-title">${icon("clock")}Recovery history</h2></div>
       <div class="panel-body table-wrap"><table class="table"><caption class="sr-only">Previous recoveries</caption>
         <thead><tr><th scope="col">Recovery</th><th scope="col">Started</th><th scope="col">By</th><th scope="col">Outcome</th><th scope="col">Duration</th></tr></thead>
         <tbody>${past.slice().reverse().map((r) => html`<tr data-key="rh-${r.recovery_id}"><td class="mono">${r.recovery_id}</td><td>${dateTime(r.started_at)}</td><td>${r.requested_by || "—"}</td>
