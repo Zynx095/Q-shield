@@ -14,6 +14,7 @@ const NAV = [
     { route: "evidence", label: "Evidence chain", icon: "ledger" },
     { route: "twin", label: "Digital twin", icon: "twin" },
     { route: "crypto", label: "Cryptography", icon: "key" },
+    { route: "vision", label: "Camera & vision", icon: "camera" },
   ] },
   { group: "Operate", items: [
     { route: "live", label: "Presentation mode", icon: "present" },
