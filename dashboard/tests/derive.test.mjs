@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { html, raw, esc } from "../src/lib/html.js";
 import {
   buildIncidents, buildTimeline, chainView, evidenceIndex, factorView, posture, recoverySteps, scoreBreakdown,
-  scoreSeries, statePath, observationView, visionStatus,
+  scoreSeries, statePath, observationView, visionStatus, liveProof,
 } from "../src/lib/derive.js";
 import { storyProgress } from "../src/components/rail.js";
 import { countdown, duration, signed } from "../src/lib/format.js";
@@ -260,4 +260,21 @@ test("vision status reports the latest path, camera health and rule matches from
   assert.equal(observationView(obs[2]).signed, false);
   assert.equal(visionStatus([], 10).camera, null, "no camera-health report means no fault reported, not 'ok'");
   assert.equal(visionStatus([], 10).last, null);
+});
+
+test("presentation proof shows only what the gateway reported for this device", () => {
+  const twin = { comparison: { overall: "MATCH", fields: { fw_version: { status: "MATCH" } } } };
+  const obs = [
+    { observation_id: "x", device_id: "OTHER", received_at: 99, event_type: "visual_observation", object: "car", confidence: 0.5, auth: "ML-DSA-65:v" },
+    { observation_id: "y", device_id: DEV, received_at: 90, event_type: "visual_observation", object: "person", confidence: 0.7,
+      auth: "ML-DSA-65:vision-1", transport: "secure", model: { name: "yolo11n", version: "8" } },
+  ];
+  const p = liveProof({ snapshot: { last_device_evidence_age_s: 3.2 }, observations: obs, deviceId: DEV, twin, now: 100 });
+  assert.deepEqual(p.device, { ageS: 3.2 });
+  assert.equal(p.vision.ageS, 10);
+  assert.equal(p.vision.transport, "secure");
+  assert.equal(p.vision.synthetic, false);
+  assert.equal(p.twin, "MATCH");
+  const none = liveProof({ snapshot: {}, observations: [], deviceId: DEV, twin: { comparison: { overall: "UNKNOWN", fields: {} } }, now: 1 });
+  assert.deepEqual(none, { device: null, vision: null, twin: null }, "nothing reported, nothing claimed");
 });

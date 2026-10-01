@@ -156,6 +156,12 @@ body.is-live .toasts { display: none; }
 .lv-restored { background: var(--ok-tint); border-color: var(--ok-line); }
 .lv-restored .lv-ctx-label { color: var(--ok); font-size: clamp(14px, 2.2vh, 17px); }
 .lv-progress-block { background: var(--cobalt-tint); border-color: var(--cobalt-line); gap: clamp(6px, 1.2vh, 10px); }
+.lv-proof { background: var(--ok-tint); border-color: var(--ok-line); }
+.lv-proof .lv-ctx-label { color: var(--ok); }
+.lv-proof-list { display: flex; flex-direction: column; gap: clamp(2px, 0.5vh, 6px); font-size: clamp(13px, 1.9vh, 16px); color: var(--ink-2); }
+.lv-proof-list li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: var(--s2); align-items: baseline; }
+.lv-proof-list b { color: var(--ink); }
+.lv-proof-list li.is-crit span { color: var(--crit); font-weight: 600; }
 .lv-pips i { width: 30px; height: 8px; border-radius: 4px; }
 .lv-progress { flex: 0 1 220px; height: 10px; border-radius: 5px; background: #fff; border: 1px solid var(--cobalt-line); }
 .lv-progress.is-ok { border-color: var(--ok-line); }

@@ -517,3 +517,21 @@ export function visionStatus(observations, now) {
     rules: views.filter((v) => v.rule).length,
   };
 }
+
+/**
+ * What is being verified right now, for presentation mode's trusted state: the age of the device's latest
+ * authenticated message, the latest vision observation for this device (its signature label and transport) and the
+ * digital-twin verdict. Each part is null when the gateway has nothing to show; nothing is inferred.
+ */
+export function liveProof({ snapshot = null, observations = [], deviceId, twin = null, now = null }) {
+  const age = snapshot && Number.isFinite(snapshot.last_device_evidence_age_s) ? snapshot.last_device_evidence_age_s : null;
+  const o = (observations || []).find((x) => x.device_id === deviceId);
+  const v = o ? observationView(o) : null;
+  const c = twin && twin.comparison;
+  return {
+    device: age === null ? null : { ageS: age },
+    vision: v ? { ageS: Number.isFinite(now) ? Math.max(0, now - v.ts) : null, signed: v.signed, alg: v.alg, transport: v.transport,
+      synthetic: v.synthetic, title: v.title } : null,
+    twin: c && Object.keys(c.fields || {}).length ? c.overall : null,
+  };
+}

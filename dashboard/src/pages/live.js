@@ -3,6 +3,7 @@
 import { html } from "../lib/html.js";
 import { STORY, failureLabel, stateMeta } from "../lib/copy.js";
 import { clock, duration } from "../lib/format.js";
+import { liveProof } from "../lib/derive.js";
 import { S, focusId, gatewayNow } from "../store.js";
 import { UI, deviceModel, thresholds } from "../model.js";
 import { storyProgress } from "../components/rail.js";
@@ -105,12 +106,30 @@ function restored(m, state) {
   </div>`;
 }
 
+// Trusted: what is being verified continuously, so "trusted" is visibly earned rather than assumed.
+function proof(m) {
+  const p = liveProof({ snapshot: m.snapshot, observations: S.observations, deviceId: m.id, twin: m.twin, now: gatewayNow() });
+  const sig = (S.system && S.system.pqc && S.system.pqc.sig_algorithm) || "ML-DSA";
+  const vis = p.vision;
+  const twinLine = { MATCH: ["ok", "Matches the known-good state (self-reported)"],
+    MISMATCH: ["crit", "Differs from the known-good state"], UNKNOWN: ["na", "Not every expected field reported yet"] }[p.twin];
+  return html`<div class="lv-ctx lv-proof">
+    <div class="lv-ctx-label">${icon("shieldCheck")}Verified continuously</div>
+    <ul class="lv-proof-list">
+      <li><b>Device</b><span>${p.device ? html`HMAC-SHA256 authenticated, <span class="num">${duration(p.device.ageS)}</span> ago` : "No authenticated message yet"}</span></li>
+      <li><b>Vision</b><span>${vis ? html`${vis.signed ? `${vis.alg || sig} signed` : "Unsigned"}${vis.transport === "secure" ? ", ML-KEM-768 session" : ""}, <span class="num">${duration(vis.ageS)}</span> ago${vis.synthetic ? html` ${simTag("Synthetic detection signed with the real vision key; not camera output")}` : ""}` : "No vision observation yet"}</span></li>
+      ${twinLine ? html`<li class="is-${twinLine[0]}"><b>Twin</b><span>${twinLine[1]}</span></li>` : ""}
+    </ul>
+  </div>`;
+}
+
 function context(m, state, meta, recent) {
   if (state === "QUARANTINED") return quarantineReason(m);
   if ((state === "RECOVERING" || state === "VERIFIED") && m.recovery) return recoveryProgress(m, !!recent && recent.to === state);
   const normalOpen = m.access && m.access.normal && m.access.normal.allowed;
   if (normalOpen && state === "RECOVERED") return restored(m, state);
   if (normalOpen && state === "TRUSTED" && afterRecovery(m)) return restored(m, state);
+  if (state === "TRUSTED") return proof(m);
   return html`<p class="live-line">${meta.line}</p>`;
 }
 
