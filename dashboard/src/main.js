@@ -28,11 +28,13 @@ import * as twin from "./pages/twin.js";
 import * as crypto from "./pages/crypto.js";
 import * as settings from "./pages/settings.js";
 import * as live from "./pages/live.js";
+import * as vision from "./pages/vision.js";
 
 const PAGES = {
   overview: [overview, "Overview"], devices: [devices, "Devices"], device: [device, "Device"], incidents: [incidents, "Incidents"],
   recovery: [recovery, "Recovery"], evidence: [evidence, "Evidence chain"], twin: [twin, "Digital twin"],
   crypto: [crypto, "Cryptography"], settings: [settings, "Settings"], live: [live, "Presentation mode"],
+  vision: [vision, "Camera & vision"],
 };
 
 const app = document.getElementById("app");
@@ -60,6 +62,7 @@ export function scheduleRender() {
 
 function paint() {
   if (!S.token || !S.me) {
+    vision.release();                                   // signed out: the camera goes off with the session
     setPosture("neutral");
     document.title = "Sign in – Q-SHIELD";
     if (auth.phase === "checking") {
@@ -94,6 +97,7 @@ function paint() {
   if (key !== lastRouteKey) {
     lastRouteKey = key;
     revealer.reset();                                   // each page gets its own entrance
+    if (route.name !== "vision") vision.release();      // leaving the page turns the camera off
     document.title = `${route.name === "device" ? route.params.id : title} – Q-SHIELD`;
     UI.menuOpen = false;
     window.scrollTo(0, 0);
@@ -104,6 +108,7 @@ function paint() {
     }
   }
   afterRender();
+  if (route.name === "vision") vision.mount();
 }
 
 // ---------------------------------------------------------------------------------------------- post-render effects
