@@ -39,6 +39,25 @@ export function rowTokens(depth, row, n = TOKENS) {
   return out;
 }
 
+// Drift speed per overall posture: calm when trusted, a little quicker under suspicion, almost still while a threat
+// is contained (the system feels sealed), steady during recovery. The tint is in ambient.css (body[data-posture]).
+const RATE = { ok: 1, "ok-soft": 1, warn: 1.6, crit: 0.15, proc: 0.8, neutral: 1 };
+let posture = null;
+
+/** Follow the fleet posture tone. Speed changes go through the Web Animations API, so the rows never jump. */
+export function setPosture(tone, { force = false } = {}) {
+  if (tone === posture && !force) return;
+  posture = tone;
+  document.body.setAttribute("data-posture", tone);
+  const host = document.getElementById("ambient");
+  if (!host || !host.getAnimations) return;
+  const rate = RATE[tone] ?? 1;
+  for (const a of host.getAnimations({ subtree: true })) {
+    if (a.animationName !== "amb-drift") continue;         // leave the tint's colour transition at normal speed
+    if (a.updatePlaybackRate) a.updatePlaybackRate(rate); else a.playbackRate = rate;
+  }
+}
+
 /** Build the layers once into `host` (the aria-hidden #ambient element). */
 export function mountAmbient(host) {
   if (!host || host.childElementCount) return;

@@ -16,7 +16,7 @@ import { installModal, isModalOpen } from "./components/modal.js";
 import { installChartHover } from "./components/chart.js";
 import { sidebar, topbar } from "./components/shell.js";
 import { icon } from "./components/icons.js";
-import { mountAmbient } from "./components/ambient.js";
+import { mountAmbient, setPosture } from "./components/ambient.js";
 import { signInView } from "./pages/signin.js";
 import * as overview from "./pages/overview.js";
 import * as devices from "./pages/devices.js";
@@ -60,6 +60,7 @@ export function scheduleRender() {
 
 function paint() {
   if (!S.token || !S.me) {
+    setPosture("neutral");
     document.title = "Sign in – Q-SHIELD";
     if (auth.phase === "checking") {
       render(app, html`<main class="signin" id="content"><div class="signin-card"><div class="row" style="gap:10px"><span class="spinner" aria-hidden="true"></span><span>Connecting to the gateway…</span></div></div></main>`);
@@ -72,6 +73,7 @@ function paint() {
   const [page, title] = PAGES[route.name];
   const f = fleet();
   const bare = route.name === "live";
+  setPosture(f.posture.tone);                           // ambient tint and drift follow the fleet posture
   document.body.classList.toggle("is-live", bare);      // presentation mode: no toasts (see views.css)
   const counts = { incidents: f.open.length, recovery: f.activeRecoveries.length };
   const body = page.render({ params: route.params, rerender: scheduleRender });

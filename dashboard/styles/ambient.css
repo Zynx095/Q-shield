@@ -14,7 +14,13 @@
   display: grid; align-content: space-around;
   font-family: var(--mono); color: var(--ink); white-space: nowrap;
   word-spacing: 2.4em; letter-spacing: 0.04em; line-height: 1;
+  transition: color 1.2s var(--ease);
 }
+/* the overall posture tints the text; opacity (and so contrast) is unchanged */
+body[data-posture="warn"] .amb-layer { color: var(--warn-fill); }
+body[data-posture="crit"] .amb-layer { color: var(--crit-fill); }
+body[data-posture="proc"] .amb-layer { color: var(--cobalt); }
+body[data-posture="ok-soft"] .amb-layer { color: var(--ok-fill); }
 .amb-d1 { font-size: 12px; opacity: 0.035; padding-top: 2vh; }
 .amb-d2 { font-size: 13px; opacity: 0.045; padding-top: 8vh; }
 .amb-d3 { font-size: 15px; opacity: 0.05; padding-top: 14vh; }
