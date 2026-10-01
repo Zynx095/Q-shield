@@ -26,7 +26,7 @@ export function render() {
   const sensors = obs.sensors || {};
   return html`${head(id)}
   <div class="grid split-7-5">
-    <section class="panel" aria-labelledby="tw-title">
+    <section class="panel" aria-labelledby="tw-title" data-reveal>
       <div class="panel-head"><h2 class="panel-title" id="tw-title">${icon("twin")}${id}: expected and observed</h2>
         <span class="act-wrap" title="${a.expected.ok ? "" : a.expected.why}"><button class="btn sm" type="button" data-action="op-expected" data-id="${id}" ${a.expected.ok ? "" : "disabled"}>${icon("edit")}Edit known-good state</button></span></div>
       <div class="panel-body stack">
@@ -35,7 +35,7 @@ export function render() {
         ${m.twin ? twinTable(m.twin, { serverNow: gatewayNow() }) : loadingPanel(4)}
       </div>
     </section>
-    <div class="stack">
+    <div class="stack" data-reveal>
       <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("cpu")}Latest self-reported state</h2></div>
         <div class="panel-body">
           ${Object.keys(obs).length ? html`<dl class="kv">
