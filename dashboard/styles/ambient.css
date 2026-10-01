@@ -6,6 +6,9 @@
   position: fixed; inset: 0; z-index: 0;
   overflow: hidden; pointer-events: none; user-select: none;
   contain: strict;
+  /* page headings and lead text sit on the paper at the top of the screen: keep that band clear of the rows */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 120px, #000 320px);
+  mask-image: linear-gradient(to bottom, transparent 0, transparent 120px, #000 320px);
 }
 #app { position: relative; z-index: 1; }
 /* a blurred, translucent topbar would re-blur the moving rows every frame: go near-solid while they are on */
