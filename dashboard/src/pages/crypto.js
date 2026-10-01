@@ -46,7 +46,7 @@ export function render() {
   ];
   const tls = sys.transport === "https";
   return html`${head}
-  <div class="grid grid-2">${cards.map((c) => html`<section class="panel pq-card" data-key="pq-${c.name}">
+  <div class="grid grid-2">${cards.map((c) => html`<section class="panel pq-card" data-key="pq-${c.name}" data-reveal>
     <div class="panel-body stack-sm">
       <div class="row-between"><span class="caption">${c.role}</span><span class="badge ${c.status.startsWith("Protocol") ? "tone-neutral" : "tone-ok"}">${icon(c.status.startsWith("Protocol") ? "info" : "checkCircle")}${c.status}</span></div>
       <div class="pq-name">${c.name}</div>
@@ -54,7 +54,7 @@ export function render() {
       <p class="caption">${c.live}</p>
     </div></section>`)}</div>
 
-  <section class="panel section" aria-labelledby="paths-title">
+  <section class="panel section" aria-labelledby="paths-title" data-reveal>
     <div class="panel-head"><h2 class="panel-title" id="paths-title">${icon("link")}Which path is protected by what</h2></div>
     <div class="panel-body">
       <div class="table-wrap"><svg class="pq-paths" viewBox="0 0 1040 236" role="img" aria-label="Vision service to gateway: ML-DSA-65 signatures inside an ML-KEM-768 session, post-quantum. Device to gateway: HMAC-SHA256, not post-quantum. Gateway to evidence chain: ML-DSA-65 signed. Operator browser to gateway: bearer token over ${tls ? "HTTPS" : "plain HTTP"}.">
@@ -67,13 +67,13 @@ export function render() {
     </div>
   </section>
 
-  <div class="grid grid-3 section">
+  <div class="grid grid-3 section" data-reveal>
     <section class="panel"><div class="panel-body"><div class="caption">Signed observations accepted</div><div class="pq-stat">${signed}</div><p class="caption">${p.sig_algorithm} verified, in the latest ${S.observations.length} observations</p></div></section>
     <section class="panel"><div class="panel-body"><div class="caption">Forged signatures rejected</div><div class="pq-stat">${forged}</div><p class="caption">Rejected at the gateway; they add only bounded attack pressure to trust</p></div></section>
     <section class="panel"><div class="panel-body"><div class="caption">Replays rejected</div><div class="pq-stat">${replays}</div><p class="caption">Observation, handshake and session replays${deviceForgeries ? `; plus ${deviceForgeries} forged or replayed device message${deviceForgeries === 1 ? "" : "s"}` : ""}</p></div></section>
   </div>
 
-  <section class="panel section">
+  <section class="panel section" data-reveal>
     <div class="panel-head"><h2 class="panel-title">${icon("info")}Technical details</h2>
       <button class="btn sm ghost" type="button" data-action="toggle" data-id="pq-tech" aria-expanded="${UI.expanded.has("pq-tech")}" aria-controls="pq-tech">${UI.expanded.has("pq-tech") ? "Hide" : "Show"}</button></div>
     <div class="panel-body" id="pq-tech" ${UI.expanded.has("pq-tech") ? "" : "hidden"}>${UI.expanded.has("pq-tech") ? html`<dl class="kv">
