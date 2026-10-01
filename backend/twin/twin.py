@@ -83,21 +83,26 @@ def _in_range(value, lo, hi) -> bool:
 
 
 def _compare(device_id: str, exp: dict, obs: dict) -> Comparison:
+    """`reported_at` (when present) is the gateway time each field was last carried by an authenticated message, so a
+    reader can tell a value from the latest report from one that has not been reported for a while."""
     cmp = Comparison(device_id)
+    seen = obs.get("reported_at", {})
     for k in ("fw_version", "cfg_hash"):
         if k in exp:
             o = obs.get(k)
             status = UNKNOWN if o is None else (MATCH if o == exp[k] else MISMATCH)
-            cmp.fields[k] = {"expected": exp[k], "observed": o, "status": status}
+            cmp.fields[k] = {"expected": exp[k], "observed": o, "status": status, "reported_at": seen.get(k)}
     if "capabilities" in exp:
         o = obs.get("capabilities")
         status = UNKNOWN if o is None else (MATCH if sorted(o) == exp["capabilities"] else MISMATCH)
-        cmp.fields["capabilities"] = {"expected": exp["capabilities"], "observed": o, "status": status}
+        cmp.fields["capabilities"] = {"expected": exp["capabilities"], "observed": o, "status": status,
+                                      "reported_at": seen.get("capabilities")}
     sensors = obs.get("sensors", {})
     for f, (lo, hi) in exp.get("sensor_ranges", {}).items():
         o = sensors.get(f)
         status = UNKNOWN if o is None else (MATCH if _in_range(o, lo, hi) else MISMATCH)
-        cmp.fields[f"sensor:{f}"] = {"expected": [lo, hi], "observed": o, "status": status}
+        cmp.fields[f"sensor:{f}"] = {"expected": [lo, hi], "observed": o, "status": status,
+                                     "reported_at": seen.get(f"sensor:{f}")}
     statuses = [v["status"] for v in cmp.fields.values()]
     if not statuses or all(s == UNKNOWN for s in statuses):
         cmp.overall = UNKNOWN
@@ -137,21 +142,23 @@ class DigitalTwin:
     def observe(self, device_id: str, now: float, *, info: dict | None = None, telemetry: dict | None = None) -> None:
         """Record authenticated, self-reported state. Called only after the HMAC envelope verified."""
         exp, obs = self._row(device_id)
+        seen = obs.setdefault("reported_at", {})          # field -> gateway time it was last reported
         if info:
             for k in ("fw_version",):
                 if info.get(k) is not None:
-                    obs[k] = info[k]
+                    obs[k], seen[k] = info[k], now
             if isinstance(info.get("capabilities"), list):
-                obs["capabilities"] = sorted(set(info["capabilities"]))
+                obs["capabilities"], seen["capabilities"] = sorted(set(info["capabilities"])), now
         if telemetry:
             for k in ("fw_version", "cfg_hash"):
                 if telemetry.get(k) is not None:
-                    obs[k] = telemetry[k]
+                    obs[k], seen[k] = telemetry[k], now
             sensors = {k: v for k, v in telemetry.items() if k not in ("fw_version", "cfg_hash", "tamper") and v is not None}
             if sensors:
                 obs["sensors"] = sensors
+                seen.update({f"sensor:{k}": now for k in sensors})
             if isinstance(telemetry.get("tamper"), bool):
-                obs["tamper"] = telemetry["tamper"]
+                obs["tamper"], seen["tamper"] = telemetry["tamper"], now
         obs["observed_at"] = now
         self.store.execute("INSERT OR REPLACE INTO device_twin(device_id, expected, observed, updated_at) VALUES (?,?,?,?)",
                            (device_id, json.dumps(exp), json.dumps(obs), now))

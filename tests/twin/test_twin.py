@@ -90,3 +90,15 @@ def test_compare_report_judges_only_what_the_report_says(twin):
     assert full.overall == MATCH and full.fields["capabilities"]["status"] == MATCH   # from the last registration
     bad = twin.compare_report("D", {"fw_version": "1.2", "cfg_hash": "abc", "temperature_c": 99.0, "tamper": False})
     assert bad.overall == MISMATCH and bad.fields["sensor:temperature_c"]["status"] == MISMATCH
+
+
+def test_each_observed_field_carries_when_it_was_last_reported(twin):
+    twin.set_expected("D", EXP, 1.0)
+    twin.observe("D", 2.0, info={"fw_version": "1.2", "capabilities": ["temperature", "tamper"]})
+    twin.observe("D", 3.0, telemetry={"fw_version": "1.2", "cfg_hash": "abc", "temperature_c": 20.0, "tamper": False})
+    twin.observe("D", 9.0, telemetry={"fw_version": "1.2", "temperature_c": 21.0, "tamper": True})   # no cfg_hash now
+    f = twin.compare("D").fields
+    assert f["cfg_hash"]["reported_at"] == 3.0 and f["fw_version"]["reported_at"] == 9.0
+    assert f["capabilities"]["reported_at"] == 2.0 and f["sensor:temperature_c"]["reported_at"] == 9.0
+    obs = twin.observed("D")
+    assert obs["observed_at"] == 9.0 and obs["reported_at"]["tamper"] == 9.0 and obs["tamper"] is True
