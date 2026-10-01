@@ -49,7 +49,7 @@ function hero(f, m) {
   const sys = S.system || {};
   const age = snap && Number.isFinite(snap.last_device_evidence_age_s) ? snap.last_device_evidence_age_s : null;
   const firstOpen = f.open.find((i) => i.deviceId === (m && m.id));
-  return html`<section class="hero panel tone-${p.tone}" aria-labelledby="posture-title">
+  return html`<section class="hero panel tone-${p.tone}" aria-labelledby="posture-title" data-reveal>
     <div class="hero-main">
       <div class="posture">
         <span class="posture-icon">${icon(p.icon)}</span>
@@ -106,14 +106,14 @@ export function render() {
   const openForDevice = f.open.filter((i) => i.deviceId === m.id);
   return html`
     ${hero(f, m)}
-    <div class="section">${trustHistoryPanel(m, "ov")}</div>
+    <div class="section" data-reveal>${trustHistoryPanel(m, "ov")}</div>
     <div class="grid split-7-5 section">
-      <section class="panel" aria-labelledby="tl-title">
+      <section class="panel" aria-labelledby="tl-title" data-reveal>
         <div class="panel-head"><h2 class="panel-title" id="tl-title">${icon("signal")}Live security timeline</h2><span class="meta">${m.id}, newest first</span></div>
         <div class="panel-body">${m.timeline.length ? timeline(m.timeline, { expanded: UI.expanded, limit: limitOf("ov-tl", 14), deviceId: m.id, moreAction: "more:ov-tl", scope: "ov" })
           : empty({ title: "No security events yet", text: "Events appear here as the device reports and the gateway decides.", iconName: "signal" })}</div>
       </section>
-      <div class="stack">
+      <div class="stack" data-reveal>
         ${openForDevice.length ? incidentCard(openForDevice[0], { compact: true })
           : html`<section class="panel">${empty({ title: "All clear", text: f.incidents.length ? "No active security incidents. Past incidents are resolved." : "No active security incidents.", iconName: "shieldCheck", ok: true })}</section>`}
         <section class="panel" aria-labelledby="ch-title">
