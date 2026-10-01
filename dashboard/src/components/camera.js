@@ -22,6 +22,37 @@ export function cameraLabel(device, index) {
   return (device && device.label) || `Camera ${index + 1}`;
 }
 
+/** Why a camera could not be opened, in the operator's terms, with the next step. Pure: maps a DOMException name. */
+export function classifyCameraError(err, { secure = true, host = "this address" } = {}) {
+  const name = (err && err.name) || "";
+  if (!secure || name === "SecurityError") {
+    return { kind: "insecure", title: "Camera preview needs HTTPS or localhost",
+      text: `The browser offers cameras only to secure pages, and this one is served over plain HTTP from ${host}. Open the dashboard as http://localhost or http://127.0.0.1 on this machine, or start the gateway with QSHIELD_TLS_CERT and QSHIELD_TLS_KEY.` };
+  }
+  switch (name) {
+    case "NotAllowedError":
+    case "PermissionDeniedError":
+      return { kind: "denied", title: "Camera access was not allowed",
+        text: "Allow the camera for this site in the browser's site settings (the camera icon in the address bar), then press Start preview." };
+    case "NotFoundError":
+    case "DevicesNotFoundError":
+      return { kind: "none", title: "No camera found", text: "Connect a camera (integrated or USB), then press Start preview." };
+    case "OverconstrainedError":
+      return { kind: "missing", title: "That camera is no longer available", text: "Pick another camera from the list and press Start preview." };
+    case "NotReadableError":
+    case "TrackStartError":
+    case "AbortError":
+      return { kind: "in-use", title: "Camera in use by another program",
+        text: "Possibly the Q-SHIELD vision service (python -m ai.vision), which opens the camera set in config/vision.json. Pick the other camera, or stop the vision service first." };
+    case "NotSupportedError":
+      return { kind: "unsupported", title: "No camera access in this browser", text: "This browser does not offer camera access to web pages. Use a current Edge, Chrome or Firefox." };
+    default:
+      return { kind: "error", title: "The camera could not be opened", text: `The browser reported ${name || "an unknown error"}. Pick a camera and press Start preview to try again.` };
+  }
+}
+
+const HOST = () => (globalThis.location && globalThis.location.host) || "this address";
+
 // ---------------------------------------------------------------------------------------------- controller (no DOM)
 const NAV = globalThis.navigator;
 const PREF = "qshield_camera";                      // the chosen camera, per tab (sessionStorage, like the session)
@@ -92,13 +123,13 @@ export function createCameraController({
     stopTracks();
     if (!secure) {                                  // browsers expose cameras only to HTTPS and localhost pages
       st.status = "error";
-      st.error = { kind: "insecure", name: "SecurityError" };
+      st.error = classifyCameraError(null, { secure: false, host: HOST() });
       emit();
       return;
     }
     if (!media || typeof media.getUserMedia !== "function") {
       st.status = "error";
-      st.error = { kind: "unsupported", name: "NotSupportedError" };
+      st.error = classifyCameraError({ name: "NotSupportedError" });
       emit();
       return;
     }
@@ -119,7 +150,7 @@ export function createCameraController({
     } catch (err) {
       if (mine !== seq) return;
       st.status = "error";
-      st.error = { kind: "error", name: (err && err.name) || "Error" };
+      st.error = classifyCameraError(err, { secure, host: HOST() });
     }
     emit();
   }
@@ -226,7 +257,8 @@ function mountCameraView(host, ctl) {
     if (video.srcObject !== s.stream) video.srcObject = s.stream;
     placeholder.hidden = s.status === "live";
     const res = s.info && s.info.width ? ` ${s.info.width}×${s.info.height} as reported by the camera.` : "";
-    status.textContent = s.status === "live" ? `${STATUS_TEXT.live}${s.info && s.info.label ? ` ${s.info.label}.` : ""}${res}` : STATUS_TEXT[s.status] || "";
+    status.textContent = s.status === "error" && s.error ? s.error.title
+      : s.status === "live" ? `${STATUS_TEXT.live}${s.info && s.info.label ? ` ${s.info.label}.` : ""}${res}` : STATUS_TEXT[s.status] || "";
     const opts = s.devices.map((d) => `${d.deviceId}=${d.label}`).join("|");
     if (select.dataset.opts !== opts) {                // rebuild only when the list really changed
       select.dataset.opts = opts;
@@ -235,8 +267,8 @@ function mountCameraView(host, ctl) {
     if (s.deviceId && select.value !== s.deviceId) select.value = s.deviceId;
     pick.hidden = s.devices.length === 0;
     count.textContent = s.devices.length ? `${s.devices.length} camera${s.devices.length === 1 ? "" : "s"} found` : "No camera listed yet";
-    note.textContent = !s.secure
-      ? `Camera preview needs HTTPS or localhost. This page is served over plain HTTP from ${location.host}, so the browser offers no camera here. Open it as http://localhost or http://127.0.0.1 on this machine, or start the gateway with QSHIELD_TLS_CERT and QSHIELD_TLS_KEY.`
+    note.textContent = s.status === "error" && s.error ? s.error.text
+      : !s.secure ? classifyCameraError(null, { secure: false, host: HOST() }).text
       : s.permission === "denied" && s.status !== "live"
         ? "Camera access is blocked for this site. Allow it in the browser's site settings (the camera icon in the address bar), then press Start preview."
         : s.status === "live" ? "" : "Nothing starts until you press Start preview. The browser then asks for camera access; video only, no microphone.";
