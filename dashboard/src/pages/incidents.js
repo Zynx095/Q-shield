@@ -11,7 +11,7 @@ export function render() {
     <p class="lead">An incident is confirmed only when independent evidence agrees inside the correlation window, such as an authenticated tamper report and a signed camera observation.</p></div></div>`;
   if (!f) return html`${head}${loadingPanel(6)}`;
   if (!f.incidents.length) {
-    return html`${head}<section class="panel">${empty({ title: "All clear. No security incidents.", text: "Single signals lower trust, but an incident needs two independent kinds of evidence. None has been correlated.", iconName: "shieldCheck", ok: true })}</section>`;
+    return html`${head}<section class="panel" data-reveal>${empty({ title: "All clear. No security incidents.", text: "Single signals lower trust, but an incident needs two independent kinds of evidence. None has been correlated.", iconName: "shieldCheck", ok: true })}</section>`;
   }
   const order = { open: 0, recovering: 1, resolved: 2 };
   const list = [...f.incidents].sort((a, b) => order[a.status] - order[b.status] || b.started - a.started);
@@ -19,7 +19,7 @@ export function render() {
   const past = list.filter((i) => i.status === "resolved");
   return html`${head}
     <div class="stack">
-      ${open.length ? html`<h2 class="h-section">Active</h2>${open.map((i) => incidentCard(i))}` : html`<section class="panel">${empty({ title: "No active incidents", text: "Every recorded incident has been resolved by a completed recovery.", iconName: "shieldCheck", ok: true })}</section>`}
-      ${past.length ? html`<h2 class="h-section" style="margin-top:8px">Resolved</h2>${past.map((i) => incidentCard(i))}` : ""}
+      ${open.length ? html`<h2 class="h-section">Active</h2>${open.map((i) => incidentCard(i, { reveal: true }))}` : html`<section class="panel" data-reveal>${empty({ title: "No active incidents", text: "Every recorded incident has been resolved by a completed recovery.", iconName: "shieldCheck", ok: true })}</section>`}
+      ${past.length ? html`<h2 class="h-section" style="margin-top:8px">Resolved</h2>${past.map((i) => incidentCard(i, { reveal: true }))}` : ""}
     </div>`;
 }

@@ -33,12 +33,12 @@ function convergence(inc) {
   </figure>`;
 }
 
-export function incidentCard(inc, { compact = false } = {}) {
+export function incidentCard(inc, { compact = false, reveal = false } = {}) {
   const st = STATUS[inc.status] || STATUS.open;
   const statusLine = inc.status === "resolved"
     ? `Resolved by ${inc.recovery.recovery_id} at ${clock(inc.resolvedAt)}`
     : inc.status === "recovering" ? `Recovery ${inc.recovery.recovery_id} in progress` : "Waiting for an operator to start recovery";
-  return html`<article class="incident is-${inc.status === "open" ? "active" : inc.status} ${compact ? "is-compact" : ""}" data-key="inc-${inc.id}" aria-labelledby="inc-${inc.id}-t">
+  return html`<article class="incident is-${inc.status === "open" ? "active" : inc.status} ${compact ? "is-compact" : ""}" data-key="inc-${inc.id}" aria-labelledby="inc-${inc.id}-t" ${reveal ? html`data-reveal` : ""}>
     <div class="incident-bar"></div>
     <header class="incident-head">
       <div class="stack-sm" style="gap:4px">
