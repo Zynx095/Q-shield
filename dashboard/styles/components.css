@@ -108,6 +108,10 @@
 .btn:disabled, .btn.primary:disabled, .btn.accent:disabled, .btn.danger:disabled, .btn.danger-solid:disabled {
   cursor: not-allowed; background: var(--surface-2); border-color: var(--line); color: var(--muted);
 }
+/* keyboard focus: the 2 px cobalt ring stays the only focus signal and is never replaced by a glow */
+.btn:focus-visible { outline-offset: 3px; }                              /* clear of the hover glow and lift */
+.status-strip .chip:focus-visible, .seg button:focus-visible,
+.tl-head:focus-visible, .block-head:focus-visible { outline-offset: -2px; }   /* drawn inside: clipped or tightly packed */
 .btn.sm { height: 30px; padding: 0 var(--s3); font-size: var(--t-sm); }
 .btn.icon { width: 38px; padding: 0; }
 .btn .spinner { width: 15px; height: 15px; }
@@ -278,6 +282,7 @@
 .table tr:last-child td { border-bottom: 0; }
 .table tbody tr.is-link { cursor: pointer; }
 .table tbody tr.is-link:hover td { background: var(--surface-2); }
+.table tbody tr.is-link:focus-within td { background: var(--surface-2); }   /* keyboard parity with row hover */
 .table-wrap { overflow-x: auto; }
 
 /* ---------- digital twin ---------- */
