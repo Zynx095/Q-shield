@@ -18,6 +18,7 @@ def test_ingest_and_query(ingest_client, client):
     (o,) = client.get("/api/v1/observations").json()
     assert o["object"] == "person" and o["anomaly"] is True and o["zone"] == "restricted_zone"
     assert "received_at" in o
+    assert o["auth"] == "ingest-token" and o["transport"] == "token"        # bearer token only: not signed
 
 
 def test_ingest_is_idempotent_on_observation_id(ingest_client, client):

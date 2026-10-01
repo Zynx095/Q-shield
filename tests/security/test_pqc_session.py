@@ -276,7 +276,8 @@ def test_secure_endpoint_accepts_signed_observation_in_session(pqc_client, pqc_o
     r, _, ct = send(pqc_client, ch, sid, signed_env(pqc_world, clock))
     assert r.status_code == 200
     assert b"person" not in ct and b"restricted_zone" not in ct        # payload is not visible on the wire
-    assert pqc_operator.get("/api/v1/observations").json()[0]["auth"] == "ML-DSA-65:vision-1"
+    o = pqc_operator.get("/api/v1/observations").json()[0]
+    assert o["auth"] == "ML-DSA-65:vision-1" and o["transport"] == "secure"   # arrived inside the ML-KEM session
 
 
 def test_secure_endpoint_rejects_tampered_ciphertext(pqc_client, pqc_operator, pqc_world, clock):

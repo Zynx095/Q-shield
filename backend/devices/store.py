@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS observations (
     anomaly        INTEGER NOT NULL,
     body           TEXT NOT NULL,
     auth           TEXT NOT NULL DEFAULT 'ingest-token',
-    envelope       TEXT
+    envelope       TEXT,
+    transport      TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_obs_dev ON observations(device_id, id);
 CREATE TABLE IF NOT EXISTS device_messages (
@@ -133,8 +134,8 @@ class Store:
             self._db.execute("PRAGMA journal_mode=WAL")
         self._db.executescript(SCHEMA)
         cols = {r["name"] for r in self._db.execute("PRAGMA table_info(observations)")}
-        for col, ddl in (("auth", "TEXT NOT NULL DEFAULT 'ingest-token'"), ("envelope", "TEXT")):
-            if col not in cols:  # databases created before Phase 3
+        for col, ddl in (("auth", "TEXT NOT NULL DEFAULT 'ingest-token'"), ("envelope", "TEXT"), ("transport", "TEXT")):
+            if col not in cols:  # databases created before Phase 3 (auth, envelope) or before transport was recorded
                 self._db.execute(f"ALTER TABLE observations ADD COLUMN {col} {ddl}")
 
     def close(self) -> None:
@@ -224,17 +225,19 @@ class Store:
 
     # --- observations (Phase 2: vision and other observers; NOT trust decisions) ---
     def add_observation(self, now: float, obs: dict, auth: str = "ingest-token",
-                        envelope: str | None = None) -> bool:
+                        envelope: str | None = None, transport: str = "token") -> bool:
         """Store a normalized observation. Returns False if observation_id was already stored.
-        `auth` records how it was authenticated ('ingest-token' or 'ml-dsa-65:<signer_id>');
-        `envelope` keeps the signed envelope text as verifiable evidence."""
+        `auth` records how it was authenticated ('ingest-token' or 'ML-DSA-65:<signer_id>');
+        `envelope` keeps the signed envelope text as verifiable evidence;
+        `transport` records how it reached the gateway: 'token' (ingest bearer token), 'signed' (ML-DSA envelope posted
+        directly) or 'secure' (ML-DSA envelope inside an ML-KEM-768 / AES-256-GCM session)."""
         try:
             with self._lock, self._db:
                 self._db.execute(
                     "INSERT INTO observations(observation_id, received_at, device_id, event_type, observed_at, anomaly,"
-                    " body, auth, envelope) VALUES (?,?,?,?,?,?,?,?,?)",
+                    " body, auth, envelope, transport) VALUES (?,?,?,?,?,?,?,?,?,?)",
                     (obs["observation_id"], now, obs["device_id"], obs["event_type"], obs["timestamp"],
-                     1 if obs["anomaly"] else 0, json.dumps(obs), auth, envelope),
+                     1 if obs["anomaly"] else 0, json.dumps(obs), auth, envelope, transport),
                 )
             return True
         except sqlite3.IntegrityError:
@@ -242,7 +245,7 @@ class Store:
 
     def list_observations(self, device_id: str | None = None, limit: int = 100,
                           anomalies_only: bool = False) -> list[dict]:
-        q, args = "SELECT received_at, body, auth FROM observations WHERE 1=1", []
+        q, args = "SELECT received_at, body, auth, transport FROM observations WHERE 1=1", []
         if device_id:
             q += " AND device_id=?"; args.append(device_id)
         if anomalies_only:
@@ -250,7 +253,8 @@ class Store:
         q += " ORDER BY id DESC LIMIT ?"; args.append(limit)
         with self._lock:
             rows = self._db.execute(q, args).fetchall()
-        return [{"received_at": r["received_at"], **json.loads(r["body"]), "auth": r["auth"]} for r in rows]
+        return [{"received_at": r["received_at"], **json.loads(r["body"]), "auth": r["auth"], "transport": r["transport"]}
+                for r in rows]
 
     def get_observation_envelope(self, observation_id: str) -> str | None:
         with self._lock:

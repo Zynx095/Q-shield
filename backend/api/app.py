@@ -286,7 +286,7 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
                             {"via": via, "claimed_device_id": obs.device_id, "signer_id": signer.signer_id})
             raise HTTPException(422, "unknown_or_revoked_device")
         auth = f"{env.algorithm}:{signer.signer_id}"
-        if not store.add_observation(now, obs.to_wire(), auth=auth, envelope=env.model_dump_json()):
+        if not store.add_observation(now, obs.to_wire(), auth=auth, envelope=env.model_dump_json(), transport=via):
             _reject(PqcRejection("observation_replay", "medium", 409, device_id=obs.device_id), via, env.signer_id, env.observation_id)
         return {"status": "accepted", "observation_id": obs.observation_id, "auth": auth}
 

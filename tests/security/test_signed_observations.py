@@ -29,6 +29,7 @@ def test_valid_signed_observation_accepted_without_any_token(pqc_client, pqc_ope
     assert r.status_code == 200 and r.json()["auth"] == "ML-DSA-65:vision-1"
     (o,) = stored(pqc_operator)
     assert o["object"] == "person" and o["auth"] == "ML-DSA-65:vision-1"
+    assert o["transport"] == "signed"                 # direct signed POST: integrity, no ML-KEM session
 
 
 def test_stored_envelope_is_independently_verifiable(pqc_client, store, pqc_world, clock, pqc_backend):
