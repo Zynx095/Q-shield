@@ -90,11 +90,28 @@
   --dur-1: 140ms;
   --dur-2: 260ms;
   --dur-3: 700ms;
+  /* interaction motion: short, answers a person's action; never decorative loops */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);          /* entrances and settling */
+  --ease-press: cubic-bezier(0.3, 0, 0.5, 1);
+  --dur-press: 90ms;
+  --dur-release: 160ms;
+  --dur-reveal: 420ms;
+  --reveal-shift: 12px;
+  --reveal-stagger: 60ms;
+  --lift: -1px;                                       /* hover lift of actionable controls */
+  /* glows: soft and tinted by the control's meaning; only actionable things get one, only on hover */
+  --glow-neutral: 0 1px 2px rgba(15, 27, 45, 0.06), 0 4px 12px -6px rgba(15, 27, 45, 0.20);
+  --glow-primary: 0 1px 2px rgba(15, 27, 45, 0.16), 0 6px 16px -6px rgba(15, 27, 45, 0.42);
+  --glow-accent: 0 1px 2px rgba(45, 69, 196, 0.18), 0 6px 18px -6px rgba(45, 69, 196, 0.50);
+  --glow-danger: 0 1px 2px rgba(163, 33, 58, 0.12), 0 6px 18px -6px rgba(194, 51, 76, 0.42);
 
   --sidebar-w: 236px;
   --topbar-h: 60px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; }
+  :root {
+    --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms;
+    --dur-press: 0ms; --dur-release: 0ms; --dur-reveal: 0ms; --reveal-shift: 0px; --reveal-stagger: 0ms; --lift: 0px;
+  }
 }
