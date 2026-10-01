@@ -152,6 +152,8 @@ body.is-live .toasts { display: none; }
 .lv-steps li.is-done .lv-step-node { background: var(--cobalt); border-color: var(--cobalt); }
 .lv-steps li.is-active .lv-step-node { border-color: var(--cobalt); box-shadow: 0 0 0 4px rgba(45, 69, 196, 0.16); }
 .lv-steps li.is-active .lv-step-node::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--cobalt); }
+.lv-steps.is-advancing li.is-active .lv-step-node { --node-rest: 0 0 0 4px rgba(45, 69, 196, 0.16); animation: node-pulse 900ms var(--ease-out) 1; }
+@media (prefers-reduced-motion: reduce) { .lv-steps.is-advancing li.is-active .lv-step-node { animation: none; } }
 .lv-steps li.is-failed .lv-step-node { background: var(--crit); border-color: var(--crit); }
 .lv-step-label { font-size: clamp(11px, 1.6vh, 13px); font-weight: 600; color: var(--slate); line-height: 1.2; }
 .lv-steps li.is-done .lv-step-label { color: var(--ink-2); }

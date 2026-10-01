@@ -342,6 +342,10 @@ a.chip { transition: border-color var(--dur-1) var(--ease); }
 .step.is-done .step-node { border-color: var(--ink-2); background: var(--ink-2); color: #fff; }
 .step.is-active .step-node { border-color: var(--cobalt); color: var(--cobalt); box-shadow: 0 0 0 5px var(--cobalt-tint); }
 .step.is-active .step-node::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--cobalt); }
+/* the device has just moved forward: the newly active step pulses once, then settles to its resting ring */
+.stepper.is-advancing .step.is-active .step-node { --node-rest: 0 0 0 5px var(--cobalt-tint); animation: node-pulse 900ms var(--ease-out) 1; }
+@keyframes node-pulse { 0% { box-shadow: 0 0 0 0 rgba(45, 69, 196, 0.5); } 65% { box-shadow: 0 0 0 13px rgba(45, 69, 196, 0); } 100% { box-shadow: var(--node-rest); } }
+@media (prefers-reduced-motion: reduce) { .stepper.is-advancing .step.is-active .step-node { animation: none; } }
 .step.is-failed .step-node { border-color: var(--crit); background: var(--crit); color: #fff; }
 .step-text { padding: 5px 0 var(--s5); min-width: 0; }
 .step-title { font-weight: 600; display: flex; gap: var(--s2); align-items: center; flex-wrap: wrap; }

@@ -3,7 +3,7 @@ import { html } from "../lib/html.js";
 import { AUTH_PROFILES, stateMeta } from "../lib/copy.js";
 import { clock, isoToTs, ago } from "../lib/format.js";
 import { S } from "../store.js";
-import { UI, deviceModel, evidenceBlocks, flashTo, limitOf, thresholds } from "../model.js";
+import { UI, advancedTo, deviceModel, evidenceBlocks, flashTo, limitOf, thresholds } from "../model.js";
 import { availability } from "../actions.js";
 import { icon } from "../components/icons.js";
 import { trustLattice } from "../components/lattice.js";
@@ -76,7 +76,7 @@ export function render({ params }) {
 
   <div class="grid grid-2 section">
     <section class="panel" data-reveal><div class="panel-head"><h2 class="panel-title">${icon("refresh")}Recovery</h2><a class="meta" href="#/recovery">Open recovery</a></div>
-      <div class="panel-body">${m.recoveryUnavailable ? empty({ title: "Recovery is not enabled on this gateway", iconName: "refresh" }) : stepper(m.steps, { compact: true })}</div></section>
+      <div class="panel-body">${m.recoveryUnavailable ? empty({ title: "Recovery is not enabled on this gateway", iconName: "refresh" }) : stepper(m.steps, { compact: true, advancing: advancedTo(id) })}</div></section>
     <section class="panel" data-reveal><div class="panel-head"><h2 class="panel-title">${icon("twin")}Digital twin</h2><a class="meta" href="#/twin">Open twin</a></div>
       <div class="panel-body stack-sm">${twinVerdict(m.twin)}${twinTable(m.twin)}</div></section>
   </div>

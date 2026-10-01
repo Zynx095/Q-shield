@@ -3,7 +3,7 @@ import { html } from "../lib/html.js";
 import { STAGES, failureLabel, stateMeta } from "../lib/copy.js";
 import { clock, countdown, dateTime, duration } from "../lib/format.js";
 import { S, focusId, gatewayNow } from "../store.js";
-import { deviceModel, flashTo } from "../model.js";
+import { advancedTo, deviceModel, flashTo } from "../model.js";
 import { icon } from "../components/icons.js";
 import { stepper } from "../components/recovery.js";
 import { channels } from "../components/rail.js";
@@ -71,7 +71,7 @@ export function render() {
     <div class="grid split-5-7">
       <section class="panel" aria-labelledby="steps-title" data-reveal>
         <div class="panel-head"><h2 class="panel-title" id="steps-title">${icon("refresh")}${id}: path back to trusted</h2></div>
-        <div class="panel-body">${stepper(m.steps)}</div>
+        <div class="panel-body">${stepper(m.steps, { advancing: advancedTo(id) })}</div>
       </section>
       ${currentPanel(m)}
     </div>

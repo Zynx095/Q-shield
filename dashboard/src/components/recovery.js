@@ -3,8 +3,9 @@
 import { html } from "../lib/html.js";
 import { icon } from "./icons.js";
 
-export function stepper(steps, { compact = false } = {}) {
-  return html`<ol class="stepper" aria-label="Recovery progress">${steps.map((s) => {
+/** `advancing`: the device has just moved forward (model.advancedTo); the active step pulses once. */
+export function stepper(steps, { compact = false, advancing = false } = {}) {
+  return html`<ol class="stepper ${advancing ? "is-advancing" : ""}" aria-label="Recovery progress">${steps.map((s) => {
     const label = { done: "completed", active: "in progress", pending: "pending", failed: "failed" }[s.status];
     return html`<li class="step is-${s.status}" data-key="st-${s.key}" ${s.status === "active" ? html`aria-current="step"` : ""}>
       <span class="step-node" aria-hidden="true">${s.status === "done" ? icon("check") : s.status === "failed" ? icon("x") : s.status === "active" ? "" : s.idx}</span>

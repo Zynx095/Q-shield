@@ -26,6 +26,9 @@ export function flashTo(id) {
   return f && f.deviceId === id && f.until > Date.now() ? f.to : null;
 }
 
+/** Has the device just moved forward along the recovery path (into RECOVERING or VERIFIED)? */
+export const advancedTo = (id) => ["RECOVERING", "VERIFIED"].includes(flashTo(id));
+
 export function thresholds() {
   const t = S.system && S.system.trust;
   return t && t.enabled ? t : null;

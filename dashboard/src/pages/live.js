@@ -61,7 +61,7 @@ function quarantineReason(m) {
   </div>`;
 }
 
-function recoveryProgress(m) {
+function recoveryProgress(m, advancing) {
   const steps = m.steps.slice(2);                        // remediation .. trusted
   const active = steps.find((s) => s.status === "active" || s.status === "failed");
   let detail = "";
@@ -77,7 +77,7 @@ function recoveryProgress(m) {
     detail = html`<span>${active.sub}</span>`;
   }
   return html`<div class="lv-ctx lv-progress-block">
-    <ol class="lv-steps" aria-label="Recovery progress">${steps.map((s) => html`<li class="is-${s.status}" ${s.status === "active" ? html`aria-current="step"` : ""}>
+    <ol class="lv-steps ${advancing ? "is-advancing" : ""}" aria-label="Recovery progress">${steps.map((s) => html`<li class="is-${s.status}" ${s.status === "active" ? html`aria-current="step"` : ""}>
       <span class="lv-step-node" aria-hidden="true">${s.status === "done" ? icon("check") : s.status === "failed" ? icon("x") : ""}</span>
       <span class="lv-step-label">${SHORT_STEP[s.key] || s.title}<span class="sr-only"> (${s.status})</span></span></li>`)}</ol>
     ${detail ? html`<div class="lv-ctx-detail">${detail}</div>` : ""}
@@ -105,9 +105,9 @@ function restored(m, state) {
   </div>`;
 }
 
-function context(m, state, meta) {
+function context(m, state, meta, recent) {
   if (state === "QUARANTINED") return quarantineReason(m);
-  if ((state === "RECOVERING" || state === "VERIFIED") && m.recovery) return recoveryProgress(m);
+  if ((state === "RECOVERING" || state === "VERIFIED") && m.recovery) return recoveryProgress(m, !!recent && recent.to === state);
   const normalOpen = m.access && m.access.normal && m.access.normal.allowed;
   if (normalOpen && state === "RECOVERED") return restored(m, state);
   if (normalOpen && state === "TRUSTED" && afterRecovery(m)) return restored(m, state);
@@ -152,7 +152,7 @@ export function render() {
         ${recent ? html`<div class="live-change">${recent.from} → ${recent.to}</div>` : html`<div class="live-change is-quiet">Current state</div>`}
         <div class="live-word">${icon(meta.icon)}${state || "NO DATA"}</div>
         <div class="live-score"><span class="num" data-tween="score">${snap && Number.isFinite(snap.score) ? snap.score : "—"}</span><span class="live-of">trust score</span></div>
-        ${snap && snap.status === "TRACKED" ? context(m, state, meta) : ""}
+        ${snap && snap.status === "TRACKED" ? context(m, state, meta, recent) : ""}
         <div class="live-channels">
           <div class="lc ${n ? (n.allowed ? "ok" : "crit") : ""} ${restoredNow ? "is-restored" : ""} ${justRestored ? "is-new" : ""} ${sealing && n && !n.allowed ? "is-sealing" : ""}">${icon(n && !n.allowed ? "x" : "check")}<span>Normal channel</span><b>${n ? (n.allowed ? (restoredNow ? "Restored" : "Open") : "Blocked") : "—"}</b></div>
           <div class="lc ${r ? (r.allowed ? "ok" : "") : ""} ${sealing && r && r.allowed ? "is-opening" : ""}">${icon(r && r.allowed ? "refresh" : "minus")}<span>Recovery channel</span><b>${r ? (r.allowed ? "Available" : "Closed") : "—"}</b></div>
