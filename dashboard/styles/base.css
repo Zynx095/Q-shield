@@ -1,0 +1,134 @@
+/* Reset, typography and the application shell. */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--t-md);
+  line-height: 1.5;
+  font-feature-settings: "tnum" 1, "cv11" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, p, dl, dd, ol, ul, figure { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--cobalt); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+svg { display: block; }
+code, .mono { font-family: var(--mono); font-size: 0.92em; font-feature-settings: normal; }
+[hidden] { display: none !important; }
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; left: var(--s4); top: -48px; z-index: 100;
+  background: var(--ink); color: #fff; padding: var(--s2) var(--s3); border-radius: var(--r-sm);
+}
+.skip-link:focus { top: var(--s3); }
+
+/* ---------- type roles ---------- */
+.h-page { font-size: var(--t-3xl); font-weight: 620; font-stretch: 104%; letter-spacing: -0.015em; line-height: 1.15; }
+.h-section { font-size: var(--t-xl); font-weight: 600; letter-spacing: -0.005em; line-height: 1.3; }
+.h-panel { font-size: var(--t-lg); font-weight: 600; line-height: 1.35; }
+.lead { font-size: var(--t-lg); color: var(--ink-2); line-height: 1.55; max-width: 68ch; }
+.meta { font-size: var(--t-sm); color: var(--slate); }
+.caption { font-size: var(--t-xs); color: var(--slate); }
+.num { font-variant-numeric: tabular-nums; }
+.strong { font-weight: 600; }
+.ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- shell ---------- */
+.shell { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); min-height: 100vh; }
+.shell.is-bare { grid-template-columns: minmax(0, 1fr); }
+
+.sidebar {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  padding: var(--s5) var(--s3) var(--s4);
+}
+.brand { display: flex; align-items: center; gap: var(--s3); padding: 0 var(--s2) var(--s6); color: var(--ink); text-decoration: none !important; }
+.brand-mark { width: 34px; height: 34px; flex: none; }
+.brand-name { font-weight: 700; font-stretch: 112%; letter-spacing: 0.04em; font-size: 15px; line-height: 1.1; }
+.brand-sub { font-size: var(--t-xs); color: var(--slate); }
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-group + .nav-group { margin-top: var(--s5); }
+.nav-label { font-size: var(--t-xs); color: var(--muted); padding: 0 var(--s3) var(--s2); }
+.nav a {
+  display: flex; align-items: center; gap: var(--s3);
+  padding: 8px var(--s3); border-radius: var(--r-sm);
+  color: var(--ink-2); font-weight: 500; text-decoration: none;
+  transition: background var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+}
+.nav a svg { width: 18px; height: 18px; color: var(--slate); flex: none; }
+.nav a:hover { background: var(--surface-3); color: var(--ink); }
+.nav a[aria-current="page"] { background: var(--cobalt-tint); color: var(--cobalt-strong); }
+.nav a[aria-current="page"] svg { color: var(--cobalt); }
+.nav-count {
+  margin-left: auto; min-width: 22px; padding: 0 7px; height: 20px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--t-xs); font-weight: 600; background: var(--surface-3); color: var(--ink-2);
+}
+.nav-count.crit { background: var(--crit-tint); color: var(--crit); }
+.nav-count.proc { background: var(--cobalt-tint); color: var(--cobalt-strong); }
+.sidebar-foot { margin-top: auto; padding: var(--s4) var(--s3) 0; border-top: 1px solid var(--line); }
+.sidebar-foot .caption { line-height: 1.45; }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  height: var(--topbar-h);
+  display: flex; align-items: center; gap: var(--s4);
+  padding: 0 var(--s8);
+  background: rgba(244, 246, 248, 0.86);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar .menu-btn { display: none; }
+/* chips that do not fit drop to a hidden second row instead of being cut in half */
+.status-strip { display: flex; align-items: center; gap: var(--s2); min-width: 0; overflow: hidden; flex-wrap: wrap; height: 32px; padding-top: 1px; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: var(--s4); flex: none; }
+.content { padding: var(--s8) var(--s8) var(--s14); max-width: 1480px; width: 100%; }
+
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s6); margin-bottom: var(--s6); flex-wrap: wrap; }
+.page-head .lead { margin-top: var(--s2); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  :root { --sidebar-w: 76px; }
+  .brand-text, .nav a span:not(.nav-count), .nav-label, .sidebar-foot { display: none; }
+  .brand { justify-content: center; padding-inline: 0; }
+  .nav a { justify-content: center; position: relative; }
+  .nav-count { position: absolute; top: 2px; right: 6px; height: 16px; min-width: 16px; padding: 0 4px; font-size: 10px; }
+  .content, .topbar { padding-inline: var(--s6); }
+}
+@media (max-width: 760px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .sidebar {
+    position: fixed; inset: 0 auto 0 0; width: 260px; z-index: 60; transform: translateX(-105%);
+    transition: transform var(--dur-2) var(--ease); box-shadow: var(--shadow-pop);
+  }
+  .sidebar.is-open { transform: none; }
+  .sidebar .brand-text, .sidebar .nav a span:not(.nav-count), .sidebar .nav-label, .sidebar .sidebar-foot { display: revert; }
+  .sidebar .nav a { justify-content: flex-start; }
+  .sidebar .nav-count { position: static; height: 20px; }
+  .topbar .menu-btn { display: inline-flex; }
+  .content, .topbar { padding-inline: var(--s4); }
+  .status-strip .chip:not(.chip-key) { display: none; }
+}

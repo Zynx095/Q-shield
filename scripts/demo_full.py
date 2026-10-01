@@ -305,11 +305,14 @@ class Demo:
         self.show_chain()
         self.say(f"dashboard {self.url}/dashboard/#token={self.op_token}")
         if self.a.hold:
-            self.say("gateway kept running for the dashboard; the simulated device keeps reporting every 5 s; Ctrl+C to stop")
+            self.say("gateway kept running for the dashboard; the simulated device keeps reporting every 4 s; Ctrl+C to stop")
             try:
                 while True:
-                    time.sleep(5)
-                    self.agent.telemetry()            # real time from here on: no more time-lapse
+                    time.sleep(4)                     # < uvicorn's 5 s keep-alive, so the pooled connection stays valid
+                    try:
+                        self.agent.telemetry()        # real time from here on: no more time-lapse
+                    except httpx.TransportError:      # server closed an idle connection: the next report reconnects
+                        pass
             except KeyboardInterrupt:
                 pass
         self.server.should_exit = True

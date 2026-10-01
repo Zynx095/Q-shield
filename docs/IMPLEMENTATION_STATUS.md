@@ -1,13 +1,13 @@
 # Q-SHIELD — Implementation Status
 
 Persistent project memory. Read together with `docs/BUILD_CHECKPOINT.md`.
-Last updated: 2026-09-30.
+Last updated: 2026-10-01.
 
 ## CURRENT PHASE
-Phases 0–11 implemented, tested, and exercised by the integrated demo. Remaining work is listed under **WHAT IS LEFT**.
+Phases 0–14 implemented and tested. Phase 14 is the command-center UI rework (see **COMMAND CENTER UI (Phase 14)**). Remaining work is listed under **WHAT IS LEFT**.
 
 ## TEST COUNT
-**614 passed, 0 failed** (`python -m pytest -o addopts="" -q`, ~2 min). The baseline before the continuous build was 544.
+**683 passed, 0 failed** (`python -m pytest -o addopts="" -q`, ~2 min; this includes the dashboard JavaScript unit tests, run through Node). The baseline before the continuous build was 544.
 
 ## COMPLETED
 | Phase | Feature | Status | Key code | Tests |
@@ -64,6 +64,17 @@ trust-engine.md §6.4 and covered by regression tests.
 - The dev certificate is self-signed: no PKI, no rotation automation, no HTTP->HTTPS redirect, no mTLS. The ESP32 firmware has no TLS client (HMAC only).
 - The `demo_full.py` script still uses the shared bootstrap token over local HTTP and prints a dashboard URL containing it (demo only).
 
+## COMMAND CENTER UI (Phase 14)
+**Implemented and tested.** `dashboard/` was rebuilt as a light security command center. It uses native ES modules and has no build step or dependencies; the fonts are vendored so it works on an offline LAN. See `dashboard/README.md`.
+- **Screens:** Overview (posture, trust lattice, story rail, enforcement channels, trust over time, live timeline, active incident, evidence chain); Devices and the device security profile; Incidents; Recovery (8-step stepper, deadlines, remediation, health checks, history); Evidence ledger; Digital twin; Cryptography (which path is post-quantum and which is not, plus live rejection counts); Settings (operator, connection, roster); Presentation mode (`#/live`); Sign-in.
+- **Real data only:** every value comes from the operator API. `Math.random`, seeded data, `localStorage` and unescaped markup are forbidden by `tests/fullstack/test_dashboard_contract.py`. Simulated device data and synthetic detections are labelled on screen.
+- **Operator actions:** start recovery, abort recovery and set the known-good state run in confirmation dialogs that require a reason. Each dialog shows the gateway's real response or its refusal verbatim. Availability hints come from role and state; the gateway stays authoritative.
+- **Minimal backend addition:** `GET /api/v1/system` (operator, read-only, no key material). It returns trust thresholds and weights, recovery limits, the PQC and evidence configuration, the transport, and the gateway clock, so the UI hard-codes none of them and can show the demo's TIME-LAPSE offset. Tests: `tests/fullstack/test_system_info.py`.
+- **Demo fix:** `demo_full.py --hold` crashed with `WinError 10053` when uvicorn closed an idle keep-alive connection exactly as the 5 s report fired. It now reports every 4 s and tolerates a transport error.
+- **Tests:** `dashboard/tests/derive.test.mjs` has 13 node tests on two real captured gateway runs, one of which includes an operator abort and a second recovery. It runs inside pytest via `tests/fullstack/test_dashboard_unit.py` and is skipped if Node.js is absent. The contract tests check every route in `ROUTES` against the real app, check the action methods, and check that the files are served with a JS MIME type.
+- **Browser QA (Edge, headless Playwright, outside the repo):** the full story was driven on a live gateway through the UI. Steps checked: bad-token sign-in rejected; the token is removed from the URL; TRUSTED → SUSPICIOUS → QUARANTINED rendered live; a viewer's controls are disabled; operator `alice` started recovery through the dialog (validation, then success); aborted (the device returned to QUARANTINED); started again; the twin edit is locked during recovery; VERIFIED → RECOVERED → TRUSTED; the evidence ledger shows `alice started recovery` and `alice aborted recovery`; a known-good edit produced a visible MISMATCH; with the gateway stopped, the offline banner appeared. Layout was checked at 1440/1280/1024/768/390 px. There was no horizontal overflow from 768 px up; the 390 px overflow found during QA was fixed. Keyboard checks: skip link, nav order, dialog focus and Escape with focus return.
+- **Not verified:** the webcam path in the UI (no camera here); screen-reader output (only structure and ARIA were checked).
+
 ## HOW TO RUN
 ```
 python -m pytest -o addopts="" -q                   # full suite
@@ -97,6 +108,6 @@ The demo prints the dashboard URL with the operator token.
 | Done | Background timer for recovery deadlines | `RecoveryTimer` in `backend/recovery/orchestrator.py`, started/stopped with the gateway; tests in `tests/fullstack/test_recovery_timer.py` |
 | Done | Dashboard operator actions | See "OPERATOR CONTROLS" below |
 | Done (prototype) | TLS for the gateway; per-operator tokens | Phase 13; see above |
-| Medium | Update the audit PDF and the PPT to reflect Phases 5–11 | Both still describe Phases 5–10 as planned |
+| Medium | Update the audit PDF and the PPT to reflect Phases 5–14 (new dashboard screenshots) | Both still describe Phases 5–10 as planned |
 | Low | External anchoring of the evidence head; key rotation | TD-09, TD-15 |
 | Research | Calibrate trust parameters; measure vision accuracy; external review of the session protocol | trust-engine.md §16 |

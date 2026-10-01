@@ -1,0 +1,100 @@
+/* Q-SHIELD design tokens. Light, calm, high-trust. Colour carries meaning only:
+   emerald = verified/healthy, amber = suspicious, crimson = genuinely dangerous, cobalt = security process / focus.
+   Every status colour ships with an icon and a word (never colour alone). */
+
+@font-face {
+  font-family: "Archivo";
+  src: url("../assets/fonts/archivo-latin-wdth-normal.woff2") format("woff2-variations"),
+       url("../assets/fonts/archivo-latin-wdth-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../assets/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../assets/fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --paper: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #f8f9fb;
+  --surface-3: #eef1f5;
+  --line: #e3e7ed;
+  --line-strong: #d0d7e1;
+
+  /* ink */
+  --ink: #0f1b2d;          /* deep ink navy: primary text, display numerals */
+  --ink-2: #2e3c52;
+  --slate: #56647a;        /* secondary text (5.9:1 on white) */
+  --muted: #7d889a;        /* tertiary, non-essential only */
+
+  /* accent: deep cobalt (security process, focus, selection) */
+  --cobalt: #2d45c4;
+  --cobalt-strong: #22379f;
+  --cobalt-tint: #eef1fc;
+  --cobalt-line: #c8d1f4;
+
+  /* status */
+  --ok: #0f7a55;           /* text-safe emerald */
+  --ok-fill: #1a9a6c;
+  --ok-tint: #e9f6f0;
+  --ok-line: #bfe3d2;
+  --warn: #8f5500;         /* text-safe amber */
+  --warn-fill: #e19a2c;
+  --warn-tint: #fdf4e3;
+  --warn-line: #f0d39c;
+  --crit: #a3213a;         /* restrained crimson */
+  --crit-fill: #c2334c;
+  --crit-tint: #fbeef0;
+  --crit-line: #efc4cc;
+  --info: #1e66c7;
+  --info-tint: #eaf2fc;
+
+  /* type */
+  --font: "Archivo", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --t-xs: 0.75rem;     /* 12 */
+  --t-sm: 0.8125rem;   /* 13 */
+  --t-md: 0.875rem;    /* 14 body */
+  --t-lg: 1rem;        /* 16 */
+  --t-xl: 1.25rem;     /* 20 */
+  --t-2xl: 1.625rem;   /* 26 */
+  --t-3xl: 2.125rem;   /* 34 */
+
+  /* space (4-pt) */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px; --s14: 56px;
+
+  /* shape */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --shadow-panel: 0 1px 0 rgba(15, 27, 45, 0.03);
+  --shadow-lift: 0 1px 2px rgba(15, 27, 45, 0.05), 0 8px 24px -12px rgba(15, 27, 45, 0.12);
+  --shadow-pop: 0 2px 6px rgba(15, 27, 45, 0.08), 0 24px 48px -16px rgba(15, 27, 45, 0.28);
+
+  /* motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-1: 140ms;
+  --dur-2: 260ms;
+  --dur-3: 700ms;
+
+  --sidebar-w: 236px;
+  --topbar-h: 60px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-1: 0ms; --dur-2: 0ms; --dur-3: 0ms; }
+}

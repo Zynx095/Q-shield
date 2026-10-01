@@ -374,6 +374,43 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
             trust.process_pending()
             return trust.history(device_id, limit)
 
+    @app.get("/api/v1/system", dependencies=[require_operator])
+    def system(request: Request):
+        """Read-only description of how THIS gateway is configured, for the dashboard (no secrets, no private keys).
+        server_time lets the UI show gateway-clock offsets honestly (e.g. the demo's announced TIME-LAPSE)."""
+        out: dict = {"server_time": clock(), "transport": request.url.scheme,
+                     "operator_auth": {"shared_token_enabled": settings.allow_shared_operator_token}}
+        if pqc is not None:
+            key = pqc.gateway_public_key()
+            out["pqc"] = {"enabled": True, **pqc.backend.info(), "gateway_kem_key_id": key.key_id,
+                          "gateway_kem_fingerprint_sha256": key.fingerprint,
+                          "signers": [{"signer_id": s.signer_id, "algorithm": s.algorithm, "source": s.source,
+                                       "allowed_devices": list(s.allowed_devices), "status": s.status}
+                                      for s in store.list_signers()]}
+        else:
+            out["pqc"] = {"enabled": False}
+        signer = getattr(evidence, "signer", None)
+        out["evidence"] = {"enabled": evidence is not None, "signed": signer is not None,
+                           "key_id": getattr(signer, "key_id", None),
+                           "algorithm": getattr(getattr(signer, "backend", None), "sig_algorithm", None),
+                           "hash": "SHA-256" if evidence is not None else None}
+        if trust is not None:
+            c = trust.cfg
+            out["trust"] = {"enabled": True, "trusted_min": c.trusted_min, "quarantine_below": c.quarantine_below,
+                            "trusted_reentry_min": c.trusted_reentry_min, "pressure_cap": c.pressure_cap,
+                            "correlation_window_s": c.correlation_window_s, "offline_timeout_s": c.offline_timeout_s,
+                            "weights": {f.value: w for f, w in c.weights.items()}}
+        else:
+            out["trust"] = {"enabled": False}
+        if recovery is not None:
+            rc = recovery.cfg
+            out["recovery"] = {"enabled": True, "health_checks_required": rc.health_checks_required,
+                               "deadline_s": rc.deadline_s, "ramp_timeout_s": rc.ramp_timeout_s,
+                               "background_timer_s": settings.recovery_tick_s or None}
+        else:
+            out["recovery"] = {"enabled": False}
+        return out
+
     register_security_routes(app, store=store, clock=clock, require_operator=require_operator, require_actor=require_actor,
                              require_admin=require_admin, operators=operators, handle=handle,
                              trust=trust, twin=twin, evidence=evidence, recorder=recorder, recovery=recovery)

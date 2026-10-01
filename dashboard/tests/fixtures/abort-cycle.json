@@ -1,0 +1,2319 @@
+{
+ "_note": "Captured from a real gateway run with an operator abort and a second recovery (2026-10-01). Signatures trimmed.",
+ "snapshot": {
+  "device_id": "DEVICE-001",
+  "status": "TRACKED",
+  "state": "TRUSTED",
+  "score": 85,
+  "score_exact": 84.55010370918234,
+  "recommended_action": "none",
+  "coverage": 1.0,
+  "unavailable": [],
+  "factors": {
+   "identity_crypto": {
+    "available": true,
+    "nominal_weight": 0.25,
+    "effective_weight": 0.25,
+    "penalty": 0.0
+   },
+   "physical": {
+    "available": true,
+    "nominal_weight": 0.2,
+    "effective_weight": 0.2,
+    "penalty": 61.926782098950916
+   },
+   "config_integrity": {
+    "available": true,
+    "nominal_weight": 0.15,
+    "effective_weight": 0.15,
+    "penalty": 0.0
+   },
+   "sensor_consistency": {
+    "available": true,
+    "nominal_weight": 0.15,
+    "effective_weight": 0.15,
+    "penalty": 0.0
+   },
+   "visual": {
+    "available": true,
+    "nominal_weight": 0.15,
+    "effective_weight": 0.15,
+    "penalty": 11.506614741411065
+   },
+   "network": {
+    "available": true,
+    "nominal_weight": 0.1,
+    "effective_weight": 0.1,
+    "penalty": 0.0
+   }
+  },
+  "pressure": 1.3385476598158106,
+  "raw": 85.88865136899815,
+  "uncapped": 84.55010370918234,
+  "caps": [],
+  "revoked": false,
+  "tamper_active": false,
+  "incident": {
+   "id": "INC-DEVICE-001-1",
+   "class": "confirmed_incident",
+   "modalities": [
+    "PHYSICAL",
+    "VISUAL"
+   ],
+   "members": {
+    "PHYSICAL": "msg:7:tamper",
+    "VISUAL": "obs:9f71663f-6691-4e4a-a49d-4be00179bb67"
+   },
+   "started": 1790867084.573598
+  },
+  "provenance": {
+   "device_evidence": "simulated by software-agent",
+   "physical_tamper": "simulated by software-agent",
+   "sensor_out_of_range": "simulated by software-agent",
+   "integrity_mismatch": "self-reported, not proof of integrity"
+  },
+  "last_device_evidence_age_s": 1.8955931663513184,
+  "credit_clock_s": 2541.0659754276276,
+  "duplicates_ignored": 0,
+  "notes": "score reflects only available signals; see coverage and unavailable"
+ },
+ "history": [
+  {
+   "event_id": "TC-DEVICE-001-21",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790869660.9620419,
+   "kind": "state_transition_request",
+   "previous_score": 85,
+   "new_score": 85,
+   "delta": 0,
+   "previous_exact": 84.537150765955,
+   "new_exact": 84.537150765955,
+   "previous_state": "RECOVERED",
+   "new_state": "TRUSTED",
+   "trigger_signals": [
+    "recovery:REC-d5b0e1b234d5"
+   ],
+   "reasons": [
+    {
+     "signal": "state_transition_request",
+     "impact": 0.0,
+     "reason": "trust rebuilt to 85",
+     "evidence_id": "recovery:REC-d5b0e1b234d5",
+     "from": "RECOVERED",
+     "to": "TRUSTED"
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-20",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790869660.918717,
+   "kind": "score_change",
+   "previous_score": 84,
+   "new_score": 85,
+   "delta": 1,
+   "previous_exact": 84.4824778607231,
+   "new_exact": 84.537150765955,
+   "previous_state": "RECOVERED",
+   "new_state": "RECOVERED",
+   "trigger_signals": [
+    "msg:248"
+   ],
+   "reasons": [
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.024703876980252917,
+     "factor": "physical",
+     "credited_s": 10.344163
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.016137467057170785,
+     "factor": "pressure",
+     "credited_s": 10.344163
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.013831561194488895,
+     "factor": "visual",
+     "credited_s": 10.344163
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-19",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790869485.077371,
+   "kind": "score_change",
+   "previous_score": 83,
+   "new_score": 84,
+   "delta": 1,
+   "previous_exact": 83.49632528503356,
+   "new_exact": 83.55746521417169,
+   "previous_state": "RECOVERED",
+   "new_state": "RECOVERED",
+   "trigger_signals": [
+    "msg:231"
+   ],
+   "reasons": [
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.025544718839503846,
+     "factor": "physical",
+     "credited_s": 10.340229
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.019764118788909713,
+     "factor": "pressure",
+     "credited_s": 10.340229
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.015831091509705873,
+     "factor": "visual",
+     "credited_s": 10.340229
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-18",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790869319.5990717,
+   "kind": "score_change",
+   "previous_score": 82,
+   "new_score": 83,
+   "delta": 1,
+   "previous_exact": 82.4588209560863,
+   "new_exact": 82.5270676651057,
+   "previous_state": "RECOVERED",
+   "new_state": "RECOVERED",
+   "trigger_signals": [
+    "msg:215"
+   ],
+   "reasons": [
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.026358335442048998,
+     "factor": "physical",
+     "credited_s": 10.33504
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.023914892815457556,
+     "factor": "pressure",
+     "credited_s": 10.33504
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.017973480761893066,
+     "factor": "visual",
+     "credited_s": 10.33504
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-17",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790869174.811101,
+   "kind": "score_change",
+   "previous_score": 81,
+   "new_score": 82,
+   "delta": 1,
+   "previous_exact": 81.44980726113769,
+   "new_exact": 81.52530432581445,
+   "previous_state": "RECOVERED",
+   "new_state": "RECOVERED",
+   "trigger_signals": [
+    "msg:201"
+   ],
+   "reasons": [
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.02828034460846718,
+     "factor": "pressure",
+     "credited_s": 10.339396
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.027114808066897922,
+     "factor": "physical",
+     "credited_s": 10.339396
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.02010191200140259,
+     "factor": "visual",
+     "credited_s": 10.339396
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-16",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790869050.6904106,
+   "kind": "score_change",
+   "previous_score": 80,
+   "new_score": 81,
+   "delta": 1,
+   "previous_exact": 80.49874159985963,
+   "new_exact": 80.5812653889297,
+   "previous_state": "RECOVERED",
+   "new_state": "RECOVERED",
+   "trigger_signals": [
+    "msg:189"
+   ],
+   "reasons": [
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.032638056365532186,
+     "factor": "pressure",
+     "credited_s": 10.338809
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.02776893684707318,
+     "factor": "physical",
+     "credited_s": 10.338809
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.022116795857460403,
+     "factor": "visual",
+     "credited_s": 10.338809
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-15",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790868936.9173877,
+   "kind": "state_transition_request",
+   "previous_score": 80,
+   "new_score": 80,
+   "delta": 0,
+   "previous_exact": 79.63745430300958,
+   "new_exact": 79.63745430300958,
+   "previous_state": "VERIFIED",
+   "new_state": "RECOVERED",
+   "trigger_signals": [
+    "recovery:REC-d5b0e1b234d5"
+   ],
+   "reasons": [
+    {
+     "signal": "state_transition_request",
+     "impact": 0.0,
+     "reason": "trust rebuilt to 80",
+     "evidence_id": "recovery:REC-d5b0e1b234d5",
+     "from": "VERIFIED",
+     "to": "RECOVERED"
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-14",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790868936.8742902,
+   "kind": "score_change",
+   "previous_score": 30,
+   "new_score": 80,
+   "delta": 50,
+   "previous_exact": 30.0,
+   "new_exact": 79.63745430300958,
+   "previous_state": "VERIFIED",
+   "new_state": "VERIFIED",
+   "trigger_signals": [
+    "msg:178"
+   ],
+   "reasons": [
+    {
+     "signal": "cap:confirmed_incident",
+     "impact": 49.54763368453196
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.03725289928224518,
+     "factor": "pressure",
+     "credited_s": 10.346829
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.028406158488232337,
+     "factor": "physical",
+     "credited_s": 10.346829
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.024161560707126207,
+     "factor": "visual",
+     "credited_s": 10.346829
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-13",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790868037.120033,
+   "kind": "score_change",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "VERIFIED",
+   "new_state": "VERIFIED",
+   "trigger_signals": [
+    "msg:91"
+   ],
+   "reasons": [
+    {
+     "signal": "cap:confirmed_incident",
+     "impact": -0.18728496866469868
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.10525169154257696,
+     "factor": "pressure",
+     "credited_s": 10.340004
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.048277207086688985,
+     "factor": "visual",
+     "credited_s": 10.340004
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.0337560700354203,
+     "factor": "physical",
+     "credited_s": 10.340004
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-12",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867292.2455642,
+   "kind": "state_transition_request",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "RECOVERING",
+   "new_state": "VERIFIED",
+   "trigger_signals": [
+    "recovery:REC-d5b0e1b234d5"
+   ],
+   "reasons": [
+    {
+     "signal": "state_transition_request",
+     "impact": 0.0,
+     "reason": "3 consecutive clean authenticated reports",
+     "evidence_id": "recovery:REC-d5b0e1b234d5",
+     "from": "RECOVERING",
+     "to": "VERIFIED"
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-11",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867239.392929,
+   "kind": "state_transition_request",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "QUARANTINED",
+   "new_state": "RECOVERING",
+   "trigger_signals": [
+    "recovery:REC-d5b0e1b234d5"
+   ],
+   "reasons": [
+    {
+     "signal": "state_transition_request",
+     "impact": 0.0,
+     "reason": "recovery started: Alice: indicator cleared, retry",
+     "evidence_id": "recovery:REC-d5b0e1b234d5",
+     "from": "QUARANTINED",
+     "to": "RECOVERING"
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-10",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867236.2994223,
+   "kind": "state_transition_request",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "VERIFIED",
+   "new_state": "QUARANTINED",
+   "trigger_signals": [
+    "recovery:REC-133beae7d378"
+   ],
+   "reasons": [
+    {
+     "signal": "state_transition_request",
+     "impact": 0.0,
+     "reason": "recovery failed: aborted: Alice: second indicator of compromise (by alice)",
+     "evidence_id": "recovery:REC-133beae7d378",
+     "from": "VERIFIED",
+     "to": "QUARANTINED"
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-9",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867215.5522602,
+   "kind": "state_transition_request",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "RECOVERING",
+   "new_state": "VERIFIED",
+   "trigger_signals": [
+    "recovery:REC-133beae7d378"
+   ],
+   "reasons": [
+    {
+     "signal": "state_transition_request",
+     "impact": 0.0,
+     "reason": "3 consecutive clean authenticated reports",
+     "evidence_id": "recovery:REC-133beae7d378",
+     "from": "RECOVERING",
+     "to": "VERIFIED"
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-8",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867174.0948384,
+   "kind": "score_change",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "RECOVERING",
+   "new_state": "RECOVERING",
+   "trigger_signals": [
+    "msg:8"
+   ],
+   "reasons": [
+    {
+     "signal": "cap:confirmed_incident",
+     "impact": -7.431607245398702
+    },
+    {
+     "signal": "network_liveness",
+     "impact": 5.751286665598553,
+     "factor": "network"
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 1.2664469762370203,
+     "factor": "pressure",
+     "credited_s": 45.0
+    },
+    {
+     "signal": "healthy_evidence_recovery",
+     "impact": 0.4138736035631254,
+     "factor": "visual",
+     "credited_s": 45.0
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-7",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867162.179554,
+   "kind": "state_transition_request",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "QUARANTINED",
+   "new_state": "RECOVERING",
+   "trigger_signals": [
+    "recovery:REC-133beae7d378"
+   ],
+   "reasons": [
+    {
+     "signal": "state_transition_request",
+     "impact": 0.0,
+     "reason": "recovery started: Alice: incident contained, restore known-good",
+     "evidence_id": "recovery:REC-133beae7d378",
+     "from": "QUARANTINED",
+     "to": "RECOVERING"
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper",
+    "stale_device"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-6",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867127.0951371,
+   "kind": "time_driven",
+   "previous_score": 30,
+   "new_score": 30,
+   "delta": 0,
+   "previous_exact": 30.0,
+   "new_exact": 30.0,
+   "previous_state": "QUARANTINED",
+   "new_state": "QUARANTINED",
+   "trigger_signals": [],
+   "reasons": [
+    {
+     "signal": "cap:confirmed_incident",
+     "impact": 0.12564265286482623
+    },
+    {
+     "signal": "network_liveness",
+     "impact": -0.1256426528648092,
+     "factor": "network"
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper",
+    "stale_device"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-5",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867084.573598,
+   "kind": "score_change",
+   "previous_score": 55,
+   "new_score": 30,
+   "delta": -25,
+   "previous_exact": 55.0,
+   "new_exact": 30.0,
+   "previous_state": "SUSPICIOUS",
+   "new_state": "QUARANTINED",
+   "trigger_signals": [
+    "obs:9f71663f-6691-4e4a-a49d-4be00179bb67"
+   ],
+   "reasons": [
+    {
+     "signal": "cap:confirmed_incident",
+     "impact": -12.849999999999994
+    },
+    {
+     "signal": "visual_rule_violation",
+     "impact": -12.15,
+     "factor": "visual",
+     "authenticity": "SIGNER_MLDSA",
+     "source_ref": "observation:9f71663f-6691-4e4a-a49d-4be00179bb67",
+     "confidence": 0.9,
+     "impact_points": 81.0
+    }
+   ],
+   "caps_active": [
+    "confirmed_incident",
+    "physical_tamper"
+   ],
+   "incident": {
+    "id": "INC-DEVICE-001-1",
+    "class": "confirmed_incident",
+    "modalities": [
+     "PHYSICAL",
+     "VISUAL"
+    ],
+    "members": {
+     "PHYSICAL": "msg:7:tamper",
+     "VISUAL": "obs:9f71663f-6691-4e4a-a49d-4be00179bb67"
+    },
+    "started": 1790867084.573598
+   },
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-4",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867081.4524684,
+   "kind": "score_change",
+   "previous_score": 82,
+   "new_score": 55,
+   "delta": -27,
+   "previous_exact": 82.06408505622844,
+   "new_exact": 55.0,
+   "previous_state": "TRUSTED",
+   "new_state": "SUSPICIOUS",
+   "trigger_signals": [
+    "msg:7:tamper"
+   ],
+   "reasons": [
+    {
+     "signal": "physical_tamper",
+     "impact": -20.0,
+     "factor": "physical",
+     "authenticity": "DEVICE_HMAC",
+     "source_ref": "device_message:7",
+     "provenance": "simulated by software-agent"
+    },
+    {
+     "signal": "cap:physical_tamper",
+     "impact": -7.064085056228443
+    }
+   ],
+   "caps_active": [
+    "physical_tamper"
+   ],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-3",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867078.3621922,
+   "kind": "score_change",
+   "previous_score": 90,
+   "new_score": 82,
+   "delta": -8,
+   "previous_exact": 90.0,
+   "new_exact": 82.0,
+   "previous_state": "TRUSTED",
+   "new_state": "TRUSTED",
+   "trigger_signals": [
+    "event:6"
+   ],
+   "reasons": [
+    {
+     "signal": "observation_replay",
+     "impact": -8.0,
+     "factor": "pressure",
+     "authenticity": "UNAUTHENTICATED",
+     "source_ref": "security_event:6"
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 1.0,
+   "unavailable": []
+  },
+  {
+   "event_id": "TC-DEVICE-001-2",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867075.228728,
+   "kind": "score_change",
+   "previous_score": 100,
+   "new_score": 90,
+   "delta": -10,
+   "previous_exact": 100.0,
+   "new_exact": 90.0,
+   "previous_state": "TRUSTED",
+   "new_state": "TRUSTED",
+   "trigger_signals": [
+    "event:5"
+   ],
+   "reasons": [
+    {
+     "signal": "invalid_signature",
+     "impact": -10.0,
+     "factor": "pressure",
+     "authenticity": "UNAUTHENTICATED",
+     "source_ref": "security_event:5"
+    }
+   ],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 0.85,
+   "unavailable": [
+    "visual"
+   ]
+  },
+  {
+   "event_id": "TC-DEVICE-001-1",
+   "device_id": "DEVICE-001",
+   "timestamp": 1790867071.0873134,
+   "kind": "created",
+   "previous_score": 100,
+   "new_score": 100,
+   "delta": 0,
+   "previous_exact": 100.0,
+   "new_exact": 100.0,
+   "previous_state": null,
+   "new_state": "TRUSTED",
+   "trigger_signals": [
+    "msg:1"
+   ],
+   "reasons": [],
+   "caps_active": [],
+   "incident": null,
+   "coverage": 0.35,
+   "unavailable": [
+    "physical",
+    "config_integrity",
+    "sensor_consistency",
+    "visual"
+   ]
+  }
+ ],
+ "events": [
+  {
+   "id": 25,
+   "received_at": 1790869660.9571917,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_completed",
+   "severity": "medium",
+   "details": {
+    "recovery_id": "REC-d5b0e1b234d5",
+    "score": 85
+   }
+  },
+  {
+   "id": 24,
+   "received_at": 1790867292.2377326,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_verified",
+   "severity": "medium",
+   "details": {
+    "recovery_id": "REC-d5b0e1b234d5",
+    "checks": [
+     {
+      "msg_id": 17,
+      "t": 1790867271.5359316,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 18,
+      "t": 1790867281.8855245,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 19,
+      "t": 1790867292.2377326,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     }
+    ]
+   }
+  },
+  {
+   "id": 23,
+   "received_at": 1790867239.4495277,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "severity": "low",
+   "details": {
+    "operator_id": "alice",
+    "operator_role": "operator",
+    "bootstrap_identity": false,
+    "action": "START_RECOVERY",
+    "device_id": "DEVICE-001",
+    "reason": "Alice: indicator cleared, retry",
+    "result": "success"
+   }
+  },
+  {
+   "id": 22,
+   "received_at": 1790867239.3858917,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_started",
+   "severity": "medium",
+   "details": {
+    "recovery_id": "REC-d5b0e1b234d5",
+    "reason": "Alice: indicator cleared, retry",
+    "requested_by": "alice",
+    "command": {
+     "command_id": "CMD-28325f5ac8",
+     "action": "apply_known_good_config",
+     "cfg_hash": "cfg-good-1",
+     "fw_version": "agent-0.1",
+     "note": "software configuration remediation; firmware is checked, not reflashed"
+    }
+   }
+  },
+  {
+   "id": 21,
+   "received_at": 1790867236.6933684,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 20,
+   "received_at": 1790867236.3508952,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "severity": "low",
+   "details": {
+    "operator_id": "alice",
+    "operator_role": "operator",
+    "bootstrap_identity": false,
+    "action": "ABORT_RECOVERY",
+    "device_id": "DEVICE-001",
+    "reason": "Alice: second indicator of compromise",
+    "result": "success"
+   }
+  },
+  {
+   "id": 19,
+   "received_at": 1790867236.2840066,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_failed",
+   "severity": "high",
+   "details": {
+    "recovery_id": "REC-133beae7d378",
+    "reason": "aborted: Alice: second indicator of compromise (by alice)"
+   }
+  },
+  {
+   "id": 18,
+   "received_at": 1790867215.5442543,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_verified",
+   "severity": "medium",
+   "details": {
+    "recovery_id": "REC-133beae7d378",
+    "checks": [
+     {
+      "msg_id": 10,
+      "t": 1790867194.8540363,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 11,
+      "t": 1790867205.1957655,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 12,
+      "t": 1790867215.5442543,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     }
+    ]
+   }
+  },
+  {
+   "id": 17,
+   "received_at": 1790867162.2351222,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "severity": "low",
+   "details": {
+    "operator_id": "alice",
+    "operator_role": "operator",
+    "bootstrap_identity": false,
+    "action": "START_RECOVERY",
+    "device_id": "DEVICE-001",
+    "reason": "Alice: incident contained, restore known-good",
+    "result": "success"
+   }
+  },
+  {
+   "id": 16,
+   "received_at": 1790867162.1705847,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_started",
+   "severity": "medium",
+   "details": {
+    "recovery_id": "REC-133beae7d378",
+    "reason": "Alice: incident contained, restore known-good",
+    "requested_by": "alice",
+    "command": {
+     "command_id": "CMD-ec53a17caf",
+     "action": "apply_known_good_config",
+     "cfg_hash": "cfg-good-1",
+     "fw_version": "agent-0.1",
+     "note": "software configuration remediation; firmware is checked, not reflashed"
+    }
+   }
+  },
+  {
+   "id": 15,
+   "received_at": 1790867157.9565983,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 14,
+   "received_at": 1790867147.7743592,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 13,
+   "received_at": 1790867137.5942335,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 12,
+   "received_at": 1790867127.4147243,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 11,
+   "received_at": 1790867117.2529304,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 10,
+   "received_at": 1790867107.0753336,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 9,
+   "received_at": 1790867096.89727,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 8,
+   "received_at": 1790867086.7063162,
+   "device_id": "DEVICE-001",
+   "event_type": "invalid_tag",
+   "severity": "high",
+   "details": {
+    "claimed_device_id": "DEVICE-001",
+    "type": "telemetry",
+    "counter": 10000000000000
+   }
+  },
+  {
+   "id": 7,
+   "received_at": 1790867086.6651323,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "severity": "high",
+   "details": {
+    "channel": "normal",
+    "trust_state": "QUARANTINED",
+    "reason": "device_quarantined"
+   }
+  },
+  {
+   "id": 6,
+   "received_at": 1790867078.3621922,
+   "device_id": "DEVICE-001",
+   "event_type": "pqc_observation_replay",
+   "severity": "medium",
+   "details": {
+    "via": "signed",
+    "claimed_signer_id": "vision-1",
+    "observation_id": "cef3de3d-cb2e-4bb3-b7c3-c752d18547ab",
+    "device_id": "DEVICE-001"
+   }
+  },
+  {
+   "id": 5,
+   "received_at": 1790867075.228728,
+   "device_id": null,
+   "event_type": "pqc_invalid_signature",
+   "severity": "high",
+   "details": {
+    "via": "signed",
+    "claimed_signer_id": "vision-1",
+    "observation_id": "41799d21-5572-415e-bbe8-16c072f873c7",
+    "device_id": null
+   }
+  },
+  {
+   "id": 4,
+   "received_at": 1790867071.068017,
+   "device_id": "DEVICE-001",
+   "event_type": "twin_expected_updated",
+   "severity": "low",
+   "details": {
+    "expected": {
+     "fw_version": "agent-0.1",
+     "cfg_hash": "cfg-good-1",
+     "capabilities": [
+      "tamper",
+      "temperature",
+      "vibration"
+     ],
+     "sensor_ranges": {
+      "temperature_c": [
+       -20,
+       60
+      ]
+     }
+    },
+    "operator_id": "bootstrap-admin"
+   }
+  },
+  {
+   "id": 3,
+   "received_at": 1790867071.0563378,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "severity": "low",
+   "details": {
+    "operator_id": "bootstrap-admin",
+    "operator_role": "admin",
+    "bootstrap_identity": true,
+    "action": "SET_EXPECTED_STATE",
+    "device_id": "DEVICE-001",
+    "reason": null,
+    "result": "success"
+   }
+  },
+  {
+   "id": 2,
+   "received_at": 1790867071.0351162,
+   "device_id": null,
+   "event_type": "operator_action",
+   "severity": "low",
+   "details": {
+    "operator_id": "bootstrap-admin",
+    "operator_role": "admin",
+    "bootstrap_identity": true,
+    "action": "CREATE_OPERATOR",
+    "device_id": null,
+    "reason": null,
+    "result": "success",
+    "target_operator": "alice",
+    "target_role": "operator"
+   }
+  },
+  {
+   "id": 1,
+   "received_at": 1790867071.0160525,
+   "device_id": null,
+   "event_type": "operator_action",
+   "severity": "low",
+   "details": {
+    "operator_id": "bootstrap-admin",
+    "operator_role": "admin",
+    "bootstrap_identity": true,
+    "action": "CREATE_OPERATOR",
+    "device_id": null,
+    "reason": null,
+    "result": "success",
+    "target_operator": "vera",
+    "target_role": "viewer"
+   }
+  }
+ ],
+ "recovery": {
+  "current": {
+   "recovery_id": "REC-d5b0e1b234d5",
+   "device_id": "DEVICE-001",
+   "status": "completed",
+   "stage": "restoring",
+   "started_at": 1790867239.3858917,
+   "deadline": 1790868139.3858917,
+   "ramp_deadline": 1790874492.2377326,
+   "updated_at": 1790869660.9571917,
+   "last_msg_id": 19,
+   "reason": "Alice: indicator cleared, retry",
+   "requested_by": "alice",
+   "health": [
+    {
+     "msg_id": 17,
+     "t": 1790867271.5359316,
+     "tamper": false,
+     "twin": "MATCH",
+     "clean": true
+    },
+    {
+     "msg_id": 18,
+     "t": 1790867281.8855245,
+     "tamper": false,
+     "twin": "MATCH",
+     "clean": true
+    },
+    {
+     "msg_id": 19,
+     "t": 1790867292.2377326,
+     "tamper": false,
+     "twin": "MATCH",
+     "clean": true
+    }
+   ],
+   "log": [
+    {
+     "t": 1790867239.3858917,
+     "event": "recovery_started",
+     "reason": "Alice: indicator cleared, retry",
+     "requested_by": "alice",
+     "command": {
+      "command_id": "CMD-28325f5ac8",
+      "action": "apply_known_good_config",
+      "cfg_hash": "cfg-good-1",
+      "fw_version": "agent-0.1",
+      "note": "software configuration remediation; firmware is checked, not reflashed"
+     }
+    },
+    {
+     "t": 1790867261.1571085,
+     "event": "remediation_acknowledged",
+     "msg_id": 16
+    },
+    {
+     "t": 1790867292.2377326,
+     "event": "recovery_verified",
+     "checks": [
+      {
+       "msg_id": 17,
+       "t": 1790867271.5359316,
+       "tamper": false,
+       "twin": "MATCH",
+       "clean": true
+      },
+      {
+       "msg_id": 18,
+       "t": 1790867281.8855245,
+       "tamper": false,
+       "twin": "MATCH",
+       "clean": true
+      },
+      {
+       "msg_id": 19,
+       "t": 1790867292.2377326,
+       "tamper": false,
+       "twin": "MATCH",
+       "clean": true
+      }
+     ]
+    },
+    {
+     "t": 1790868936.9133284,
+     "event": "access_restored",
+     "score": 80
+    },
+    {
+     "t": 1790869660.9571917,
+     "event": "recovery_completed",
+     "score": 85
+    }
+   ],
+   "command": {
+    "command_id": "CMD-28325f5ac8",
+    "action": "apply_known_good_config",
+    "cfg_hash": "cfg-good-1",
+    "fw_version": "agent-0.1",
+    "note": "software configuration remediation; firmware is checked, not reflashed"
+   },
+   "command_acked": true,
+   "consecutive_clean": 3
+  },
+  "history": [
+   {
+    "recovery_id": "REC-133beae7d378",
+    "device_id": "DEVICE-001",
+    "status": "failed",
+    "stage": "trust_ramp",
+    "started_at": 1790867162.1705847,
+    "deadline": 1790868062.1705847,
+    "ramp_deadline": 1790874415.5442543,
+    "updated_at": 1790867236.2840066,
+    "last_msg_id": 12,
+    "reason": "Alice: incident contained, restore known-good",
+    "requested_by": "alice",
+    "health": [
+     {
+      "msg_id": 10,
+      "t": 1790867194.8540363,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 11,
+      "t": 1790867205.1957655,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 12,
+      "t": 1790867215.5442543,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     }
+    ],
+    "log": [
+     {
+      "t": 1790867162.1705847,
+      "event": "recovery_started",
+      "reason": "Alice: incident contained, restore known-good",
+      "requested_by": "alice",
+      "command": {
+       "command_id": "CMD-ec53a17caf",
+       "action": "apply_known_good_config",
+       "cfg_hash": "cfg-good-1",
+       "fw_version": "agent-0.1",
+       "note": "software configuration remediation; firmware is checked, not reflashed"
+      }
+     },
+     {
+      "t": 1790867184.479771,
+      "event": "remediation_acknowledged",
+      "msg_id": 9
+     },
+     {
+      "t": 1790867215.5442543,
+      "event": "recovery_verified",
+      "checks": [
+       {
+        "msg_id": 10,
+        "t": 1790867194.8540363,
+        "tamper": false,
+        "twin": "MATCH",
+        "clean": true
+       },
+       {
+        "msg_id": 11,
+        "t": 1790867205.1957655,
+        "tamper": false,
+        "twin": "MATCH",
+        "clean": true
+       },
+       {
+        "msg_id": 12,
+        "t": 1790867215.5442543,
+        "tamper": false,
+        "twin": "MATCH",
+        "clean": true
+       }
+      ]
+     },
+     {
+      "t": 1790867236.2840066,
+      "event": "recovery_failed",
+      "reason": "aborted: Alice: second indicator of compromise (by alice)"
+     }
+    ],
+    "command": {
+     "command_id": "CMD-ec53a17caf",
+     "action": "apply_known_good_config",
+     "cfg_hash": "cfg-good-1",
+     "fw_version": "agent-0.1",
+     "note": "software configuration remediation; firmware is checked, not reflashed"
+    },
+    "command_acked": true,
+    "consecutive_clean": 3,
+    "failure_reason": "aborted: Alice: second indicator of compromise (by alice)"
+   },
+   {
+    "recovery_id": "REC-d5b0e1b234d5",
+    "device_id": "DEVICE-001",
+    "status": "completed",
+    "stage": "restoring",
+    "started_at": 1790867239.3858917,
+    "deadline": 1790868139.3858917,
+    "ramp_deadline": 1790874492.2377326,
+    "updated_at": 1790869660.9571917,
+    "last_msg_id": 19,
+    "reason": "Alice: indicator cleared, retry",
+    "requested_by": "alice",
+    "health": [
+     {
+      "msg_id": 17,
+      "t": 1790867271.5359316,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 18,
+      "t": 1790867281.8855245,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     },
+     {
+      "msg_id": 19,
+      "t": 1790867292.2377326,
+      "tamper": false,
+      "twin": "MATCH",
+      "clean": true
+     }
+    ],
+    "log": [
+     {
+      "t": 1790867239.3858917,
+      "event": "recovery_started",
+      "reason": "Alice: indicator cleared, retry",
+      "requested_by": "alice",
+      "command": {
+       "command_id": "CMD-28325f5ac8",
+       "action": "apply_known_good_config",
+       "cfg_hash": "cfg-good-1",
+       "fw_version": "agent-0.1",
+       "note": "software configuration remediation; firmware is checked, not reflashed"
+      }
+     },
+     {
+      "t": 1790867261.1571085,
+      "event": "remediation_acknowledged",
+      "msg_id": 16
+     },
+     {
+      "t": 1790867292.2377326,
+      "event": "recovery_verified",
+      "checks": [
+       {
+        "msg_id": 17,
+        "t": 1790867271.5359316,
+        "tamper": false,
+        "twin": "MATCH",
+        "clean": true
+       },
+       {
+        "msg_id": 18,
+        "t": 1790867281.8855245,
+        "tamper": false,
+        "twin": "MATCH",
+        "clean": true
+       },
+       {
+        "msg_id": 19,
+        "t": 1790867292.2377326,
+        "tamper": false,
+        "twin": "MATCH",
+        "clean": true
+       }
+      ]
+     },
+     {
+      "t": 1790868936.9133284,
+      "event": "access_restored",
+      "score": 80
+     },
+     {
+      "t": 1790869660.9571917,
+      "event": "recovery_completed",
+      "score": 85
+     }
+    ],
+    "command": {
+     "command_id": "CMD-28325f5ac8",
+     "action": "apply_known_good_config",
+     "cfg_hash": "cfg-good-1",
+     "fw_version": "agent-0.1",
+     "note": "software configuration remediation; firmware is checked, not reflashed"
+    },
+    "command_acked": true,
+    "consecutive_clean": 3
+   }
+  ]
+ },
+ "observations": [
+  {
+   "received_at": 1790867084.573598,
+   "schema_version": 1,
+   "observation_id": "9f71663f-6691-4e4a-a49d-4be00179bb67",
+   "event_type": "visual_observation",
+   "device_id": "DEVICE-001",
+   "timestamp": "2026-10-01T15:04:44.541321Z",
+   "source": "usb_webcam",
+   "object": "person",
+   "confidence": 0.9,
+   "zone": "restricted_zone",
+   "zone_kind": "restricted",
+   "bbox": {
+    "x1": 0.55,
+    "y1": 0.1,
+    "x2": 0.9,
+    "y2": 0.95
+   },
+   "anomaly": true,
+   "anomaly_reason": "restricted_class_in_restricted_zone",
+   "model": {
+    "name": "synthetic",
+    "version": "attack-sim"
+   },
+   "details": {
+    "simulated": true
+   },
+   "auth": "ML-DSA-65:vision-1"
+  },
+  {
+   "received_at": 1790867078.348832,
+   "schema_version": 1,
+   "observation_id": "cef3de3d-cb2e-4bb3-b7c3-c752d18547ab",
+   "event_type": "visual_observation",
+   "device_id": "DEVICE-001",
+   "timestamp": "2026-10-01T15:04:38.323730Z",
+   "source": "usb_webcam",
+   "object": "chair",
+   "confidence": 0.8,
+   "zone": "restricted_zone",
+   "zone_kind": "restricted",
+   "bbox": {
+    "x1": 0.55,
+    "y1": 0.1,
+    "x2": 0.9,
+    "y2": 0.95
+   },
+   "anomaly": false,
+   "anomaly_reason": null,
+   "model": {
+    "name": "synthetic",
+    "version": "attack-sim"
+   },
+   "details": {
+    "simulated": true
+   },
+   "auth": "ML-DSA-65:vision-1"
+  }
+ ],
+ "evidence": [
+  {
+   "seq": 1,
+   "event_id": "EV-eefb6f86-2942-4b3e-a366-9de871da3bea",
+   "ts": 1790867071.0160525,
+   "device_id": null,
+   "event_type": "operator_action",
+   "source": "operator:bootstrap-admin",
+   "trust_state": null,
+   "trust_score": null,
+   "payload": "{\"action\":\"CREATE_OPERATOR\",\"bootstrap_identity\":true,\"device_id\":null,\"operator_id\":\"bootstrap-admin\",\"operator_role\":\"admin\",\"reason\":null,\"result\":\"success\",\"target_operator\":\"vera\",\"target_role\":\"viewer\"}",
+   "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "38a04a88f40be62a443db32b9a0b68c9c5796838a12d8f2ca9713cfb7372a37f",
+   "signature": "e44ff1d2ed3db9437aa84a8e52ed81c6ae1da4317e2ec326f96d2977d88b6000"
+  },
+  {
+   "seq": 2,
+   "event_id": "EV-5270e15f-c591-4142-9311-7606b552c219",
+   "ts": 1790867071.0351162,
+   "device_id": null,
+   "event_type": "operator_action",
+   "source": "operator:bootstrap-admin",
+   "trust_state": null,
+   "trust_score": null,
+   "payload": "{\"action\":\"CREATE_OPERATOR\",\"bootstrap_identity\":true,\"device_id\":null,\"operator_id\":\"bootstrap-admin\",\"operator_role\":\"admin\",\"reason\":null,\"result\":\"success\",\"target_operator\":\"alice\",\"target_role\":\"operator\"}",
+   "prev_hash": "38a04a88f40be62a443db32b9a0b68c9c5796838a12d8f2ca9713cfb7372a37f",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "00bb0e4f66256c4b80584fef7e2a7631749e1a0f512c67c68562ea074cc51ff3",
+   "signature": "9ce9f28711100bec99e970d1832b0506856d1ec8c555562817323306f4c5266a"
+  },
+  {
+   "seq": 3,
+   "event_id": "EV-7ff10145-d502-44b1-a864-124c595ed3db",
+   "ts": 1790867071.0563378,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "source": "operator:bootstrap-admin",
+   "trust_state": null,
+   "trust_score": null,
+   "payload": "{\"action\":\"SET_EXPECTED_STATE\",\"bootstrap_identity\":true,\"device_id\":\"DEVICE-001\",\"operator_id\":\"bootstrap-admin\",\"operator_role\":\"admin\",\"reason\":null,\"result\":\"success\"}",
+   "prev_hash": "00bb0e4f66256c4b80584fef7e2a7631749e1a0f512c67c68562ea074cc51ff3",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "0451b95c2539de8bac6e911d642bf0a62aae20d0c55259d2e678022340db6096",
+   "signature": "c2d77ca071326ac08a84888bb716e661bb578c1a6f9afbb1f4869b9fc62ff81d"
+  },
+  {
+   "seq": 4,
+   "event_id": "EV-d936b310-fe1f-433f-9675-569a6fbbe24a",
+   "ts": 1790867071.068017,
+   "device_id": "DEVICE-001",
+   "event_type": "twin_expected_updated",
+   "source": "operator:bootstrap-admin",
+   "trust_state": null,
+   "trust_score": null,
+   "payload": "{\"expected\":{\"capabilities\":[\"tamper\",\"temperature\",\"vibration\"],\"cfg_hash\":\"cfg-good-1\",\"fw_version\":\"agent-0.1\",\"sensor_ranges\":{\"temperature_c\":[-20,60]}},\"operator_id\":\"bootstrap-admin\"}",
+   "prev_hash": "0451b95c2539de8bac6e911d642bf0a62aae20d0c55259d2e678022340db6096",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "2c477d80aa4f24e2e540354c65edaa27bedc41387488399301ba21e30ceb31cf",
+   "signature": "8370b47ef538f23941d3ac996a0edbae501a318d4120f6202dd39303966c68c4"
+  },
+  {
+   "seq": 5,
+   "event_id": "EV-TC-DEVICE-001-1",
+   "ts": 1790867071.0873134,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "TRUSTED",
+   "trust_score": 100,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":100,\"new_state\":\"TRUSTED\",\"previous_score\":100,\"previous_state\":null,\"reasons\":[],\"trigger_signals\":[\"msg:1\"],\"trust_event_id\":\"TC-DEVICE-001-1\"}",
+   "prev_hash": "2c477d80aa4f24e2e540354c65edaa27bedc41387488399301ba21e30ceb31cf",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "673e5c874c6774eeb090c7a12f6552eda95911ecad85fc28b8b72fe87dc976f1",
+   "signature": "e35ceddeef4f45aaeae40535166e1f7a49800a6b4386619a1f0a638f918f826d"
+  },
+  {
+   "seq": 6,
+   "event_id": "EV-TC-DEVICE-001-2",
+   "ts": 1790867075.228728,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "TRUSTED",
+   "trust_score": 90,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":90,\"new_state\":\"TRUSTED\",\"previous_score\":100,\"previous_state\":\"TRUSTED\",\"reasons\":[{\"factor\":\"pressure\",\"impact\":-10.0,\"signal\":\"invalid_signature\",\"source_ref\":\"security_event:5\"}],\"trigger_signals\":[\"event:5\"],\"trust_event_id\":\"TC-DEVICE-001-2\"}",
+   "prev_hash": "673e5c874c6774eeb090c7a12f6552eda95911ecad85fc28b8b72fe87dc976f1",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "f817eabb8f7ff2742a5f33c1f2fdcb9421cc2b4e7703731bee72532e262b2a2a",
+   "signature": "9e942ddb18cb008e2c5c6266e706ec1ef95cfebb08ca7b389867b06dae433c15"
+  },
+  {
+   "seq": 7,
+   "event_id": "EV-TC-DEVICE-001-3",
+   "ts": 1790867078.3621922,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "TRUSTED",
+   "trust_score": 82,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":82,\"new_state\":\"TRUSTED\",\"previous_score\":90,\"previous_state\":\"TRUSTED\",\"reasons\":[{\"factor\":\"pressure\",\"impact\":-8.0,\"signal\":\"observation_replay\",\"source_ref\":\"security_event:6\"}],\"trigger_signals\":[\"event:6\"],\"trust_event_id\":\"TC-DEVICE-001-3\"}",
+   "prev_hash": "f817eabb8f7ff2742a5f33c1f2fdcb9421cc2b4e7703731bee72532e262b2a2a",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "9bf585d485d7d728534cda788dd9dada8d9e6becd778dad3f6c23081c8162024",
+   "signature": "3ff81d5b540c6295a00d1abf2057cdf70c3b5b6d79b161fe16b927bfc6c3df6c"
+  },
+  {
+   "seq": 8,
+   "event_id": "EV-TC-DEVICE-001-4",
+   "ts": 1790867081.4524684,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "SUSPICIOUS",
+   "trust_score": 55,
+   "payload": "{\"caps_active\":[\"physical_tamper\"],\"incident\":null,\"new_score\":55,\"new_state\":\"SUSPICIOUS\",\"previous_score\":82,\"previous_state\":\"TRUSTED\",\"reasons\":[{\"factor\":\"physical\",\"impact\":-20.0,\"signal\":\"physical_tamper\",\"source_ref\":\"device_message:7\"},{\"factor\":null,\"impact\":-7.064085056228443,\"signal\":\"cap:physical_tamper\",\"source_ref\":null}],\"trigger_signals\":[\"msg:7:tamper\"],\"trust_event_id\":\"TC-DEVICE-001-4\"}",
+   "prev_hash": "9bf585d485d7d728534cda788dd9dada8d9e6becd778dad3f6c23081c8162024",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "5aba9a2dbcd7b14c14a8d04404ae19fe3d8e9811013db4f81ac5ddd88eece6d8",
+   "signature": "03079ac44299aef533863e92c128baad8faac7af37f8eb774248f86b81eeeed7"
+  },
+  {
+   "seq": 9,
+   "event_id": "EV-TC-DEVICE-001-5",
+   "ts": 1790867084.573598,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\"],\"incident\":{\"class\":\"confirmed_incident\",\"id\":\"INC-DEVICE-001-1\",\"members\":{\"PHYSICAL\":\"msg:7:tamper\",\"VISUAL\":\"obs:9f71663f-6691-4e4a-a49d-4be00179bb67\"},\"modalities\":[\"PHYSICAL\",\"VISUAL\"],\"started\":1790867084.573598},\"new_score\":30,\"new_state\":\"QUARANTINED\",\"previous_score\":55,\"previous_state\":\"SUSPICIOUS\",\"reasons\":[{\"factor\":null,\"impact\":-12.849999999999994,\"signal\":\"cap:confirmed_incident\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":-12.15,\"signal\":\"visual_rule_violation\",\"source_ref\":\"observation:9f71663f-6691-4e4a-a49d-4be00179bb67\"}],\"trigger_signals\":[\"obs:9f71663f-6691-4e4a-a49d-4be00179bb67\"],\"trust_event_id\":\"TC-DEVICE-001-5\"}",
+   "prev_hash": "5aba9a2dbcd7b14c14a8d04404ae19fe3d8e9811013db4f81ac5ddd88eece6d8",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "fe17278e59521ccec5cfe37ea02077d7424f919f1091fb746ea9ca61e70652cb",
+   "signature": "1677236cb2c76b4d9d7fcea43a085ceb5a83ec55db6f310a9899bcca19e84a68"
+  },
+  {
+   "seq": 10,
+   "event_id": "EV-f51b67ab-2d34-4929-936d-6712f4baeb15",
+   "ts": 1790867086.6651323,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "fe17278e59521ccec5cfe37ea02077d7424f919f1091fb746ea9ca61e70652cb",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "1e237bcfb32e214b45006a2a0bec53eca022afab09c8776b993ba5515fd27cb4",
+   "signature": "43f06461de91af733e537032a6e7350d2c868052ba8887668446046905345e6c"
+  },
+  {
+   "seq": 11,
+   "event_id": "EV-44525445-6278-42ab-a22e-470be64fc763",
+   "ts": 1790867096.89727,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "1e237bcfb32e214b45006a2a0bec53eca022afab09c8776b993ba5515fd27cb4",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "a13cd03c6d14c630086c1b5bacacec7aeef58ffd7c3ba48d92d67b9ac679888c",
+   "signature": "b0bec699037886618a4a77de0612a59d27acc4bcd439e2e2fae747ceb8d7c6d7"
+  },
+  {
+   "seq": 12,
+   "event_id": "EV-9aa3126c-5f65-4c92-8888-fc40b84999ed",
+   "ts": 1790867107.0753336,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "a13cd03c6d14c630086c1b5bacacec7aeef58ffd7c3ba48d92d67b9ac679888c",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "228bc089a7204e53c6d73209f1c22931c4392530d12e6d0155d02202f8d4ab55",
+   "signature": "c61ef58d57e6fba3e1a675545c9c5402beef6fd07c6ea06e4f2710834d13d141"
+  },
+  {
+   "seq": 13,
+   "event_id": "EV-a7b45942-358b-41b4-8846-e6804b43e2dd",
+   "ts": 1790867117.2529304,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "228bc089a7204e53c6d73209f1c22931c4392530d12e6d0155d02202f8d4ab55",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "dc23d8457847e89e01efbdceff62b852a3b75567f358b5ee861fa1e23d58ab13",
+   "signature": "018b7d41a1cc7026282b937c33ec3fc70b19dc9ca25fcec9197480a0fa3c7b2e"
+  },
+  {
+   "seq": 14,
+   "event_id": "EV-TC-DEVICE-001-6",
+   "ts": 1790867127.0951371,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\",\"stale_device\"],\"incident\":null,\"new_score\":30,\"new_state\":\"QUARANTINED\",\"previous_score\":30,\"previous_state\":\"QUARANTINED\",\"reasons\":[{\"factor\":null,\"impact\":0.12564265286482623,\"signal\":\"cap:confirmed_incident\",\"source_ref\":null},{\"factor\":\"network\",\"impact\":-0.1256426528648092,\"signal\":\"network_liveness\",\"source_ref\":null}],\"trigger_signals\":[],\"trust_event_id\":\"TC-DEVICE-001-6\"}",
+   "prev_hash": "dc23d8457847e89e01efbdceff62b852a3b75567f358b5ee861fa1e23d58ab13",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "5991c7a53ffaaddfbe8d7682287a685a4d969bc095c41634863cc1cd870e411c",
+   "signature": "e6306df70cfbacd609f2cedf6e27d5955bd88e16bc532cafd4b26797f157dd3a"
+  },
+  {
+   "seq": 15,
+   "event_id": "EV-c3453aa8-994e-4307-a837-6181a0282925",
+   "ts": 1790867127.4147243,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "5991c7a53ffaaddfbe8d7682287a685a4d969bc095c41634863cc1cd870e411c",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "1feb845c6f2460e4d1831251c48045e6443553df1c3f9fac05fab22eb12bf639",
+   "signature": "4718724e51c7ba6bca4a5317be0f88e89bd215f5854b9f6839cfb920e12a5159"
+  },
+  {
+   "seq": 16,
+   "event_id": "EV-90cfca0b-5eae-4db5-bb44-631458d6e8c2",
+   "ts": 1790867137.5942335,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "1feb845c6f2460e4d1831251c48045e6443553df1c3f9fac05fab22eb12bf639",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "54ff77648d29a50e37b2b971554074363d022bc1084d1da14db53d19a0005d82",
+   "signature": "11aca97489f303349622a9a37bda70912d72ba73901f60da440639105a651c99"
+  },
+  {
+   "seq": 17,
+   "event_id": "EV-45addf30-f73a-4d9d-ab21-a6002c754462",
+   "ts": 1790867147.7743592,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "54ff77648d29a50e37b2b971554074363d022bc1084d1da14db53d19a0005d82",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "f580ad3ea0d2452e68d92d53906139266eb32acafb09cb0da989b9e692a214f5",
+   "signature": "9ce6b4d2d38bed137fbfa0970343b18b237bc3235494ae2651ebb0623ac48248"
+  },
+  {
+   "seq": 18,
+   "event_id": "EV-d280a25b-62a7-4e7c-9176-4fab95771a2e",
+   "ts": 1790867157.9565983,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "f580ad3ea0d2452e68d92d53906139266eb32acafb09cb0da989b9e692a214f5",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "a15f72c3e916ff47fb3a3898f28039143ab0453c16af62b15bc275bb03de8de2",
+   "signature": "9c93b2e4cbed4fa898118ec43f98fc73b998f887113ed856ea26f169f25dde04"
+  },
+  {
+   "seq": 19,
+   "event_id": "EV-TC-DEVICE-001-7",
+   "ts": 1790867162.179554,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "RECOVERING",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\",\"stale_device\"],\"incident\":null,\"new_score\":30,\"new_state\":\"RECOVERING\",\"previous_score\":30,\"previous_state\":\"QUARANTINED\",\"reasons\":[{\"factor\":null,\"impact\":0.0,\"signal\":\"state_transition_request\",\"source_ref\":null}],\"trigger_signals\":[\"recovery:REC-133beae7d378\"],\"trust_event_id\":\"TC-DEVICE-001-7\"}",
+   "prev_hash": "a15f72c3e916ff47fb3a3898f28039143ab0453c16af62b15bc275bb03de8de2",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "6ddc26ebfa4288a68fa9902d81cfa60e36ac1575b7351004bc23f40c2e28c2de",
+   "signature": "a13be89d3abe07ab695af87a01f5c7fc1f9ad5660894bc99d964150ecbf7bcc6"
+  },
+  {
+   "seq": 20,
+   "event_id": "EV-5f769a2c-6139-4841-ad98-a7a292fc17b2",
+   "ts": 1790867162.1705847,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_started",
+   "source": "recovery_orchestrator",
+   "trust_state": "RECOVERING",
+   "trust_score": 30,
+   "payload": "{\"command\":{\"action\":\"apply_known_good_config\",\"cfg_hash\":\"cfg-good-1\",\"command_id\":\"CMD-ec53a17caf\",\"fw_version\":\"agent-0.1\",\"note\":\"software configuration remediation; firmware is checked, not reflashed\"},\"reason\":\"Alice: incident contained, restore known-good\",\"recovery_id\":\"REC-133beae7d378\",\"requested_by\":\"alice\",\"stage\":\"remediation_pending\"}",
+   "prev_hash": "6ddc26ebfa4288a68fa9902d81cfa60e36ac1575b7351004bc23f40c2e28c2de",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "7093b49756d7b45f37370b411b41df50ecca08521c103eee60c1368b488e2c00",
+   "signature": "fc4c7eef79c08abe01fb8bc8c64d7edcd8c479736e42a8616c9d1d097ae2be67"
+  },
+  {
+   "seq": 21,
+   "event_id": "EV-112a7540-d9af-4f05-bdca-fa8f6d221344",
+   "ts": 1790867162.2351222,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "source": "operator:alice",
+   "trust_state": null,
+   "trust_score": null,
+   "payload": "{\"action\":\"START_RECOVERY\",\"bootstrap_identity\":false,\"device_id\":\"DEVICE-001\",\"operator_id\":\"alice\",\"operator_role\":\"operator\",\"reason\":\"Alice: incident contained, restore known-good\",\"result\":\"success\"}",
+   "prev_hash": "7093b49756d7b45f37370b411b41df50ecca08521c103eee60c1368b488e2c00",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "5229b56567ee1d18c3ccd49e17d6025edda2ffefd3c773b8428657eb5babe11e",
+   "signature": "23f06da5da1826b10604010d5d6939a7dc9bf6b9bc9953f9a1b46e7f0a6aedde"
+  },
+  {
+   "seq": 22,
+   "event_id": "EV-TC-DEVICE-001-8",
+   "ts": 1790867174.0948384,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "RECOVERING",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\"],\"incident\":null,\"new_score\":30,\"new_state\":\"RECOVERING\",\"previous_score\":30,\"previous_state\":\"RECOVERING\",\"reasons\":[{\"factor\":null,\"impact\":-7.431607245398702,\"signal\":\"cap:confirmed_incident\",\"source_ref\":null},{\"factor\":\"network\",\"impact\":5.751286665598553,\"signal\":\"network_liveness\",\"source_ref\":null},{\"factor\":\"pressure\",\"impact\":1.2664469762370203,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.4138736035631254,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:8\"],\"trust_event_id\":\"TC-DEVICE-001-8\"}",
+   "prev_hash": "5229b56567ee1d18c3ccd49e17d6025edda2ffefd3c773b8428657eb5babe11e",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "d1f69c9d49ac33cfa216c2a30d153f9e97a4b4818d9b150d0b7707aee455047a",
+   "signature": "8c499d2ee1c07cd4596e2b6e4b06627526d2a167e19ecc695e0098b77da42950"
+  },
+  {
+   "seq": 23,
+   "event_id": "EV-59621f0e-3b23-43c5-9034-a180776d4951",
+   "ts": 1790867184.479771,
+   "device_id": "DEVICE-001",
+   "event_type": "remediation_acknowledged",
+   "source": "recovery_orchestrator",
+   "trust_state": "RECOVERING",
+   "trust_score": 30,
+   "payload": "{\"msg_id\":9,\"recovery_id\":\"REC-133beae7d378\",\"stage\":\"health_checks\"}",
+   "prev_hash": "d1f69c9d49ac33cfa216c2a30d153f9e97a4b4818d9b150d0b7707aee455047a",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "ac0cec7ddbfadef5a1ac9d1da589d8ec607ac8be0dcad1b5a61d30d4cbe94a3f",
+   "signature": "26af992c55e0a142a713fa6466259bd7e42dbdf091790f00d447b868e23d606d"
+  },
+  {
+   "seq": 24,
+   "event_id": "EV-TC-DEVICE-001-9",
+   "ts": 1790867215.5522602,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "VERIFIED",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\"],\"incident\":null,\"new_score\":30,\"new_state\":\"VERIFIED\",\"previous_score\":30,\"previous_state\":\"RECOVERING\",\"reasons\":[{\"factor\":null,\"impact\":0.0,\"signal\":\"state_transition_request\",\"source_ref\":null}],\"trigger_signals\":[\"recovery:REC-133beae7d378\"],\"trust_event_id\":\"TC-DEVICE-001-9\"}",
+   "prev_hash": "ac0cec7ddbfadef5a1ac9d1da589d8ec607ac8be0dcad1b5a61d30d4cbe94a3f",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "fe95cfe234b907c8574a2527f22336ef963e1f3681d6066ba01aaf2b57f49f17",
+   "signature": "69b7f07b826d7f0111fcb381440dc0088af7d8da0ab0708c0831096410b3c720"
+  },
+  {
+   "seq": 25,
+   "event_id": "EV-e04f845a-1c6f-4d3a-ad51-aecfde9beb47",
+   "ts": 1790867215.5442543,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_verified",
+   "source": "recovery_orchestrator",
+   "trust_state": "VERIFIED",
+   "trust_score": 30,
+   "payload": "{\"checks\":[{\"clean\":true,\"msg_id\":10,\"t\":1790867194.8540363,\"tamper\":false,\"twin\":\"MATCH\"},{\"clean\":true,\"msg_id\":11,\"t\":1790867205.1957655,\"tamper\":false,\"twin\":\"MATCH\"},{\"clean\":true,\"msg_id\":12,\"t\":1790867215.5442543,\"tamper\":false,\"twin\":\"MATCH\"}],\"recovery_id\":\"REC-133beae7d378\",\"stage\":\"trust_ramp\"}",
+   "prev_hash": "fe95cfe234b907c8574a2527f22336ef963e1f3681d6066ba01aaf2b57f49f17",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "5c5d3effee834df087bd4abd0cee725781b09b063c537cae6fa294feed11911c",
+   "signature": "266469d045dddd424392a81ec4e5b001dbe3723aa42f6247128cb4990d17e6a8"
+  },
+  {
+   "seq": 26,
+   "event_id": "EV-TC-DEVICE-001-10",
+   "ts": 1790867236.2994223,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\"],\"incident\":null,\"new_score\":30,\"new_state\":\"QUARANTINED\",\"previous_score\":30,\"previous_state\":\"VERIFIED\",\"reasons\":[{\"factor\":null,\"impact\":0.0,\"signal\":\"state_transition_request\",\"source_ref\":null}],\"trigger_signals\":[\"recovery:REC-133beae7d378\"],\"trust_event_id\":\"TC-DEVICE-001-10\"}",
+   "prev_hash": "5c5d3effee834df087bd4abd0cee725781b09b063c537cae6fa294feed11911c",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "8dfa5654c970465600fefffb0167b8ac1405de515245934cf3850b0fdf206100",
+   "signature": "f61167371b08978dd9b86e09b6acc52e9075d2eb1ef94d639cc3ba5dba967399"
+  },
+  {
+   "seq": 27,
+   "event_id": "EV-ae2e3692-50d6-4294-b7da-9ffd848cdc7a",
+   "ts": 1790867236.2840066,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_failed",
+   "source": "recovery_orchestrator",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"reason\":\"aborted: Alice: second indicator of compromise (by alice)\",\"recovery_id\":\"REC-133beae7d378\",\"stage\":\"trust_ramp\"}",
+   "prev_hash": "8dfa5654c970465600fefffb0167b8ac1405de515245934cf3850b0fdf206100",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "958dc845453545024f95638f403e1b074a401f3be4cfb8c9c8072d162b7ed257",
+   "signature": "7327df77d94bad89728e30c6803a2498dbb0ee5eeafc0fccf6e1160b65b8f7bc"
+  },
+  {
+   "seq": 28,
+   "event_id": "EV-5b567a08-73d8-4691-b24f-d8ccb2f30709",
+   "ts": 1790867236.3508952,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "source": "operator:alice",
+   "trust_state": null,
+   "trust_score": null,
+   "payload": "{\"action\":\"ABORT_RECOVERY\",\"bootstrap_identity\":false,\"device_id\":\"DEVICE-001\",\"operator_id\":\"alice\",\"operator_role\":\"operator\",\"reason\":\"Alice: second indicator of compromise\",\"result\":\"success\"}",
+   "prev_hash": "958dc845453545024f95638f403e1b074a401f3be4cfb8c9c8072d162b7ed257",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "7de0fb0a1f293841a6f1d44bda553e95f4a31ebc32e215cd69c15c480742871a",
+   "signature": "eb2427ba5ee3ec6808c939cc12616a292a126e1bb057de72c765fd62567e2b90"
+  },
+  {
+   "seq": 29,
+   "event_id": "EV-edb456e3-699a-4b37-aad1-f0534e4ef3be",
+   "ts": 1790867236.6933684,
+   "device_id": "DEVICE-001",
+   "event_type": "quarantine_access_blocked",
+   "source": "gateway_enforcement",
+   "trust_state": "QUARANTINED",
+   "trust_score": 30,
+   "payload": "{\"channel\":\"normal\",\"reason\":\"device_quarantined\"}",
+   "prev_hash": "7de0fb0a1f293841a6f1d44bda553e95f4a31ebc32e215cd69c15c480742871a",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "e2a809497307aaa7dad4b12b67d6158112c71a9ddc19769d92406fba9d60a6c3",
+   "signature": "b0f8243d38c61f3358d1442dc242f84949bf1e3fa27e277a991628d0aa07b928"
+  },
+  {
+   "seq": 30,
+   "event_id": "EV-TC-DEVICE-001-11",
+   "ts": 1790867239.392929,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "RECOVERING",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\"],\"incident\":null,\"new_score\":30,\"new_state\":\"RECOVERING\",\"previous_score\":30,\"previous_state\":\"QUARANTINED\",\"reasons\":[{\"factor\":null,\"impact\":0.0,\"signal\":\"state_transition_request\",\"source_ref\":null}],\"trigger_signals\":[\"recovery:REC-d5b0e1b234d5\"],\"trust_event_id\":\"TC-DEVICE-001-11\"}",
+   "prev_hash": "e2a809497307aaa7dad4b12b67d6158112c71a9ddc19769d92406fba9d60a6c3",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "ca2601585c5ba40e0a5c0a97af4fbb7094fba48c06c666a1917b870cd93469d8",
+   "signature": "f86a831d6efba46b940f3bd5ce158b6a9b1ec39e84c1aedb28d909bd5c9b5965"
+  },
+  {
+   "seq": 31,
+   "event_id": "EV-e2b3992b-a64d-4a06-b206-410bc392b7d2",
+   "ts": 1790867239.3858917,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_started",
+   "source": "recovery_orchestrator",
+   "trust_state": "RECOVERING",
+   "trust_score": 30,
+   "payload": "{\"command\":{\"action\":\"apply_known_good_config\",\"cfg_hash\":\"cfg-good-1\",\"command_id\":\"CMD-28325f5ac8\",\"fw_version\":\"agent-0.1\",\"note\":\"software configuration remediation; firmware is checked, not reflashed\"},\"reason\":\"Alice: indicator cleared, retry\",\"recovery_id\":\"REC-d5b0e1b234d5\",\"requested_by\":\"alice\",\"stage\":\"remediation_pending\"}",
+   "prev_hash": "ca2601585c5ba40e0a5c0a97af4fbb7094fba48c06c666a1917b870cd93469d8",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "7422cca2af1188b8e0f79d04052bc7babd00863558b3ad9a95cc2152b2d9fff2",
+   "signature": "0e9d9acfa4b77a6cd1302288b840e7f5eb22ab20f14fa4d62c65bf50914c2cee"
+  },
+  {
+   "seq": 32,
+   "event_id": "EV-762d0fab-f539-4e36-a43a-b1f4324f0fdc",
+   "ts": 1790867239.4495277,
+   "device_id": "DEVICE-001",
+   "event_type": "operator_action",
+   "source": "operator:alice",
+   "trust_state": null,
+   "trust_score": null,
+   "payload": "{\"action\":\"START_RECOVERY\",\"bootstrap_identity\":false,\"device_id\":\"DEVICE-001\",\"operator_id\":\"alice\",\"operator_role\":\"operator\",\"reason\":\"Alice: indicator cleared, retry\",\"result\":\"success\"}",
+   "prev_hash": "7422cca2af1188b8e0f79d04052bc7babd00863558b3ad9a95cc2152b2d9fff2",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "0386b42fcbb00c0f200199615d14f192e5db8108492479dde40fb05ed3d62257",
+   "signature": "5cae7ccd98f94d9eee020f7dd5822fca731100d90d51985fa19e16efeb6d4451"
+  },
+  {
+   "seq": 33,
+   "event_id": "EV-e7218c69-800d-484f-bb65-354750ebf43d",
+   "ts": 1790867261.1571085,
+   "device_id": "DEVICE-001",
+   "event_type": "remediation_acknowledged",
+   "source": "recovery_orchestrator",
+   "trust_state": "RECOVERING",
+   "trust_score": 30,
+   "payload": "{\"msg_id\":16,\"recovery_id\":\"REC-d5b0e1b234d5\",\"stage\":\"health_checks\"}",
+   "prev_hash": "0386b42fcbb00c0f200199615d14f192e5db8108492479dde40fb05ed3d62257",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "cb320fd53e383e464b6b4f46bd3e55423c0c356525dc5ac31e2be61c70226267",
+   "signature": "a481d12a970d59ea3a12be6e8390738c66212ca09082e57b27a3a1c1338c58ca"
+  },
+  {
+   "seq": 34,
+   "event_id": "EV-TC-DEVICE-001-12",
+   "ts": 1790867292.2455642,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "VERIFIED",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\",\"physical_tamper\"],\"incident\":null,\"new_score\":30,\"new_state\":\"VERIFIED\",\"previous_score\":30,\"previous_state\":\"RECOVERING\",\"reasons\":[{\"factor\":null,\"impact\":0.0,\"signal\":\"state_transition_request\",\"source_ref\":null}],\"trigger_signals\":[\"recovery:REC-d5b0e1b234d5\"],\"trust_event_id\":\"TC-DEVICE-001-12\"}",
+   "prev_hash": "cb320fd53e383e464b6b4f46bd3e55423c0c356525dc5ac31e2be61c70226267",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "4939298a2d844c7249a1defee9a2d91053298db6b0b1ecff145a722a5e22d71d",
+   "signature": "0f8772dada6f53c1b9d196a196030f24853cf6b712a30881bc10cd12f151275e"
+  },
+  {
+   "seq": 35,
+   "event_id": "EV-b9036fa4-66b4-4ac7-946f-05e8b0e0364b",
+   "ts": 1790867292.2377326,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_verified",
+   "source": "recovery_orchestrator",
+   "trust_state": "VERIFIED",
+   "trust_score": 30,
+   "payload": "{\"checks\":[{\"clean\":true,\"msg_id\":17,\"t\":1790867271.5359316,\"tamper\":false,\"twin\":\"MATCH\"},{\"clean\":true,\"msg_id\":18,\"t\":1790867281.8855245,\"tamper\":false,\"twin\":\"MATCH\"},{\"clean\":true,\"msg_id\":19,\"t\":1790867292.2377326,\"tamper\":false,\"twin\":\"MATCH\"}],\"recovery_id\":\"REC-d5b0e1b234d5\",\"stage\":\"trust_ramp\"}",
+   "prev_hash": "4939298a2d844c7249a1defee9a2d91053298db6b0b1ecff145a722a5e22d71d",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "c8c0242f6d2ec6cf7c3ea84e57fce7023edcd7c9519ae4c4f1b017f4848f41bd",
+   "signature": "6981d7035c5b4cdc84e1ccb4a8b2584933352d14903b1683e3912b3128471034"
+  },
+  {
+   "seq": 36,
+   "event_id": "EV-TC-DEVICE-001-13",
+   "ts": 1790868037.120033,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "VERIFIED",
+   "trust_score": 30,
+   "payload": "{\"caps_active\":[\"confirmed_incident\"],\"incident\":null,\"new_score\":30,\"new_state\":\"VERIFIED\",\"previous_score\":30,\"previous_state\":\"VERIFIED\",\"reasons\":[{\"factor\":null,\"impact\":-0.18728496866469868,\"signal\":\"cap:confirmed_incident\",\"source_ref\":null},{\"factor\":\"pressure\",\"impact\":0.10525169154257696,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.048277207086688985,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"physical\",\"impact\":0.0337560700354203,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:91\"],\"trust_event_id\":\"TC-DEVICE-001-13\"}",
+   "prev_hash": "c8c0242f6d2ec6cf7c3ea84e57fce7023edcd7c9519ae4c4f1b017f4848f41bd",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "8778584840eaaef9e3279e3ecf70f96bf725303685c8c505c2f1f8960abf1c7f",
+   "signature": "79f7812aa2763540a89f43e3428a8537f55a6d8931183852105f88a5e6a8d6b8"
+  },
+  {
+   "seq": 37,
+   "event_id": "EV-TC-DEVICE-001-14",
+   "ts": 1790868936.8742902,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "VERIFIED",
+   "trust_score": 80,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":80,\"new_state\":\"VERIFIED\",\"previous_score\":30,\"previous_state\":\"VERIFIED\",\"reasons\":[{\"factor\":null,\"impact\":49.54763368453196,\"signal\":\"cap:confirmed_incident\",\"source_ref\":null},{\"factor\":\"pressure\",\"impact\":0.03725289928224518,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"physical\",\"impact\":0.028406158488232337,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.024161560707126207,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:178\"],\"trust_event_id\":\"TC-DEVICE-001-14\"}",
+   "prev_hash": "8778584840eaaef9e3279e3ecf70f96bf725303685c8c505c2f1f8960abf1c7f",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "3269329f84eaecd4a2424127a6a553decf34672bd6bb23eed05eea13e1f088c0",
+   "signature": "39d22c24eed5dd6b242fb27616fb4d48899c219112ce18bd7d571e0fd55089c3"
+  },
+  {
+   "seq": 38,
+   "event_id": "EV-TC-DEVICE-001-15",
+   "ts": 1790868936.9173877,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "RECOVERED",
+   "trust_score": 80,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":80,\"new_state\":\"RECOVERED\",\"previous_score\":80,\"previous_state\":\"VERIFIED\",\"reasons\":[{\"factor\":null,\"impact\":0.0,\"signal\":\"state_transition_request\",\"source_ref\":null}],\"trigger_signals\":[\"recovery:REC-d5b0e1b234d5\"],\"trust_event_id\":\"TC-DEVICE-001-15\"}",
+   "prev_hash": "3269329f84eaecd4a2424127a6a553decf34672bd6bb23eed05eea13e1f088c0",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "b2a9daa281856a57f67a07888feffc9ac67ece1f777e544c9a2fe2fb783b27ae",
+   "signature": "38221b1b1d365623a3133e521de1c05792e2e3316facd95dbdfa78f72fc95b9e"
+  },
+  {
+   "seq": 39,
+   "event_id": "EV-000daf9d-b567-420c-bc7b-e3402e6f0855",
+   "ts": 1790868936.9133284,
+   "device_id": "DEVICE-001",
+   "event_type": "access_restored",
+   "source": "recovery_orchestrator",
+   "trust_state": "RECOVERED",
+   "trust_score": 80,
+   "payload": "{\"recovery_id\":\"REC-d5b0e1b234d5\",\"score\":80,\"stage\":\"restoring\"}",
+   "prev_hash": "b2a9daa281856a57f67a07888feffc9ac67ece1f777e544c9a2fe2fb783b27ae",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "c1af6a4d8f720f92134320cb9ae7f64637ed9a78d3b7198885b763e94c9a0059",
+   "signature": "b06a4982543b7b79266b6134e1346de520e7e043609c47baa7e18f99bd6d4e56"
+  },
+  {
+   "seq": 40,
+   "event_id": "EV-TC-DEVICE-001-16",
+   "ts": 1790869050.6904106,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "RECOVERED",
+   "trust_score": 81,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":81,\"new_state\":\"RECOVERED\",\"previous_score\":80,\"previous_state\":\"RECOVERED\",\"reasons\":[{\"factor\":\"pressure\",\"impact\":0.032638056365532186,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"physical\",\"impact\":0.02776893684707318,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.022116795857460403,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:189\"],\"trust_event_id\":\"TC-DEVICE-001-16\"}",
+   "prev_hash": "c1af6a4d8f720f92134320cb9ae7f64637ed9a78d3b7198885b763e94c9a0059",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "b0888cd11df9d74fd36d5be0fba3d5425c7b6c4cb0ab84bf9620e1386f598baf",
+   "signature": "e9e3d4fe3f4f285164d167d47e05d37cf99e4a284e6ce5858609042780d8ec6d"
+  },
+  {
+   "seq": 41,
+   "event_id": "EV-TC-DEVICE-001-17",
+   "ts": 1790869174.811101,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "RECOVERED",
+   "trust_score": 82,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":82,\"new_state\":\"RECOVERED\",\"previous_score\":81,\"previous_state\":\"RECOVERED\",\"reasons\":[{\"factor\":\"pressure\",\"impact\":0.02828034460846718,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"physical\",\"impact\":0.027114808066897922,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.02010191200140259,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:201\"],\"trust_event_id\":\"TC-DEVICE-001-17\"}",
+   "prev_hash": "b0888cd11df9d74fd36d5be0fba3d5425c7b6c4cb0ab84bf9620e1386f598baf",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "aaefd5c65de8b0c9d50f9109c4c38aa6d8464af2d8b09db86124e469b98ac444",
+   "signature": "fe86b8ad13c3fa572f1f37ec35303aabb71b6890f60bccc23427d634514e90a3"
+  },
+  {
+   "seq": 42,
+   "event_id": "EV-TC-DEVICE-001-18",
+   "ts": 1790869319.5990717,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "RECOVERED",
+   "trust_score": 83,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":83,\"new_state\":\"RECOVERED\",\"previous_score\":82,\"previous_state\":\"RECOVERED\",\"reasons\":[{\"factor\":\"physical\",\"impact\":0.026358335442048998,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"pressure\",\"impact\":0.023914892815457556,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.017973480761893066,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:215\"],\"trust_event_id\":\"TC-DEVICE-001-18\"}",
+   "prev_hash": "aaefd5c65de8b0c9d50f9109c4c38aa6d8464af2d8b09db86124e469b98ac444",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "daa1d1e73a52f0563146db40308ebd5a2b7f54176bee9316509912e49e790c9c",
+   "signature": "954822de366b7dce79b5221bbbf138d3070b1b6ff6be136454e2588b2be1ef48"
+  },
+  {
+   "seq": 43,
+   "event_id": "EV-TC-DEVICE-001-19",
+   "ts": 1790869485.077371,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "RECOVERED",
+   "trust_score": 84,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":84,\"new_state\":\"RECOVERED\",\"previous_score\":83,\"previous_state\":\"RECOVERED\",\"reasons\":[{\"factor\":\"physical\",\"impact\":0.025544718839503846,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"pressure\",\"impact\":0.019764118788909713,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.015831091509705873,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:231\"],\"trust_event_id\":\"TC-DEVICE-001-19\"}",
+   "prev_hash": "daa1d1e73a52f0563146db40308ebd5a2b7f54176bee9316509912e49e790c9c",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "49213bc473e36102b51508b97e97e7e8d614722c0e18c0ca370e9a71e66666dc",
+   "signature": "81e1382dbdf4d478d4f5b9cc3dd563b67d9c73e46dd9754f9fd10a8b0c973808"
+  },
+  {
+   "seq": 44,
+   "event_id": "EV-TC-DEVICE-001-20",
+   "ts": 1790869660.918717,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_score_change",
+   "source": "trust_engine",
+   "trust_state": "RECOVERED",
+   "trust_score": 85,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":85,\"new_state\":\"RECOVERED\",\"previous_score\":84,\"previous_state\":\"RECOVERED\",\"reasons\":[{\"factor\":\"physical\",\"impact\":0.024703876980252917,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"pressure\",\"impact\":0.016137467057170785,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null},{\"factor\":\"visual\",\"impact\":0.013831561194488895,\"signal\":\"healthy_evidence_recovery\",\"source_ref\":null}],\"trigger_signals\":[\"msg:248\"],\"trust_event_id\":\"TC-DEVICE-001-20\"}",
+   "prev_hash": "49213bc473e36102b51508b97e97e7e8d614722c0e18c0ca370e9a71e66666dc",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "8fc9a7385c48e648fdcbace528df1e6692cb6ea1e612f9464e2c518fd010e0d3",
+   "signature": "b55947b4bfe80cd72862c568a479eb829df0781e706228a82719bc504a0b8bc5"
+  },
+  {
+   "seq": 45,
+   "event_id": "EV-TC-DEVICE-001-21",
+   "ts": 1790869660.9620419,
+   "device_id": "DEVICE-001",
+   "event_type": "trust_state_transition",
+   "source": "trust_engine",
+   "trust_state": "TRUSTED",
+   "trust_score": 85,
+   "payload": "{\"caps_active\":[],\"incident\":null,\"new_score\":85,\"new_state\":\"TRUSTED\",\"previous_score\":85,\"previous_state\":\"RECOVERED\",\"reasons\":[{\"factor\":null,\"impact\":0.0,\"signal\":\"state_transition_request\",\"source_ref\":null}],\"trigger_signals\":[\"recovery:REC-d5b0e1b234d5\"],\"trust_event_id\":\"TC-DEVICE-001-21\"}",
+   "prev_hash": "8fc9a7385c48e648fdcbace528df1e6692cb6ea1e612f9464e2c518fd010e0d3",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "7d70f5a430abd0e939d14d5ef4c1474264bbf8bb435a24cfbfc15c0f668594f7",
+   "signature": "90a48dc8acd08a37a41b900bd8c236c82c54c61ad88eea000fe5171711c4aca9"
+  },
+  {
+   "seq": 46,
+   "event_id": "EV-10bb1552-b36c-48cd-b0a5-b244167d22f5",
+   "ts": 1790869660.9571917,
+   "device_id": "DEVICE-001",
+   "event_type": "recovery_completed",
+   "source": "recovery_orchestrator",
+   "trust_state": "TRUSTED",
+   "trust_score": 85,
+   "payload": "{\"recovery_id\":\"REC-d5b0e1b234d5\",\"score\":85,\"stage\":\"restoring\"}",
+   "prev_hash": "7d70f5a430abd0e939d14d5ef4c1474264bbf8bb435a24cfbfc15c0f668594f7",
+   "key_id": "gateway-evidence-1",
+   "event_hash": "f894c2203fc26f0be5dc8984c54e462be34cf17b399be239ffd4f2fc4ed65075",
+   "signature": "49d154ee0488eda130b4b93dbd76e4a3303926a1080e312581728884286fb08d"
+  }
+ ],
+ "verify": {
+  "ok": true,
+  "count": 46,
+  "signed": true,
+  "first_bad_seq": null,
+  "reason": null,
+  "head_hash": "f894c2203fc26f0be5dc8984c54e462be34cf17b399be239ffd4f2fc4ed65075",
+  "problems": [],
+  "head": {
+   "seq": 46,
+   "event_hash": "f894c2203fc26f0be5dc8984c54e462be34cf17b399be239ffd4f2fc4ed65075"
+  }
+ }
+}

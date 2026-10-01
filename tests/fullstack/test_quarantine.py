@@ -113,5 +113,8 @@ def test_dashboard_is_served_and_holds_no_data(stack):
     r = stack.gw.get("/dashboard/")
     assert r.status_code == 200 and "Q-SHIELD" in r.text
     assert "Bearer" not in r.text                          # token only ever comes from the operator
-    js = stack.gw.get("/dashboard/app.js").text
-    assert "/api/v1/evidence/verify" in js and "esc(" in js
+    # The dashboard is ES modules since the UI rework: routes in lib/api.js, escaping in lib/html.js.
+    api = stack.gw.get("/dashboard/src/lib/api.js").text
+    assert "/api/v1/evidence/verify" in api and "Bearer" in api      # the header is built from the signed-in token
+    assert "esc(" in stack.gw.get("/dashboard/src/lib/html.js").text
+    assert "qso_" not in r.text and "token=" not in r.text                 # no credential baked into the page
