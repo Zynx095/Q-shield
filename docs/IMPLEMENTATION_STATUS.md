@@ -4,10 +4,10 @@ Persistent project memory. Read together with `docs/BUILD_CHECKPOINT.md`.
 Last updated: 2026-10-02.
 
 ## CURRENT PHASE
-Phases 0–15 implemented and tested. Phase 14 is the command-center UI rework (see **COMMAND CENTER UI (Phase 14)**); Phase 15 is the premium visual pass and the Camera & vision page (see **PREMIUM VISUAL PASS + CAMERA (Phase 15)**). Remaining work is listed under **WHAT IS LEFT**.
+Phases 0–16 implemented and tested. Phase 14 is the command-center UI rework (see **COMMAND CENTER UI (Phase 14)**); Phase 15 is the premium visual pass and the Camera & vision page (see **PREMIUM VISUAL PASS + CAMERA (Phase 15)**); Phase 16 is the final hardening and demo-readiness pass (see **FINAL HARDENING + DEMO READINESS (Phase 16)**). Remaining work is listed under **WHAT IS LEFT**.
 
 ## TEST COUNT
-**686 passed, 0 failed** (`python -m pytest -o addopts="" -q`, ~1.5 min). This includes the 34 dashboard JavaScript unit tests (`node --test dashboard/tests/*.test.mjs`: derive 17, reveal 4, ambient 4, camera 9), run through Node. The baseline before the continuous build was 544.
+**695 passed, 0 failed** (`python -m pytest -o addopts="" -q`, ~1.5 min). This includes the 38 dashboard JavaScript unit tests (`node --test dashboard/tests/*.test.mjs`: derive 21, reveal 4, ambient 4, camera 9), run through Node. The baseline before the continuous build was 544.
 
 ## COMPLETED
 | Phase | Feature | Status | Key code | Tests |
@@ -127,6 +127,65 @@ trust-engine.md §6.4 and covered by regression tests.
   - camera contention with the running vision service on real hardware
   - screen-reader output
 
+## FINAL HARDENING + DEMO READINESS (Phase 16)
+
+**Bugs found and fixed, each with a regression test that failed before the fix:**
+
+| Area | Bug | Fix | Test |
+|---|---|---|---|
+| Recovery | Health checks compared the twin's *accumulated* observed state. A device that stopped reporting `cfg_hash` after the attack passed every check on the value it had reported before quarantine, and reports consumed in one tick all borrowed the newest state. | `DigitalTwin.compare_report()` judges each report on its own content. Each health-check record keeps per-field verdicts. | `tests/fullstack/test_recovery.py::test_health_checks_judge_each_report_not_a_stale_twin_field`, `::test_each_health_check_records_what_that_report_said`, `tests/twin/test_twin.py::test_compare_report_judges_only_what_the_report_says` |
+| PQC session | The handshake nonce check and record sat in two critical sections around signature verification and decapsulation, so a concurrent replay of one init got two sessions. | The nonce is reserved atomically and released on rejection. | `tests/security/test_pqc_session.py::test_concurrent_replay_of_one_handshake_yields_one_session`, `::test_failed_handshake_does_not_keep_its_nonce` |
+| Vision | Webcam auto-exposure frames read as an obstructed lens, and the signed "obstructed" report lowered trust before the attack. | `camera.warm_up()` with `camera.warmup_frames` (default 15) for live cameras. | `tests/ai/test_sinks_and_runner.py::test_camera_warm_up_keeps_auto_exposure_frames_out_of_health` |
+| Dashboard | The vision list class `.obs` turned the twin table's `td.obs` cells into flex boxes, misaligning the table. | Renamed to `.obs-list`. | Browser QA (cell geometry) |
+| Dashboard | A route change waited for the next animation frame: up to about 2 s in headless Edge. | `hashchange` paints immediately. | Browser QA (route change measured at 20–50 ms) |
+| Demo | During the webcam step the simulated device went silent, so it was marked stale (cap 79). | The device keeps reporting during the step. | Live `demo_full --webcam` run |
+
+**Other changes:**
+- **Evidence chain.** Unchanged signatures are not re-verified: a cache keyed by (event_hash, SHA-256(signature),
+  key_id). Hashes and links are still recomputed on every call, and every tampering case is still detected. A
+  repeat verification of 500 entries dropped from 172 ms to 15 ms (`tests/evidence/test_chain.py`).
+- **Observation transport.** Each stored observation records `secure` (inside an ML-KEM-768 session), `signed`
+  (direct) or `token`. The API returns it, and the Camera & vision pipeline strip and the Cryptography counts use it
+  instead of always claiming a session. The three ingest paths are tested.
+- **Digital twin.** Each field records when it was last reported. The twin view shows the enclosure tamper switch and
+  marks values missing from the latest report.
+- **Dashboard.**
+  - The forensic case file on the evidence page (`derive.forensicCase`, node-tested on both captured runs).
+  - The "Verified continuously" strip in presentation mode's trusted state (`derive.liveProof`).
+  - Camera & vision status facts (`derive.visionStatus`).
+  - One phrasing for trust rebuilt by clean evidence.
+- **Demo** (`scripts/demo_full.py`).
+  - The device keeps reporting during the webcam step.
+  - Step 3 counts clear and rule-matching observations and explains a real restricted-zone detection.
+  - With `--pace`, recovery stages are held on the wall clock so the dashboard shows each one (TIME-LAPSE
+    unchanged).
+  - A missing camera prints how to pick the index.
+- **Documentation.**
+  - The README is rewritten to match the system, with a real-versus-simulated table.
+  - The hackathon novelty and problem statements no longer claim "PQC-backed device identity", "AI-driven" trust or
+    "machine learning" sensor checks.
+  - The architecture diagram is redrawn as implemented.
+  - The demo runbook (`docs/hackathon/demo-plan.md`) is written.
+
+**Verified live:**
+- `python scripts/demo_full.py --webcam --pace 2 --hold` with the configured camera (index 1) **absent**: the webcam
+  step reported it and the rest of the demo completed (TRUSTED 85). Presentation mode showed all seven states.
+- The same command with a scratch config pointing at the built-in camera (index 0): 40 real frames, YOLO11n, and
+  signed observations accepted inside an ML-KEM-768 session.
+  - The camera saw a person in the restricted zone, which is real evidence, and the demo now says so.
+  - There was no false "obstructed" report.
+  - Every state from TRUSTED through RECOVERED to TRUSTED was shown in presentation mode at 1366x768 and 1280x720.
+
+**Browser QA** (headless Edge, Playwright outside the repo):
+- 11 routes at 1920, 1440, 1366, 1280, 768 and 390 px with no horizontal page scroll.
+- Presentation-mode 7-viewport regression: 83 of 83 checks.
+- Keyboard: skip link, 39 tab stops all with a visible focus ring, dialog focus and Escape, Escape out of
+  presentation mode.
+- Camera lifecycle with Edge's fake camera: no auto-start, start, node and stream stable across refreshes, stop,
+  leaving the page, sign-out, refused permission.
+- Reduced motion on all routes.
+- Gateway API: every dashboard endpoint under 15 ms on the demo gateway.
+
 ## HOW TO RUN
 ```
 python -m pytest -o addopts="" -q                   # full suite
@@ -156,7 +215,7 @@ The demo prints the dashboard URL with the operator token.
 ## WHAT IS LEFT
 | Priority | Item | Notes |
 |---|---|---|
-| High | Run `demo_full.py --webcam` live with a camera attached | Code path exists; not re-verified this session |
+| Done | Run `demo_full.py --webcam` live with a camera attached | Phase 16: built-in camera (index 0) via a scratch config; the configured USB camera (index 1) was not attached |
 | High | Real ESP32: compile, flash, wire the tamper switch and sensors, replace the software agent | Biggest credibility gap |
 | Done | Background timer for recovery deadlines | `RecoveryTimer` in `backend/recovery/orchestrator.py`, started/stopped with the gateway; tests in `tests/fullstack/test_recovery_timer.py` |
 | Done | Dashboard operator actions | See "OPERATOR CONTROLS" below |
