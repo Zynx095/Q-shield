@@ -133,13 +133,17 @@ class PqcGateway:
                 raise PqcRejection("too_many_sessions", "low", 503)
             if init.client_nonce in self._seen_nonces:
                 raise PqcRejection("handshake_replay")
+            # Reserve the nonce in the same critical section as the check: two copies of one init racing through
+            # the (slow) verification and decapsulation below must not both get a session.
+            self._seen_nonces[init.client_nonce] = now + 2 * self.max_skew_s
         try:
             resp, channel = server_accept(self.backend, init, self._kem[init.gateway_key_id][1], signer.public_key,
                                           self._now(), self.max_skew_s, self.session_ttl_s, self._clock)
         except SessionError as e:
+            with self._lock:                    # a rejected handshake keeps no state (memory bounded by real sessions)
+                self._seen_nonces.pop(init.client_nonce, None)
             raise PqcRejection(f"handshake_{e.reason}") from None
         with self._lock:
-            self._seen_nonces[init.client_nonce] = now + 2 * self.max_skew_s
             self._sessions[resp.session_id] = _Session(channel, signer.signer_id)
         return resp
 

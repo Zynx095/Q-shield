@@ -125,6 +125,55 @@ def test_handshake_replay_rejected(pqc_world, clock):
     assert e.value.reason == "handshake_replay"
 
 
+def test_concurrent_replay_of_one_handshake_yields_one_session(pqc_world, clock, monkeypatch):
+    """Regression: the nonce check and the nonce record were in two separate critical sections around the (slow)
+    signature verification and decapsulation, so two copies of one init racing through the gateway both got a
+    session. The nonce is now reserved atomically with the check."""
+    import threading
+    import backend.security.pqc_gateway as gw_mod
+
+    init, _ = initiate(pqc_world, clock)
+    gate = threading.Barrier(2, timeout=5)
+    real = gw_mod.server_accept
+
+    def slow_accept(*a, **kw):                      # both requests are inside the crypto at the same time
+        try:
+            gate.wait()
+        except threading.BrokenBarrierError:
+            pass
+        return real(*a, **kw)
+
+    monkeypatch.setattr(gw_mod, "server_accept", slow_accept)
+    results = []
+
+    def go():
+        try:
+            results.append(pqc_world.gateway.establish_session(HandshakeInit(**init)).session_id)
+        except PqcRejection as e:
+            results.append(e.reason)
+
+    threads = [threading.Thread(target=go) for _ in range(2)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(10)
+    assert sorted(r == "handshake_replay" for r in results) == [False, True], results
+    assert len(pqc_world.gateway._sessions) == 1
+
+
+def test_failed_handshake_does_not_keep_its_nonce(pqc_world, clock):
+    """A rejected handshake (bad signature) must not leave its nonce behind: memory stays bounded by real sessions."""
+    init, _ = initiate(pqc_world, clock)
+    bad = {**init, "signature": b64e(bytes(3309))}
+    with pytest.raises(PqcRejection):
+        pqc_world.gateway.establish_session(HandshakeInit(**bad))
+    assert init["client_nonce"] not in pqc_world.gateway._seen_nonces
+    pqc_world.gateway.establish_session(HandshakeInit(**init))        # the genuine init still works once
+    with pytest.raises(PqcRejection) as e:
+        pqc_world.gateway.establish_session(HandshakeInit(**init))
+    assert e.value.reason == "handshake_replay"
+
+
 def test_stale_and_future_handshake_rejected(pqc_world, clock, pqc_backend):
     for delta in (-400, 400):
         init, _ = client_initiate(pqc_backend, "gateway-kem-1", pqc_world.kem_rec.public_key, "vision-1",
