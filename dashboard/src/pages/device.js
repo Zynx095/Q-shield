@@ -49,7 +49,7 @@ export function render({ params }) {
     </div>
     ${actionButtons(id)}
   </div>
-  <div class="facts">
+  <div class="facts" data-reveal>
     <div class="fact"><div class="fact-label">Hardware</div><div class="fact-value">${d.hw || "—"}</div></div>
     <div class="fact"><div class="fact-label">Authentication</div><div class="fact-value">${AUTH_PROFILES[d.auth_profile] || d.auth_profile || "—"}</div></div>
     <div class="fact"><div class="fact-label">Firmware</div><div class="fact-value mono">${d.fw_version || "—"}</div></div>
@@ -59,37 +59,37 @@ export function render({ params }) {
   </div>
 
   <div class="grid split-5-7 section">
-    <section class="panel" aria-label="Trust lattice">
+    <section class="panel" aria-label="Trust lattice" data-reveal>
       <div class="panel-body">
         ${snap && snap.status === "TRACKED" ? trustLattice({ snapshot: snap, factors: m.factors, thresholds: thresholds() }) : empty({ title: "No trust evidence yet", iconName: "shield" })}
         ${m.breakdown ? html`<div style="margin-top:12px"><button class="link-btn" type="button" data-action="toggle-math" aria-expanded="${UI.showMath}" aria-controls="dev-math">${UI.showMath ? "Hide the calculation" : "How is this score calculated?"}</button>
           <div id="dev-math" style="margin-top:10px" ${UI.showMath ? "" : "hidden"}>${UI.showMath ? scoreExplain(m.breakdown) : ""}</div></div>` : ""}
       </div>
     </section>
-    <div class="stack">
+    <div class="stack" data-reveal>
       <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("shield")}Trust factors</h2></div><div class="panel-body">${factorList(m.factors)}</div></section>
       <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("lock")}Enforcement</h2></div><div class="panel-body stack-sm">${stateRail(m.path, snap && snap.state)}${channels(m.access)}</div></section>
     </div>
   </div>
 
-  <div class="section">${trustHistoryPanel(m, "dev")}</div>
+  <div class="section" data-reveal>${trustHistoryPanel(m, "dev")}</div>
 
   <div class="grid grid-2 section">
-    <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("refresh")}Recovery</h2><a class="meta" href="#/recovery">Open recovery</a></div>
+    <section class="panel" data-reveal><div class="panel-head"><h2 class="panel-title">${icon("refresh")}Recovery</h2><a class="meta" href="#/recovery">Open recovery</a></div>
       <div class="panel-body">${m.recoveryUnavailable ? empty({ title: "Recovery is not enabled on this gateway", iconName: "refresh" }) : stepper(m.steps, { compact: true })}</div></section>
-    <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("twin")}Digital twin</h2><a class="meta" href="#/twin">Open twin</a></div>
+    <section class="panel" data-reveal><div class="panel-head"><h2 class="panel-title">${icon("twin")}Digital twin</h2><a class="meta" href="#/twin">Open twin</a></div>
       <div class="panel-body stack-sm">${twinVerdict(m.twin)}${twinTable(m.twin)}</div></section>
   </div>
 
-  <div class="section stack">
+  <div class="section stack" data-reveal>
     <h2 class="h-section">Incidents</h2>
     ${m.incidents.length ? m.incidents.map((i) => incidentCard(i)) : html`<section class="panel">${empty({ title: "No incidents", text: "No correlated incident has been recorded for this device.", iconName: "shieldCheck", ok: true })}</section>`}
   </div>
 
   <div class="grid split-7-5 section">
-    <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("signal")}Security timeline</h2></div>
+    <section class="panel" data-reveal><div class="panel-head"><h2 class="panel-title">${icon("signal")}Security timeline</h2></div>
       <div class="panel-body">${m.timeline.length ? timeline(m.timeline, { expanded: UI.expanded, limit: limitOf("dev-tl", 20), deviceId: id, moreAction: "more:dev-tl", scope: "dev" }) : empty({ title: "No events yet", iconName: "signal" })}</div></section>
-    <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("ledger")}Evidence</h2><a class="meta" href="#/evidence">Full ledger</a></div>
+    <section class="panel" data-reveal><div class="panel-head"><h2 class="panel-title">${icon("ledger")}Evidence</h2><a class="meta" href="#/evidence">Full ledger</a></div>
       <div class="panel-body">${blocks.length ? ledger(blocks, { expanded: UI.expanded, limit: 6 }) : empty({ title: "No forensic events recorded yet", iconName: "ledger" })}</div></section>
   </div>`;
 }

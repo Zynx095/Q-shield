@@ -14,7 +14,7 @@ export function render() {
   if (!S.devices.length) return html`${head}<section class="panel">${empty({ title: "No devices enrolled", text: "Enrol a device with python scripts/enroll_device.py. It appears here once it authenticates.", iconName: "devices" })}</section>`;
   const f = fleet();
   return html`${head}
-  <section class="panel"><div class="panel-body table-wrap">
+  <section class="panel" data-reveal><div class="panel-body table-wrap">
     <table class="table">
       <caption class="sr-only">Enrolled devices</caption>
       <thead><tr><th scope="col">Device</th><th scope="col">State</th><th scope="col">Trust</th><th scope="col">Connection</th><th scope="col">Hardware</th><th scope="col">Authentication</th><th scope="col">Firmware</th><th scope="col">Last seen</th><th scope="col">Incident</th></tr></thead>
