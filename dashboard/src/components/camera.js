@@ -23,12 +23,18 @@ export function cameraLabel(device, index) {
 }
 
 // ---------------------------------------------------------------------------------------------- controller (no DOM)
-export function createCameraController({ media = globalThis.navigator && globalThis.navigator.mediaDevices, onChange = () => {} } = {}) {
-  const st = { status: "idle", stream: null, error: null, info: null, devices: [], chosen: null };
+const NAV = globalThis.navigator;
+
+export function createCameraController({
+  media = NAV && NAV.mediaDevices, permissions = NAV && NAV.permissions, secure = globalThis.isSecureContext !== false,
+  onChange = () => {},
+} = {}) {
+  // permission: "granted" | "prompt" | "denied" | null (unknown). The camera is only ever opened by start().
+  const st = { status: "idle", stream: null, error: null, info: null, devices: [], chosen: null, permission: null };
   let seq = 0;                                      // a newer start()/stop() supersedes a pending request
 
   const snapshot = () => ({ status: st.status, error: st.error, info: st.info, stream: st.stream, devices: st.devices,
-    deviceId: (st.info && st.info.deviceId) || st.chosen });
+    deviceId: (st.info && st.info.deviceId) || st.chosen, permission: st.permission, secure });
   const emit = () => onChange(snapshot());
 
   function stopTracks() {
@@ -49,6 +55,18 @@ export function createCameraController({ media = globalThis.navigator && globalT
   const onDeviceChange = () => { refreshDevices(); };
   if (media && typeof media.addEventListener === "function") media.addEventListener("devicechange", onDeviceChange);
 
+  // Read (never request) the camera permission, so the page can explain a block before the person presses Start.
+  let permStatus = null;
+  const onPermission = () => { st.permission = permStatus.state; refreshDevices(); };
+  if (permissions && typeof permissions.query === "function") {
+    permissions.query({ name: "camera" }).then((ps) => {
+      permStatus = ps;
+      st.permission = ps.state;
+      if (typeof ps.addEventListener === "function") ps.addEventListener("change", onPermission);
+      emit();
+    }, () => {});                                   // "camera" not queryable in this browser: stay unknown
+  }
+
   /** Choose the camera for the next start (by deviceId from the list). */
   function choose(deviceId) {
     st.chosen = deviceId || null;
@@ -58,6 +76,12 @@ export function createCameraController({ media = globalThis.navigator && globalT
   async function start() {
     const mine = ++seq;
     stopTracks();
+    if (!secure) {                                  // browsers expose cameras only to HTTPS and localhost pages
+      st.status = "error";
+      st.error = { kind: "insecure", name: "SecurityError" };
+      emit();
+      return;
+    }
     if (!media || typeof media.getUserMedia !== "function") {
       st.status = "error";
       st.error = { kind: "unsupported", name: "NotSupportedError" };
@@ -74,6 +98,7 @@ export function createCameraController({ media = globalThis.navigator && globalT
       st.stream = stream;
       st.info = describeTrack(stream.getVideoTracks()[0]);
       st.status = "live";
+      st.permission = "granted";
       refreshDevices();                             // names become readable once permission is granted
     } catch (err) {
       if (mine !== seq) return;
@@ -96,6 +121,7 @@ export function createCameraController({ media = globalThis.navigator && globalT
   function release() {
     stop();
     if (media && typeof media.removeEventListener === "function") media.removeEventListener("devicechange", onDeviceChange);
+    if (permStatus && typeof permStatus.removeEventListener === "function") permStatus.removeEventListener("change", onPermission);
   }
 
   return { start, stop, choose, refreshDevices, release, get state() { return snapshot(); } };
@@ -141,7 +167,8 @@ function mountCameraView(host, ctl) {
   const stopBtn = el("button", "btn", "Stop preview");
   stopBtn.type = "button";
   controls.append(pick, startBtn, stopBtn, count);
-  root.append(stage, status, controls);
+  const note = el("p", "caption cam-note");
+  root.append(stage, status, controls, note);
   host.append(root);
 
   startBtn.addEventListener("click", () => ctl.start());
@@ -162,7 +189,12 @@ function mountCameraView(host, ctl) {
     if (s.deviceId && select.value !== s.deviceId) select.value = s.deviceId;
     pick.hidden = s.devices.length === 0;
     count.textContent = s.devices.length ? `${s.devices.length} camera${s.devices.length === 1 ? "" : "s"} found` : "No camera listed yet";
-    startBtn.disabled = s.status === "requesting" || s.status === "live";
+    note.textContent = !s.secure
+      ? `Camera preview needs HTTPS or localhost. This page is served over plain HTTP from ${location.host}, so the browser offers no camera here. Open it as http://localhost or http://127.0.0.1 on this machine, or start the gateway with QSHIELD_TLS_CERT and QSHIELD_TLS_KEY.`
+      : s.permission === "denied" && s.status !== "live"
+        ? "Camera access is blocked for this site. Allow it in the browser's site settings (the camera icon in the address bar), then press Start preview."
+        : s.status === "live" ? "" : "Nothing starts until you press Start preview. The browser then asks for camera access; video only, no microphone.";
+    startBtn.disabled = !s.secure || s.status === "requesting" || s.status === "live";
     stopBtn.disabled = s.status !== "live" && s.status !== "requesting";
   }
   return { update };
