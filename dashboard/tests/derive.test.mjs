@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { html, raw, esc } from "../src/lib/html.js";
 import {
   buildIncidents, buildTimeline, chainView, evidenceIndex, factorView, posture, recoverySteps, scoreBreakdown,
-  scoreSeries, statePath,
+  scoreSeries, statePath, observationView,
 } from "../src/lib/derive.js";
 import { storyProgress } from "../src/components/rail.js";
 import { countdown, duration, signed } from "../src/lib/format.js";
@@ -226,4 +226,18 @@ test("a quarantined device that is still talking is 'Blocked by quarantine', a s
   assert.equal(connectionView({ device: { ...dev, status: "ONLINE" }, state: "TRUSTED" }).label, "Online");
   assert.equal(connectionView({ device: dev, state: "TRUSTED" }).label, "Offline");               // genuine offline kept
   assert.equal(connectionView({ device: { ...dev, status: "ENROLLED" }, state: null }).label, "Never connected");
+});
+
+test("vision observations show the gateway's verdict, and synthetic detections are labelled", () => {
+  const [person, chair] = FX.observations.map(observationView);
+  assert.deepEqual([person.title, person.confidence, person.signed, person.alg, person.signer, person.synthetic],
+    ["Person detected", 0.9, true, "ML-DSA-65", "vision-1", true]);
+  assert.equal(person.rule, "restricted class in restricted zone");
+  assert.equal(person.zone, "restricted zone", "zone kind is not repeated when the name already says it");
+  assert.equal(chair.rule, null);
+  const health = observationView({ observation_id: "h", received_at: 5, event_type: "camera_health", details: { state: "source_lost" },
+    auth: "ML-DSA-65:vision-1", model: { name: "yolo11n", version: "8.3" } });
+  assert.deepEqual([health.title, health.confidence, health.synthetic, health.model], ["Camera health: source lost", null, false, "yolo11n 8.3"]);
+  const unsigned = observationView({ observation_id: "u", received_at: 6, event_type: "visual_observation", object: "car", confidence: 0.5, auth: null });
+  assert.deepEqual([unsigned.signed, unsigned.alg, unsigned.signer], [false, null, null], "an ingest-token post is never shown as signed");
 });

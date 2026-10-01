@@ -92,6 +92,17 @@ def test_camera_preview_stays_in_the_browser():
     assert "audio: false" in src
 
 
+def test_vision_page_is_routed_labelled_and_releases_the_camera(stack):
+    main, vision = MODULES["src/main.js"], MODULES["src/pages/vision.js"]
+    assert 'vision: [vision, "Camera & vision"]' in main
+    assert 'route: "vision"' in MODULES["src/components/shell.js"]
+    assert '<div id="cam-mount" data-morph-skip></div>' in vision, "the refresh must never replace the <video>"
+    assert "Local preview only." in vision and "not sent to the gateway" in vision
+    assert 'if (route.name !== "vision") vision.release();' in main and main.count("vision.release()") >= 2
+    assert stack.gw.get("/dashboard/src/pages/vision.js").status_code == 200
+    assert stack.gw.get("/dashboard/src/components/camera.js").status_code == 200
+
+
 def test_dashboard_action_sequence_against_the_gateway(stack):
     """Replays exactly the requests the dashboard's operator dialogs send (same paths, bodies, bearer header)."""
     quarantine_by_correlated_attack(stack)
