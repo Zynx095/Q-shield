@@ -32,6 +32,17 @@ earned no recovery credit. Recovery was silently about 3× slower and nondetermi
 show this; the live demo did. The fix: out of order now means older than the last applied **signal**. Documented in
 trust-engine.md §6.4 and covered by regression tests.
 
+## OPERATOR CONTROLS (Phase 12)
+- These use the existing operator API and its single shared operator bearer token. That token is authentication plus authorization. There is no RBAC and no per-operator identity yet (TD-17). The ingest token and device credentials are rejected with 401.
+  - `POST /api/v1/devices/{id}/recovery/start` `{reason}`: goes through `RecoveryOrchestrator.start`. It needs QUARANTINED, not revoked, a twin expected state, and no recovery already active (otherwise 409). The body is `extra=forbid`, so no target state can be smuggled in (422). The operator cannot force any state.
+  - `POST /api/v1/devices/{id}/recovery/abort` `{reason}`: the recovery is marked failed with `aborted: <reason>` and the device goes to QUARANTINED through the state machine. If no recovery is active, it returns 409.
+  - `PUT /api/v1/devices/{id}/twin/expected`: the known-good fw_version/cfg_hash (and capabilities/sensor_ranges). It needs at least fw_version or cfg_hash (otherwise 422). It is **frozen while a recovery is active** (409), so the health-check yardstick cannot be moved mid-verification. Expected and observed state are stored and returned separately. Observed is self-reported evidence, not attestation.
+  - Every action is recorded: `recovery_started` / `recovery_failed` / `twin_expected_updated` security events plus ML-DSA evidence-chain entries.
+- Dashboard: the "Operator actions" card has a reason field, START/ABORT RECOVERY, and a known-good-state form. It shows loading, success, and refusal with the server's reason. Button enablement is only a hint, because the gateway re-checks everything. After every action the card re-renders from the API, so it reflects backend reality after a reload.
+- Tests: `tests/fullstack/test_operator_controls.py` (28) and `tests/fullstack/test_dashboard_contract.py` (3, which check that the JS calls existing routes and replay the button request sequence).
+- Not verified: no real browser click-through (no browser automation is installed here). The JS passes `node --check`, and its exact requests are replayed in the tests.
+- Webcam: `python scripts/demo_full.py --webcam` was run with no camera attached. It prints `webcam step NOT run: cannot open camera source 0` and the rest of the demo completes (TRUSTED 85). The camera path itself is still unverified.
+
 ## HOW TO RUN
 ```
 python -m pytest -o addopts="" -q                   # full suite
@@ -59,7 +70,7 @@ The demo prints the dashboard URL with the operator token.
 | High | Run `demo_full.py --webcam` live with a camera attached | Code path exists; not re-verified this session |
 | High | Real ESP32: compile, flash, wire the tamper switch and sensors, replace the software agent | Biggest credibility gap |
 | Done | Background timer for recovery deadlines | `RecoveryTimer` in `backend/recovery/orchestrator.py`, started/stopped with the gateway; tests in `tests/fullstack/test_recovery_timer.py` |
-| Medium | Dashboard: operator actions (start recovery, set twin) from the UI | Currently read-only; control is via the API |
+| Done | Dashboard operator actions | See "OPERATOR CONTROLS" below |
 | Medium | TLS for the gateway; per-operator tokens | TD-17 |
 | Medium | Update the audit PDF and the PPT to reflect Phases 5–11 | Both still describe Phases 5–10 as planned |
 | Low | External anchoring of the evidence head; key rotation | TD-09, TD-15 |

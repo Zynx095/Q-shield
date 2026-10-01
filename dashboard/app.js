@@ -23,6 +23,19 @@ async function api(path) {
   return r.json();
 }
 
+async function act(method, path, body) {
+  const r = await fetch(path, { method, headers: { Authorization: `Bearer ${S.token}`, "Content-Type": "application/json" },
+                                body: JSON.stringify(body) });
+  let data = null;
+  try { data = await r.json(); } catch { /* non-JSON error body */ }
+  if (!r.ok) {
+    const d = data && data.detail;
+    throw new Error(r.status === 401 ? "unauthorised (operator token rejected)"
+      : `${r.status}: ${typeof d === "string" ? d : JSON.stringify(d ?? data)}`);
+  }
+  return data;
+}
+
 function setConn(ok, text) {
   const c = $("conn");
   c.className = `conn ${ok ? "on" : "off"}`;
@@ -125,6 +138,50 @@ function renderEvidence(entries, verify) {
     + `<td class="${bad.has(e.seq) ? "bad" : "ok"}">${bad.has(e.seq) ? esc(bad.get(e.seq)) : "✔"}</td></tr>`).join("");
 }
 
+// ------------------------------------------------------------------ operator actions (server is authoritative)
+const A = { busy: false, expected: {}, dirty: false };
+function msg(kind, text) { const m = $("act-msg"); m.className = `act-msg ${kind}`; m.textContent = text; }
+
+function renderActions(t, rec, tw) {
+  const st = (t && t.state) || "NO DATA";
+  const cur = rec && rec.current;
+  const active = !!(cur && cur.status === "active");
+  $("act-state").textContent = st;
+  $("act-rec").textContent = cur ? `${cur.status}${cur.status === "active" ? ` · ${cur.stage}` : ""}${cur.failure_reason ? ` (${cur.failure_reason})` : ""}` : "none";
+  // Hints only: the gateway re-checks every precondition and refuses with 409 if they do not hold.
+  $("btn-start").disabled = A.busy || st !== "QUARANTINED" || active;
+  $("btn-abort").disabled = A.busy || !active;
+  $("btn-twin").disabled = A.busy || active;
+  A.expected = (tw && tw.expected) || {};
+  if (!A.dirty) { $("exp-fw").value = A.expected.fw_version || ""; $("exp-cfg").value = A.expected.cfg_hash || ""; }
+}
+
+async function runAction(label, fn) {
+  if (A.busy) return;
+  A.busy = true; msg("muted", `${label}…`);
+  ["btn-start", "btn-abort", "btn-twin"].forEach((id) => { $(id).disabled = true; });
+  try { msg("ok", `${label}: ${await fn()}`); A.dirty = false; }
+  catch (e) { msg("bad", `${label} refused · ${e.message}`); }
+  finally { A.busy = false; await refresh(); }
+}
+
+const reason = () => $("act-reason").value.trim();
+$("btn-start").addEventListener("click", () => runAction("Start recovery", async () => {
+  const r = await act("POST", `/api/v1/devices/${encodeURIComponent(S.device)}/recovery/start`, { reason: reason() });
+  return `${r.recovery_id} · ${r.stage}`;
+}));
+$("btn-abort").addEventListener("click", () => runAction("Abort recovery", async () => {
+  const r = await act("POST", `/api/v1/devices/${encodeURIComponent(S.device)}/recovery/abort`, { reason: reason() });
+  return `${r.recovery_id} · ${r.failure_reason}`;
+}));
+$("btn-twin").addEventListener("click", () => runAction("Save expected state", async () => {
+  // Keep the other expected fields (capabilities, sensor ranges); only firmware/config are edited here.
+  const body = { ...A.expected, fw_version: $("exp-fw").value.trim() || null, cfg_hash: $("exp-cfg").value.trim() || null };
+  const r = await act("PUT", `/api/v1/devices/${encodeURIComponent(S.device)}/twin/expected`, body);
+  return `fw ${r.expected.fw_version ?? "—"} · cfg ${r.expected.cfg_hash ?? "—"}`;
+}));
+["exp-fw", "exp-cfg"].forEach((id) => $(id).addEventListener("input", () => { A.dirty = true; }));
+
 // ------------------------------------------------------------------ loop
 async function refresh() {
   try {
@@ -143,7 +200,7 @@ async function refresh() {
       api(`/api/v1/evidence/device/${d}?limit=1000`), api("/api/v1/evidence/verify")]);
     const dev = (devices || []).find((x) => x.device_id === S.device);
     renderOverview(t, dev, access); renderFactors(t); renderTimeline(hist); renderRecovery(rec);
-    renderTwin(twin); renderEvents(events, hist); renderEvidence(evid, verify);
+    renderTwin(twin); renderActions(t, rec, twin); renderEvents(events, hist); renderEvidence(evid, verify);
     setConn(true, `live · ${new Date().toLocaleTimeString()}`);
   } catch (e) {
     setConn(false, e.message === "unauthorised" ? "bad token" : "offline");
@@ -160,6 +217,6 @@ function start() {
 }
 
 $("connect").addEventListener("click", start);
-$("device").addEventListener("change", (e) => { S.device = e.target.value; S.seenEvents.clear(); refresh(); });
+$("device").addEventListener("change", (e) => { S.device = e.target.value; A.dirty = false; S.seenEvents.clear(); refresh(); });
 S.token = loadToken();
 if (S.token) { $("token").value = S.token; start(); }

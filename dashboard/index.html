@@ -61,6 +61,22 @@
     <div id="recovery-detail" class="rec-detail muted">No recovery started.</div>
   </section>
 
+  <section class="card actions">
+    <h2>Operator actions <span class="hint">operator API · state machine decides</span></h2>
+    <div class="act-state">Device state: <b id="act-state">—</b> · recovery: <b id="act-rec">—</b></div>
+    <label class="fld">Reason (required, recorded in evidence)
+      <input id="act-reason" type="text" maxlength="200" placeholder="e.g. incident contained, begin remediation"></label>
+    <div class="btns">
+      <button id="btn-start" disabled>Start recovery</button>
+      <button id="btn-abort" class="danger" disabled>Abort recovery</button>
+    </div>
+    <h3>Known-good state <span class="hint">expected, not observed</span></h3>
+    <label class="fld">Firmware version <input id="exp-fw" type="text" maxlength="128"></label>
+    <label class="fld">Configuration hash <input id="exp-cfg" type="text" maxlength="128"></label>
+    <div class="btns"><button id="btn-twin">Save expected state</button></div>
+    <div id="act-msg" class="act-msg muted" role="status" aria-live="polite"></div>
+  </section>
+
   <section class="card timeline">
     <h2>State timeline</h2>
     <div id="timeline" class="tl"></div>
@@ -86,7 +102,7 @@
 </main>
 
 <footer class="foot">
-  Reads the live gateway API only (operator token). Device data from the software agent is SIMULATED;
+  Reads and acts through the live gateway operator API only (operator token); the backend state machine is authoritative. Device data from the software agent is SIMULATED;
   the ESP32 path is HMAC-SHA256, not post-quantum.
 </footer>
 <script src="app.js"></script>

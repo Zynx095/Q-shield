@@ -97,3 +97,12 @@ td { padding: 5px 6px; border-bottom: 1px solid #1f2225; vertical-align: top; ov
 .foot { padding: 0 24px 24px; }
 tr.flash td { animation: flash 1.6s ease-out; }
 @keyframes flash { from { background: rgba(255,145,77,.22); } to { background: transparent; } }
+
+/* operator actions */
+.actions h3 { font-size: 13px; margin: 14px 0 6px; }
+.actions .fld { display: block; font-size: 12px; margin: 6px 0; }
+.actions .fld input { display: block; width: 100%; box-sizing: border-box; margin-top: 3px; }
+.actions .btns { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.actions button:disabled { opacity: .45; cursor: not-allowed; }
+.actions button.danger { border-color: #c0392b; color: #e74c3c; }
+.act-msg { min-height: 1.2em; font-size: 12px; word-break: break-word; }

@@ -101,6 +101,12 @@ def register_security_routes(app, *, store, clock, require_operator, handle, tru
     def twin_set(device_id: str, expected: dict = Body(...)):
         known(device_id)
         now = clock()
+        if recovery is not None and recovery.active(device_id):
+            # The known-good state is the yardstick of the running health checks: moving it mid-recovery would let
+            # the operator (or a stolen operator token) redefine "clean" for a device that is being verified.
+            raise HTTPException(409, "recovery_active: expected state is frozen until the recovery ends (abort first)")
+        if not any(expected.get(k) for k in ("fw_version", "cfg_hash")):
+            raise HTTPException(422, "expected state must define fw_version and/or cfg_hash")
         try:
             exp = need(twin, "twin").set_expected(device_id, expected, now)
         except TwinError as e:
