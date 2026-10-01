@@ -400,6 +400,14 @@ a.chip { transition: border-color var(--dur-1) var(--ease); }
 .chain-mini .cm-block .mono { color: var(--slate); font-size: 10.5px; }
 .chain-mini .cm-link { flex: none; width: 18px; height: 2px; background: var(--ink-2); }
 
+/* ---------- camera preview (components/camera.js): local only; nothing is ever drawn over the video ---------- */
+.cam { display: flex; flex-direction: column; gap: var(--s3); }
+.cam-stage { position: relative; aspect-ratio: 16 / 9; background: var(--ink); border-radius: var(--r-md); overflow: hidden; }
+.cam-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--ink); }
+.cam-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #b9c3d3; font-size: var(--t-sm); text-align: center; padding: var(--s5); }
+.cam-status { font-size: var(--t-sm); color: var(--ink-2); min-height: 1.5em; }
+.cam-controls { display: flex; gap: var(--s3); flex-wrap: wrap; align-items: center; }
+
 /* ---------- incident ---------- */
 .incident { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); overflow: hidden; }
 .incident.is-active { border-color: var(--crit-line); }
