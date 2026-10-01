@@ -211,7 +211,10 @@ document.addEventListener("submit", async (e) => {
 
 window.addEventListener("hashchange", () => {
   if (location.hash.includes("token=")) { boot(); return; }
-  scheduleRender();
+  // Navigation is a person's action: paint now instead of waiting for the next animation frame, which a busy or
+  // throttled renderer can postpone by hundreds of milliseconds (measured up to ~2 s in headless Edge).
+  if (frame) { cancelAnimationFrame(frame); frame = 0; }
+  paint();
 });
 window.addEventListener("resize", () => scheduleRender());
 
