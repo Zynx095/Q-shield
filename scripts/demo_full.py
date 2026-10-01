@@ -180,6 +180,8 @@ class Demo:
                 self.webcam()
             except RuntimeError as e:          # no camera: say so, never fake the step
                 self.say(c("r", f"webcam step NOT run: {e}"))
+                self.say(c("d", "   check camera.source in the vision config (--vision-config): 0 is usually the built-in "
+                                "camera, 1 the first USB camera; 'python -m ai.vision probe --config <file>' tests it"))
             self.show_trust()
         else:
             self.step("Signed vision observation (webcam step skipped: run with --webcam for the real camera)")
@@ -229,16 +231,36 @@ class Demo:
         return self.recover()
 
     def webcam(self) -> None:
-        from ai.vision.camera import OpenCVSource, warm_up
         from ai.vision.config import load_config
+
+        cfg = load_config(self.a.vision_config)
+        m, cam = cfg.model, cfg.camera
+        # The device keeps operating while the vision service works: without its regular authenticated reports the
+        # trust engine would (rightly) mark it stale during the model load, camera warm-up and capture.
+        stop = threading.Event()
+
+        def keep_reporting():
+            while not stop.wait(4):
+                try:
+                    self.agent.telemetry()
+                except httpx.TransportError:
+                    pass
+        reporter = threading.Thread(target=keep_reporting, name="demo-device-reports", daemon=True)
+        reporter.start()
+        try:
+            self._webcam_run(cfg, m, cam)
+        finally:
+            stop.set()
+            reporter.join(10)
+
+    def _webcam_run(self, cfg, m, cam) -> None:
+        from ai.vision.camera import OpenCVSource, warm_up
         from ai.vision.detector import YoloDetector
         from ai.vision.pipeline import VisionPipeline
         from ai.vision.runner import run
         from ai.vision.signed_sink import SignedHttpSink
         from datetime import datetime, timezone
 
-        cfg = load_config(self.a.vision_config)
-        m, cam = cfg.model, cfg.camera
         det = YoloDetector(m.path, m.name, m.conf_threshold, m.imgsz, m.device, m.classes_of_interest)
         src = OpenCVSource(cam.source, cam.backend, cam.width, cam.height)
         sink = SignedHttpSink(self.url, self.backend, "vision-1", "usb_webcam:0", self.vision_sk, secure=True,
@@ -254,7 +276,16 @@ class Demo:
             src.release()
         after = listing()
         obs = after[: max(0, len(after) - before)]          # newest first
-        self.say(f"{n} frames processed, {len(obs)} signed observations accepted over the ML-KEM session")
+        visual = [o for o in obs if o.get("event_type") == "visual_observation"]
+        rules = [o for o in visual if o.get("anomaly")]
+        health = [o for o in obs if o.get("event_type") == "camera_health"]
+        self.say(f"{n} frames processed (after a {cam.warmup_frames if isinstance(cam.source, int) else 0}-frame camera warm-up), "
+                 f"{len(obs)} signed observations accepted over the ML-KEM session: {len(visual) - len(rules)} clear, "
+                 f"{len(rules)} restricted-zone rule match(es), {len(health)} camera-health report(s)")
+        if rules:
+            self.say(c("y", "   REAL detection: the camera saw a person in the restricted zone (right half of the frame). That is "
+                            "genuine evidence, so trust drops now and it can correlate with other evidence inside the 60 s window. "
+                            "Keep that half of the view clear during this step for the scripted story."))
         for o in obs[:4]:
             if o.get("event_type") == "camera_health":       # by protocol: no object/confidence, only details.state
                 self.say(c("d", f"  camera health: {(o.get('details') or {}).get('state')} auth={o.get('auth', '')[:18]}"))
@@ -273,6 +304,7 @@ class Demo:
     def recover(self) -> int:
         rec = lambda: self.op.get(f"/api/v1/devices/{DEVICE}/recovery").json()["current"]  # noqa: E731
         stage = None
+        stage_seen = None
         channel_open = True
         for i in range(2000):
             self.clock.fast_forward(REPORT_EVERY_S)
@@ -299,6 +331,14 @@ class Demo:
                     self.say(c("g", "   ACCESS RESTORED (RECOVERED): device back on the normal channel"))
             if r["status"] in ("completed", "failed"):
                 break
+            if self.a.pace:
+                # Presentation pacing (wall clock only; the gateway's TIME-LAPSE is unchanged): hold each health check
+                # and each stage change long enough for the dashboard (2 s refresh) to show it.
+                if r["stage"] != stage_seen:
+                    time.sleep(self.a.pace)
+                elif r["stage"] in ("remediation_pending", "health_checks"):
+                    time.sleep(min(self.a.pace, 2.5))
+            stage_seen = r["stage"]
         self.step("Result")
         self.show_trust()
         r = rec()
