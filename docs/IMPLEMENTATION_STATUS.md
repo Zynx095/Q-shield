@@ -50,7 +50,7 @@ The demo prints the dashboard URL with the operator token.
 - Trust parameters are design choices and have not been calibrated against data (trust-engine.md §16).
 - The custom ML-KEM session protocol has had no external review. There is no TLS. Tokens travel over plain HTTP, so use a trusted LAN only.
 - The evidence chain has no external anchoring. Anyone holding both the DB and the evidence key can rewrite history.
-- Recovery deadlines are only evaluated when the gateway handles a request (no background timer).
+- Recovery deadlines are evaluated by a background `RecoveryTimer` (every `RECOVERY_TICK_S`, default 5 s; 0 disables) as well as on each request.
 - The service is single-process and single-gateway (SQLite).
 
 ## WHAT IS LEFT
@@ -58,7 +58,7 @@ The demo prints the dashboard URL with the operator token.
 |---|---|---|
 | High | Run `demo_full.py --webcam` live with a camera attached | Code path exists; not re-verified this session |
 | High | Real ESP32: compile, flash, wire the tamper switch and sensors, replace the software agent | Biggest credibility gap |
-| Medium | Background timer for recovery deadlines | Currently request-driven |
+| Done | Background timer for recovery deadlines | `RecoveryTimer` in `backend/recovery/orchestrator.py`, started/stopped with the gateway; tests in `tests/fullstack/test_recovery_timer.py` |
 | Medium | Dashboard: operator actions (start recovery, set twin) from the UI | Currently read-only; control is via the API |
 | Medium | TLS for the gateway; per-operator tokens | TD-17 |
 | Medium | Update the audit PDF and the PPT to reflect Phases 5–11 | Both still describe Phases 5–10 as planned |

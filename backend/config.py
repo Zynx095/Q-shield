@@ -31,6 +31,7 @@ class Settings:
     require_signed_observations: bool = False
     trust_enabled: bool = True
     trust_config_path: str | None = None
+    recovery_tick_s: float = 5.0   # background recovery-deadline timer; 0 disables
     # Optional overrides from the environment; otherwise generated under keys_dir on first use.
     master_key_hex: str | None = field(default=None, repr=False)
     operator_token: str | None = field(default=None, repr=False)
@@ -64,6 +65,7 @@ class Settings:
             require_signed_observations=get("REQUIRE_SIGNED_OBSERVATIONS", "false").lower() in ("1", "true", "yes"),
             trust_enabled=get("TRUST_ENABLED", "true").lower() in ("1", "true", "yes"),
             trust_config_path=get("TRUST_CONFIG_PATH", "") or None,
+            recovery_tick_s=float(get("RECOVERY_TICK_S", str(cls.recovery_tick_s))),
             master_key_hex=get("QSHIELD_MASTER_KEY_HEX", "") or None,
             operator_token=get("QSHIELD_OPERATOR_TOKEN", "") or None,
             ingest_token=get("QSHIELD_INGEST_TOKEN", "") or None,

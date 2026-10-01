@@ -113,6 +113,14 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
         trust.listeners.append(recorder.on_trust_change)
     if recovery is not None and recorder is not None and recovery.recorder is None:
         recovery.recorder = recorder
+    app.state.recovery_timer = None
+    if recovery is not None and settings.recovery_tick_s > 0:
+        from backend.recovery.orchestrator import RecoveryTimer
+        timer = RecoveryTimer(recovery, settings.recovery_tick_s, on_error=lambda e: store.add_event(
+            clock(), None, "recovery_timer_error", "high", {"error": type(e).__name__}))
+        app.state.recovery_timer = timer
+        app.router.on_startup.append(timer.start)
+        app.router.on_shutdown.append(timer.stop)
     last_block_log: dict[str, float] = {}
     last_fail_log = {"t": -1e18}
 

@@ -26,6 +26,7 @@ these checks. That limitation is documented, not hidden.
 from __future__ import annotations
 
 import json
+import threading
 import time
 import uuid
 from dataclasses import dataclass
@@ -71,6 +72,7 @@ class RecoveryOrchestrator:
                  recorder=None, cfg: RecoveryConfig | None = None):
         self.store, self.trust, self.twin, self.clock = store, trust, twin, clock
         self.recorder, self.cfg = recorder, cfg or RecoveryConfig()
+        self._lock = threading.RLock()   # tick() runs from requests AND the background RecoveryTimer
         store.ensure_schema(SCHEMA)
 
     # ------------------------------------------------------------------ persistence
@@ -135,6 +137,10 @@ class RecoveryOrchestrator:
 
     # ------------------------------------------------------------------ control channel
     def start(self, device_id: str, reason: str, requested_by: str = "operator") -> dict:
+        with self._lock:
+            return self._start(device_id, reason, requested_by)
+
+    def _start(self, device_id: str, reason: str, requested_by: str) -> dict:
         now = self.clock()
         dev = self.store.get_device(device_id)
         if dev is None:
@@ -166,11 +172,12 @@ class RecoveryOrchestrator:
         return r
 
     def abort(self, device_id: str, reason: str) -> dict:
-        r = self.active(device_id)
-        if r is None:
-            raise RecoveryError("no_active_recovery")
-        self._fail(r, f"aborted: {reason}", self.clock(), force_quarantine=True)
-        return r
+        with self._lock:
+            r = self.active(device_id)
+            if r is None:
+                raise RecoveryError("no_active_recovery")
+            self._fail(r, f"aborted: {reason}", self.clock(), force_quarantine=True)
+            return r
 
     # ------------------------------------------------------------------ recovery channel
     def pending_command(self, device_id: str) -> dict | None:
@@ -183,10 +190,11 @@ class RecoveryOrchestrator:
     def tick(self) -> list[dict]:
         """Advance every active recovery. Deterministic given the stored records and the clock."""
         out = []
-        for row in self.store.query("SELECT * FROM recoveries WHERE status=?", (ACTIVE,)):
-            r = self._load(row)
-            self._advance(r, self.clock())
-            out.append(r)
+        with self._lock:
+            for row in self.store.query("SELECT * FROM recoveries WHERE status=?", (ACTIVE,)):
+                r = self._load(row)
+                self._advance(r, self.clock())
+                out.append(r)
         return out
 
     def _new_reports(self, r: dict) -> list:
@@ -246,3 +254,47 @@ class RecoveryOrchestrator:
 
         r["updated_at"] = now
         self._save(r)
+
+
+class RecoveryTimer:
+    """Background clock for recovery deadlines. Without it, deadlines are only evaluated when the gateway handles a
+    request, so a silent device in RECOVERING would never time out. Every `interval_s` it runs
+    trust.process_pending() + recovery.tick(); errors are recorded as events and never stop the timer."""
+
+    def __init__(self, recovery: RecoveryOrchestrator, interval_s: float = 5.0, on_error: Callable | None = None):
+        if interval_s <= 0:
+            raise ValueError("interval_s must be > 0")
+        self.recovery, self.interval_s, self.on_error = recovery, interval_s, on_error
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+        self.ticks = 0
+
+    def run_once(self) -> None:
+        try:
+            self.recovery.trust.process_pending()
+            self.recovery.tick()
+        except Exception as e:  # noqa: BLE001 - the timer must survive a bad tick
+            if self.on_error:
+                self.on_error(e)
+        self.ticks += 1
+
+    def _loop(self) -> None:
+        while not self._stop.wait(self.interval_s):
+            self.run_once()
+
+    def start(self) -> None:
+        if self._thread and self._thread.is_alive():
+            return
+        self._stop.clear()
+        self._thread = threading.Thread(target=self._loop, name="qshield-recovery-timer", daemon=True)
+        self._thread.start()
+
+    def stop(self, timeout: float = 5.0) -> None:
+        self._stop.set()
+        if self._thread:
+            self._thread.join(timeout)
+            self._thread = None
+
+    @property
+    def running(self) -> bool:
+        return bool(self._thread and self._thread.is_alive())
