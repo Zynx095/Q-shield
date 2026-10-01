@@ -30,6 +30,7 @@ export function render() {
   }
   const signers = p.signers || [];
   const signed = S.observations.filter((o) => String(o.auth || "").startsWith("ML-DSA")).length;
+  const sealed = S.observations.filter((o) => o.transport === "secure").length;     // recorded by the gateway per observation
   const forged = count(["pqc_invalid_signature", "pqc_malformed_signature", "pqc_handshake_invalid_signature"]);
   const replays = count(["pqc_observation_replay", "pqc_handshake_replay", "pqc_session_replayed_or_reordered_message"]);
   const deviceForgeries = count(["invalid_tag", "replay_or_stale_counter"]);
@@ -40,7 +41,8 @@ export function render() {
     { name: p.sig_algorithm, role: "Digital signatures", line: "Signs every camera observation and every evidence-chain entry. Forged or replayed observations are rejected.",
       live: html`${signers.map((s) => html`Signer <span class="mono">${s.signer_id}</span> (${s.source}, ${s.status}) `)}${ev.key_id ? html`and evidence key <span class="mono">${ev.key_id}</span>` : ""}`, status: `${signers.filter((s) => s.status === "active").length} signer${signers.length === 1 ? "" : "s"} active` },
     { name: "AES-256-GCM", role: "Session encryption", line: "Encrypts and authenticates observation traffic inside the ML-KEM session, with per-message counters.",
-      live: "Part of the session protocol; the gateway does not expose live session counts.", status: "Protocol component" },
+      live: S.observations.length ? `${sealed} of the latest ${S.observations.length} observations arrived encrypted inside an ${p.kem_algorithm} session.`
+        : "Part of the session protocol.", status: "Protocol component" },
     { name: "HKDF-SHA256", role: "Key derivation", line: "Derives the session encryption keys from the ML-KEM shared secret.",
       live: "Part of the session protocol.", status: "Protocol component" },
   ];
@@ -68,7 +70,7 @@ export function render() {
   </section>
 
   <div class="grid grid-3 section" data-reveal>
-    <section class="panel"><div class="panel-body"><div class="caption">Signed observations accepted</div><div class="pq-stat">${signed}</div><p class="caption">${p.sig_algorithm} verified, in the latest ${S.observations.length} observations</p></div></section>
+    <section class="panel"><div class="panel-body"><div class="caption">Signed observations accepted</div><div class="pq-stat">${signed}</div><p class="caption">${p.sig_algorithm} verified, in the latest ${S.observations.length} observations; ${sealed} of them inside an ${p.kem_algorithm} session</p></div></section>
     <section class="panel"><div class="panel-body"><div class="caption">Forged signatures rejected</div><div class="pq-stat">${forged}</div><p class="caption">Rejected at the gateway; they add only bounded attack pressure to trust</p></div></section>
     <section class="panel"><div class="panel-body"><div class="caption">Replays rejected</div><div class="pq-stat">${replays}</div><p class="caption">Observation, handshake and session replays${deviceForgeries ? `; plus ${deviceForgeries} forged or replayed device message${deviceForgeries === 1 ? "" : "s"}` : ""}</p></div></section>
   </div>
