@@ -81,6 +81,17 @@ def test_ambient_background_cannot_see_live_data():
     assert '<div id="ambient" aria-hidden="true"></div>' in index
 
 
+def test_camera_preview_stays_in_the_browser():
+    """The browser preview is local only: it must not send, record or capture frames. Signed observations come from
+    the Python vision service, never from this page."""
+    src = MODULES["src/components/camera.js"]
+    for banned in ("fetch(", "XMLHttpRequest", "WebSocket", "sendBeacon", "MediaRecorder", "captureStream",
+                   "toDataURL", "toBlob", "drawImage", "getImageData", "ImageCapture"):
+        assert banned not in src, banned
+    assert not re.search(r"^\s*import\b", src, re.M), "camera.js reaches neither the store nor the API"
+    assert "audio: false" in src
+
+
 def test_dashboard_action_sequence_against_the_gateway(stack):
     """Replays exactly the requests the dashboard's operator dialogs send (same paths, bodies, bearer header)."""
     quarantine_by_correlated_attack(stack)
