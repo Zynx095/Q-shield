@@ -494,6 +494,26 @@ export function observationView(o) {
     model: o.model ? `${o.model.name} ${o.model.version}` : null,
     signed: !!(alg && /ML-DSA/i.test(alg)),
     alg, signer,
+    transport: o.transport || null,          // 'secure' (ML-KEM session) | 'signed' (direct) | 'token' | null (older rows)
+    cameraState: health ? details.state || null : null,
     synthetic: !!((o.model && o.model.name === "synthetic") || details.simulated),
+  };
+}
+
+/**
+ * What the vision service has told the gateway lately, from stored observations only (newest first).
+ * camera: the latest camera-health REPORT (the service reports changes only, so null means no fault reported).
+ */
+export function visionStatus(observations, now) {
+  const views = (observations || []).map(observationView);
+  const last = views[0] || null;
+  const health = views.find((v) => v.health) || null;
+  return {
+    last,
+    lastAgeS: last && Number.isFinite(now) ? Math.max(0, now - last.ts) : null,
+    camera: health ? { state: health.cameraState, since: health.ts } : null,
+    total: views.length,
+    signed: views.filter((v) => v.signed).length,
+    rules: views.filter((v) => v.rule).length,
   };
 }

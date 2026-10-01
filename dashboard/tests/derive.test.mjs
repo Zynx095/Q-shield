@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { html, raw, esc } from "../src/lib/html.js";
 import {
   buildIncidents, buildTimeline, chainView, evidenceIndex, factorView, posture, recoverySteps, scoreBreakdown,
-  scoreSeries, statePath, observationView,
+  scoreSeries, statePath, observationView, visionStatus,
 } from "../src/lib/derive.js";
 import { storyProgress } from "../src/components/rail.js";
 import { countdown, duration, signed } from "../src/lib/format.js";
@@ -240,4 +240,24 @@ test("vision observations show the gateway's verdict, and synthetic detections a
   assert.deepEqual([health.title, health.confidence, health.synthetic, health.model], ["Camera health: source lost", null, false, "yolo11n 8.3"]);
   const unsigned = observationView({ observation_id: "u", received_at: 6, event_type: "visual_observation", object: "car", confidence: 0.5, auth: null });
   assert.deepEqual([unsigned.signed, unsigned.alg, unsigned.signer], [false, null, null], "an ingest-token post is never shown as signed");
+});
+
+test("vision status reports the latest path, camera health and rule matches from stored observations only", () => {
+  const obs = [
+    { observation_id: "c", received_at: 300, event_type: "visual_observation", object: "person", confidence: 0.8, anomaly: true,
+      anomaly_reason: "restricted_class_in_restricted_zone", auth: "ML-DSA-65:vision-1", transport: "secure" },
+    { observation_id: "b", received_at: 200, event_type: "camera_health", details: { state: "obstructed" }, anomaly: true,
+      auth: "ML-DSA-65:vision-1", transport: "secure" },
+    { observation_id: "a", received_at: 100, event_type: "visual_observation", object: "car", confidence: 0.5, anomaly: false,
+      auth: "ingest-token", transport: "token" },
+  ];
+  const vs = visionStatus(obs, 312);
+  assert.equal(vs.last.key, "c");
+  assert.equal(vs.last.transport, "secure");
+  assert.equal(vs.lastAgeS, 12);
+  assert.deepEqual(vs.camera, { state: "obstructed", since: 200 });
+  assert.deepEqual([vs.total, vs.signed, vs.rules], [3, 2, 2]);
+  assert.equal(observationView(obs[2]).signed, false);
+  assert.equal(visionStatus([], 10).camera, null, "no camera-health report means no fault reported, not 'ok'");
+  assert.equal(visionStatus([], 10).last, null);
 });
