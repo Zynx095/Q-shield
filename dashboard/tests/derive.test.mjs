@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { html, raw, esc } from "../src/lib/html.js";
 import {
   buildIncidents, buildTimeline, chainView, evidenceIndex, factorView, posture, recoverySteps, scoreBreakdown,
-  scoreSeries, statePath, observationView, visionStatus, liveProof,
+  scoreSeries, statePath, observationView, visionStatus, liveProof, forensicCase,
 } from "../src/lib/derive.js";
 import { storyProgress } from "../src/components/rail.js";
 import { countdown, duration, signed } from "../src/lib/format.js";
@@ -277,4 +277,33 @@ test("presentation proof shows only what the gateway reported for this device", 
   assert.equal(p.twin, "MATCH");
   const none = liveProof({ snapshot: {}, observations: [], deviceId: DEV, twin: { comparison: { overall: "UNKNOWN", fields: {} } }, now: 1 });
   assert.deepEqual(none, { device: null, vision: null, twin: null }, "nothing reported, nothing claimed");
+});
+
+test("forensic case reads what happened, why, the proof, the action and the recovery from chain entries only", () => {
+  const c = forensicCase(FX.evidence, DEV);
+  assert.equal(c.incidentId, "INC-DEVICE-001-1");
+  assert.equal(c.resolved, true);
+  const st = Object.fromEntries(c.stages.map((s) => [s.key, s]));
+  assert.deepEqual(st.happened.items.map((i) => [i.seq, i.kind]), [[4, "attack"], [5, "attack"], [6, "physical"], [7, "visual"]]);
+  assert.ok(st.happened.items[0].rejected && st.happened.items[0].score === "100 → 90");
+  assert.match(st.why.items[0].text, /Confirmed incident/);
+  assert.deepEqual(st.proof.items.map((i) => i.ref), ["device_message:5", "observation:ab8e18b0-9986-4fcc-b658-e49ff1c7c518"]);
+  assert.deepEqual(st.did.items.map((i) => i.seq), [7, 8]);
+  assert.deepEqual(st.recovered.items.map((i) => i.seq), [10, 12, 14, 18, 25]);
+  // every cited seq is a real entry of this device
+  const seqs = new Set(FX.evidence.map((e) => e.seq));
+  for (const s of c.stages) for (const i of s.items) assert.ok(seqs.has(i.seq), i.seq);
+});
+
+test("forensic case: an aborted recovery stays in the same case; nothing recorded means pending, not invented", () => {
+  const AB = JSON.parse(readFileSync(new URL("./fixtures/abort-cycle.json", import.meta.url), "utf-8"));
+  const c = forensicCase(AB.evidence, DEV);
+  const rec = c.stages.find((s) => s.key === "recovered").items;
+  assert.ok(rec.some((i) => /Recovery attempt failed: aborted/.test(i.text)));
+  assert.equal(rec.filter((i) => /Recovery started/.test(i.text)).length, 2);
+  const early = forensicCase(FX.evidence.filter((e) => e.seq <= 8), DEV);
+  assert.equal(early.resolved, false);
+  assert.equal(early.stages.find((s) => s.key === "recovered").pending, true);
+  assert.equal(forensicCase(FX.evidence.filter((e) => e.seq <= 5), DEV), null, "no quarantine, no case");
+  assert.equal(forensicCase(FX.evidence, "OTHER-DEVICE"), null);
 });

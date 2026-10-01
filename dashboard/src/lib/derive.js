@@ -535,3 +535,101 @@ export function liveProof({ snapshot = null, observations = [], deviceId, twin =
     twin: c && Object.keys(c.fields || {}).length ? c.overall : null,
   };
 }
+
+// ---------------------------------------------------------------------------------------------- forensic case
+const CASE_SIGNAL = {
+  invalid_signature: ["attack", "Forged message rejected: its signature did not verify"],
+  observation_replay: ["attack", "Replayed signed observation rejected"],
+  handshake_replay: ["attack", "Replayed session handshake rejected"],
+  invalid_tag: ["attack", "Forged device message rejected: its HMAC-SHA256 tag did not verify"],
+  device_replay: ["attack", "Replayed device message rejected"],
+  auth_profile_mismatch: ["attack", "Message with the wrong authentication profile rejected"],
+  stale_observation: ["attack", "Stale or future-dated observation rejected"],
+  physical_tamper: ["physical", "Enclosure tamper switch reported open (HMAC-SHA256 authenticated message)"],
+  sensor_out_of_range: ["physical", "Sensor reading outside its expected range (authenticated message)"],
+  integrity_mismatch: ["physical", "Reported firmware or configuration differs from the known-good state"],
+  auth_misbehavior: ["physical", "Signed observation broke its signer's authorisation"],
+  malformed_payload: ["physical", "Authenticated sender sent a malformed payload"],
+  visual_rule_violation: ["visual", "Signed camera observation: restricted-zone rule matched (ML-DSA)"],
+  camera_obstructed: ["visual", "Signed camera-health report: lens obstructed"],
+  camera_source_lost: ["visual", "Signed camera-health report: video source lost"],
+};
+const MODALITY_TEXT = { PHYSICAL: "physical (authenticated device report)", VISUAL: "visual (signed camera observation)",
+  SENSOR: "sensor (authenticated device report)" };
+
+const payloadOf = (e) => {
+  if (e.payload && typeof e.payload === "object") return e.payload;
+  try { return JSON.parse(e.payload || "{}"); } catch { return {}; }
+};
+const intoQuarantine = (e) => {
+  if (e.event_type !== "trust_state_transition") return false;
+  const p = payloadOf(e);
+  return p.new_state === "QUARANTINED" && p.previous_state !== "RECOVERING" && p.previous_state !== "VERIFIED";
+};
+
+/**
+ * The forensic case behind a device's latest quarantine, read from evidence-chain entries only:
+ *   what happened -> why it was quarantined -> the evidence that proved it -> what the gateway did -> how it recovered.
+ * Every line cites the chain entry (seq) it comes from. A stage with nothing recorded yet is "pending", never filled in.
+ * Quarantines entered from the recovery path (a failed or aborted recovery) belong to the same case.
+ */
+export function forensicCase(entries, deviceId) {
+  const es = (entries || []).filter((e) => e.device_id === deviceId).sort((a, b) => a.seq - b.seq);
+  let qi = -1;
+  for (let i = es.length - 1; i >= 0; i--) if (intoQuarantine(es[i])) { qi = i; break; }
+  if (qi < 0) return null;
+  let from = 0;
+  for (let i = qi - 1; i >= 0; i--) if (intoQuarantine(es[i]) || es[i].event_type === "recovery_completed") { from = i + 1; break; }
+  const q = es[qi], qp = payloadOf(q);
+  const line = (e, text, tone, extra = {}) => ({ seq: e.seq, ts: e.ts, text, tone, ...extra });
+
+  const happened = [];
+  const proof = [];
+  for (const e of es.slice(from, qi + 1)) {
+    if (e.event_type !== "trust_score_change" && e.event_type !== "trust_state_transition" && e.event_type !== "trust_incident") continue;
+    const p = payloadOf(e);
+    for (const r of p.reasons || []) {
+      const c = CASE_SIGNAL[r.signal];
+      if (!c) continue;
+      const score = Number.isFinite(p.previous_score) && Number.isFinite(p.new_score) ? `${p.previous_score} → ${p.new_score}` : null;
+      happened.push(line(e, c[1], c[0] === "attack" ? "warn" : "crit", { kind: c[0], score, rejected: c[0] === "attack" }));
+      if (c[0] !== "attack" && r.source_ref) proof.push(line(e, c[1], "crit", { ref: r.source_ref }));
+      break;
+    }
+  }
+
+  const inc = qp.incident || null;
+  const why = inc
+    ? { id: inc.id, cls: inc.class, text: `${inc.class === "confirmed_incident" ? "Confirmed incident" : "Correlated incident"}: independent evidence agreed inside the correlation window (${(inc.modalities || []).map((m) => MODALITY_TEXT[m] || m.toLowerCase()).join(" + ")})`,
+      seq: q.seq }
+    : { id: null, cls: null, text: `Trust fell to ${qp.new_score ?? "?"}, below the quarantine threshold`, seq: q.seq };
+
+  let to = es.length;
+  for (let i = qi + 1; i < es.length; i++) if (intoQuarantine(es[i])) { to = i; break; }
+  const after = es.slice(qi + 1, to);
+  const did = [line(q, `Device quarantined at trust ${qp.new_score ?? "?"}: normal channel blocked, recovery channel opened`, "crit")];
+  const block = after.find((e) => e.event_type === "quarantine_access_blocked");
+  if (block) did.push(line(block, "Gateway refused a normal-channel message from the device (enforcement)", "crit"));
+
+  const recovered = [];
+  for (const e of after) {
+    const p = payloadOf(e);
+    if (e.event_type === "recovery_started") recovered.push(line(e, `Recovery started by ${p.requested_by || "an operator"}: ${p.reason || ""}`.trim(), "proc"));
+    else if (e.event_type === "remediation_acknowledged") recovered.push(line(e, "Device acknowledged the known-good configuration (recovery channel)", "proc"));
+    else if (e.event_type === "recovery_verified") recovered.push(line(e, `Health checks passed: ${(p.checks || []).length || "the required"} consecutive clean reports, digital twin match`, "proc"));
+    else if (e.event_type === "recovery_failed") recovered.push(line(e, `Recovery attempt failed: ${p.reason || "unknown reason"}`, "crit"));
+    else if (e.event_type === "access_restored") recovered.push(line(e, `Normal access restored at trust ${p.score ?? e.trust_score ?? "?"}`, "ok"));
+    else if (e.event_type === "recovery_completed") recovered.push(line(e, `Trust rebuilt to ${p.score ?? e.trust_score ?? "?"}: device trusted again`, "ok"));
+  }
+  const done = after.some((e) => e.event_type === "recovery_completed");
+  return {
+    deviceId, incidentId: why.id, quarantinedAt: q.ts, resolved: done,
+    stages: [
+      { key: "happened", title: "What happened", items: happened },
+      { key: "why", title: "Why it was quarantined", items: [line(q, why.text, "crit")] },
+      { key: "proof", title: "Evidence that proved it", items: proof },
+      { key: "did", title: "What the gateway did", items: did },
+      { key: "recovered", title: "How the device recovered", items: recovered, pending: !recovered.length },
+    ],
+  };
+}

@@ -414,6 +414,24 @@ a.chip { transition: border-color var(--dur-1) var(--ease); }
 .cam-note { max-width: 72ch; }
 .cam-note:empty { display: none; }
 
+/* ---------- forensic case file (evidence page) ---------- */
+.case-steps { display: flex; flex-direction: column; }
+.case-step { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: var(--s3); position: relative; padding-bottom: var(--s4); }
+.case-step::before { content: ""; position: absolute; left: 14px; top: 30px; bottom: 0; width: 2px; background: var(--line); }
+.case-step:last-child::before { display: none; }
+.case-num { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--ink-2); color: #fff; font-weight: 700; font-size: var(--t-sm); position: relative; z-index: 1; }
+.case-step.is-pending .case-num { background: var(--surface); color: var(--muted); border: 2px solid var(--line-strong); }
+.case-title { font-size: var(--t-md); font-weight: 650; line-height: 30px; }
+.case-items { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+.case-items li { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: var(--s3); align-items: baseline; font-size: var(--t-sm); padding: 4px 8px; border-radius: var(--r-sm); border-left: 3px solid var(--line-strong); background: var(--surface-2); }
+.case-items li.tone-crit { border-left-color: var(--crit-fill); }
+.case-items li.tone-warn { border-left-color: var(--warn-fill); }
+.case-items li.tone-proc { border-left-color: var(--cobalt); }
+.case-items li.tone-ok { border-left-color: var(--ok-fill); }
+.case-seq { font-weight: 650; color: var(--cobalt); }
+.case-when { font-size: var(--t-xs); color: var(--slate); white-space: nowrap; }
+@media (max-width: 640px) { .case-items li { grid-template-columns: 40px minmax(0, 1fr); } .case-when { grid-column: 2; } }
+
 /* ---------- incident ---------- */
 .incident { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); overflow: hidden; }
 .incident.is-active { border-color: var(--crit-line); }
