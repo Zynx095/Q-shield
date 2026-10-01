@@ -407,6 +407,8 @@ a.chip { transition: border-color var(--dur-1) var(--ease); }
 .cam-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #b9c3d3; font-size: var(--t-sm); text-align: center; padding: var(--s5); }
 .cam-status { font-size: var(--t-sm); color: var(--ink-2); min-height: 1.5em; }
 .cam-controls { display: flex; gap: var(--s3); flex-wrap: wrap; align-items: center; }
+.cam-pick { display: inline-flex; align-items: center; gap: var(--s2); }
+.cam-pick .select { max-width: 280px; }
 
 /* ---------- incident ---------- */
 .incident { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); overflow: hidden; }

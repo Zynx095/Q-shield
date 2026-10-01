@@ -17,18 +17,42 @@ export function describeTrack(track) {
   return { label: track.label || "", deviceId: s.deviceId || null, width: s.width || null, height: s.height || null };
 }
 
+/** A camera's name. Browsers hide names until camera permission is granted, so fall back to its position. */
+export function cameraLabel(device, index) {
+  return (device && device.label) || `Camera ${index + 1}`;
+}
+
 // ---------------------------------------------------------------------------------------------- controller (no DOM)
 export function createCameraController({ media = globalThis.navigator && globalThis.navigator.mediaDevices, onChange = () => {} } = {}) {
-  const st = { status: "idle", stream: null, error: null, info: null };
+  const st = { status: "idle", stream: null, error: null, info: null, devices: [], chosen: null };
   let seq = 0;                                      // a newer start()/stop() supersedes a pending request
 
-  const snapshot = () => ({ status: st.status, error: st.error, info: st.info, stream: st.stream });
+  const snapshot = () => ({ status: st.status, error: st.error, info: st.info, stream: st.stream, devices: st.devices,
+    deviceId: (st.info && st.info.deviceId) || st.chosen });
   const emit = () => onChange(snapshot());
 
   function stopTracks() {
     if (st.stream) for (const t of st.stream.getTracks()) t.stop();
     st.stream = null;
     st.info = null;
+  }
+
+  /** List the video inputs (integrated, USB, virtual). Called on load, after permission and on plug / unplug. */
+  async function refreshDevices() {
+    if (!media || typeof media.enumerateDevices !== "function") return;
+    try {
+      const all = await media.enumerateDevices();
+      st.devices = all.filter((d) => d.kind === "videoinput").map((d, i) => ({ deviceId: d.deviceId, label: cameraLabel(d, i) }));
+    } catch { st.devices = []; }
+    emit();
+  }
+  const onDeviceChange = () => { refreshDevices(); };
+  if (media && typeof media.addEventListener === "function") media.addEventListener("devicechange", onDeviceChange);
+
+  /** Choose the camera for the next start (by deviceId from the list). */
+  function choose(deviceId) {
+    st.chosen = deviceId || null;
+    emit();
   }
 
   async function start() {
@@ -44,11 +68,13 @@ export function createCameraController({ media = globalThis.navigator && globalT
     st.error = null;
     emit();
     try {
-      const stream = await media.getUserMedia({ video: { ...IDEAL }, audio: false });
+      const video = st.chosen ? { deviceId: { exact: st.chosen }, ...IDEAL } : { ...IDEAL };
+      const stream = await media.getUserMedia({ video, audio: false });
       if (mine !== seq) { for (const t of stream.getTracks()) t.stop(); return; }
       st.stream = stream;
       st.info = describeTrack(stream.getVideoTracks()[0]);
       st.status = "live";
+      refreshDevices();                             // names become readable once permission is granted
     } catch (err) {
       if (mine !== seq) return;
       st.status = "error";
@@ -66,7 +92,13 @@ export function createCameraController({ media = globalThis.navigator && globalT
     emit();
   }
 
-  return { start, stop, get state() { return snapshot(); } };
+  /** Stop and stop listening: the page is going away. */
+  function release() {
+    stop();
+    if (media && typeof media.removeEventListener === "function") media.removeEventListener("devicechange", onDeviceChange);
+  }
+
+  return { start, stop, choose, refreshDevices, release, get state() { return snapshot(); } };
 }
 
 // ---------------------------------------------------------------------------------------------- view
@@ -99,16 +131,22 @@ function mountCameraView(host, ctl) {
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
   const controls = el("div", "cam-controls");
+  const pick = el("label", "cam-pick");
+  const select = el("select", "select");
+  select.id = "cam-device";
+  pick.append(el("span", "caption", "Camera"), select);
+  const count = el("span", "caption cam-count");
   const startBtn = el("button", "btn accent", "Start preview");
   startBtn.type = "button";
   const stopBtn = el("button", "btn", "Stop preview");
   stopBtn.type = "button";
-  controls.append(startBtn, stopBtn);
+  controls.append(pick, startBtn, stopBtn, count);
   root.append(stage, status, controls);
   host.append(root);
 
   startBtn.addEventListener("click", () => ctl.start());
   stopBtn.addEventListener("click", () => ctl.stop());
+  select.addEventListener("change", () => ctl.choose(select.value));
 
   function update(s) {
     root.dataset.status = s.status;
@@ -116,6 +154,14 @@ function mountCameraView(host, ctl) {
     placeholder.hidden = s.status === "live";
     const res = s.info && s.info.width ? ` ${s.info.width}×${s.info.height} as reported by the camera.` : "";
     status.textContent = s.status === "live" ? `${STATUS_TEXT.live}${s.info && s.info.label ? ` ${s.info.label}.` : ""}${res}` : STATUS_TEXT[s.status] || "";
+    const opts = s.devices.map((d) => `${d.deviceId}=${d.label}`).join("|");
+    if (select.dataset.opts !== opts) {                // rebuild only when the list really changed
+      select.dataset.opts = opts;
+      select.replaceChildren(...s.devices.map((d) => { const o = el("option", "", d.label); o.value = d.deviceId; return o; }));
+    }
+    if (s.deviceId && select.value !== s.deviceId) select.value = s.deviceId;
+    pick.hidden = s.devices.length === 0;
+    count.textContent = s.devices.length ? `${s.devices.length} camera${s.devices.length === 1 ? "" : "s"} found` : "No camera listed yet";
     startBtn.disabled = s.status === "requesting" || s.status === "live";
     stopBtn.disabled = s.status !== "live" && s.status !== "requesting";
   }
@@ -136,10 +182,11 @@ export class CameraMonitor {
     this.host = host;
     this.view = mountCameraView(host, this.ctl);
     this.view.update(this.ctl.state);
+    this.ctl.refreshDevices();
   }
 
   release() {
-    this.ctl.stop();
+    this.ctl.release();
     this.host = null;
     this.view = null;
   }
