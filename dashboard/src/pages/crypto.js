@@ -36,7 +36,7 @@ export function render() {
   const deviceForgeries = count(["invalid_tag", "replay_or_stale_counter"]);
   const sizes = p.sizes_bytes || {};
   const cards = [
-    { name: p.kem_algorithm, role: "Key establishment", line: "Agrees a fresh session key with the vision service. Resists quantum attacks on key exchange.",
+    { name: p.kem_algorithm, role: "Key establishment", line: "Agrees a fresh session key with the vision service. Designed to resist quantum attacks on the key exchange.",
       live: html`Gateway key <span class="mono">${p.gateway_kem_key_id}</span>, fingerprint <span class="mono">${short(p.gateway_kem_fingerprint_sha256, 16)}</span>`, status: "Key online" },
     { name: p.sig_algorithm, role: "Digital signatures", line: "Signs every camera observation and every evidence-chain entry. Forged or replayed observations are rejected.",
       live: html`${signers.map((s) => html`Signer <span class="mono">${s.signer_id}</span> (${s.source}, ${s.status}) `)}${ev.key_id ? html`and evidence key <span class="mono">${ev.key_id}</span>` : ""}`, status: `${signers.filter((s) => s.status === "active").length} signer${signers.length === 1 ? "" : "s"} active` },
