@@ -92,7 +92,7 @@ function observationsPanel() {
       ${signers.length ? html`<dl class="kv">${signers.map((sg) => html`<dt>Signer</dt><dd><span class="mono">${sg.signer_id}</span> ${sg.algorithm}, ${sg.status}<span class="caption">, source ${sg.source}${(sg.allowed_devices || []).length ? `, for ${sg.allowed_devices.join(", ")}` : ""}</span></dd>`)}</dl>` : ""}
       ${!S.loaded ? loadingPanel(4)
         : !all.length ? empty({ title: "No observations yet", text: "Start the vision service (python -m ai.vision, or scripts/demo_full.py --webcam). Its signed observations appear here.", iconName: "camera" })
-        : html`<ol class="obs">${all.slice(0, SHOW).map((o) => html`<li class="obs-item ${o.rule ? "is-rule" : ""} ${o.health ? "is-health" : ""}" data-key="ob-${o.key}">
+        : html`<ol class="obs-list">${all.slice(0, SHOW).map((o) => html`<li class="obs-item ${o.rule ? "is-rule" : ""} ${o.health ? "is-health" : ""}" data-key="ob-${o.key}">
             <span class="obs-time num" title="Received ${ago(now - o.ts)}">${clock(o.ts)}</span>
             <div class="obs-body">
               <div class="obs-title">${o.title}${o.confidence !== null ? html` <span class="caption num">confidence ${fixed(o.confidence, 2)}</span>` : ""}${many ? html` <span class="caption">${o.deviceId}</span>` : ""}</div>

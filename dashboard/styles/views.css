@@ -84,7 +84,7 @@
 .pipe-arrow svg { width: 13px; height: 13px; color: var(--muted); }
 .vision-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .vision-facts .fact:last-child { grid-column: 1 / -1; }
-.obs { display: flex; flex-direction: column; }
+.obs-list { display: flex; flex-direction: column; }
 .obs-item { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 2px var(--s3); align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
 .obs-item:first-child { border-top: 0; }
 .obs-time { font-size: var(--t-xs); color: var(--slate); padding-top: 2px; }
