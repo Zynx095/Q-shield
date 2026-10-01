@@ -473,6 +473,10 @@ a.chip { transition: border-color var(--dur-1) var(--ease); }
 .result { border-radius: var(--r-md); padding: var(--s3) var(--s4); font-size: var(--t-sm); border: 1px solid var(--line); }
 .result.ok { background: var(--ok-tint); border-color: var(--ok-line); color: var(--ok); }
 .result.crit { background: var(--crit-tint); border-color: var(--crit-line); color: var(--crit); }
+/* success: the check mark draws once when the gateway confirms an operator action */
+.result.ok svg path { stroke-dasharray: 12; stroke-dashoffset: 12; animation: draw-check 240ms var(--ease-out) 120ms forwards; }
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .result.ok svg path { animation: none; stroke-dashoffset: 0; } }
 .result pre { margin: var(--s2) 0 0; font-family: var(--mono); font-size: 11.5px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink-2); max-height: 160px; overflow: auto; }
 
 /* ---------- toasts ---------- */
