@@ -5,13 +5,16 @@
 
 const keyOf = (n) => (n.nodeType === 1 ? n.getAttribute("data-key") : null);
 const sameKind = (a, b) => a.nodeType === b.nodeType && (a.nodeType !== 1 || a.nodeName === b.nodeName);
+// Attributes that imperative code owns and templates never set: kept, or every refresh would undo them.
+// data-revealed: the scroll-reveal controller's "already shown" marker (lib/reveal.js).
+const OWNED = new Set(["data-revealed"]);
 
 function syncAttributes(from, to) {
   for (const { name, value } of Array.from(to.attributes)) {
     if (from.getAttribute(name) !== value) from.setAttribute(name, value);
   }
   for (const { name } of Array.from(from.attributes)) {
-    if (!to.hasAttribute(name)) from.removeAttribute(name);
+    if (!to.hasAttribute(name) && !OWNED.has(name)) from.removeAttribute(name);
   }
   // Form state lives in properties, not attributes; never clobber what the person is typing.
   if ((from.nodeName === "INPUT" || from.nodeName === "TEXTAREA") && from !== document.activeElement) {
