@@ -49,7 +49,7 @@ function hero(f, m) {
   const sys = S.system || {};
   const age = snap && Number.isFinite(snap.last_device_evidence_age_s) ? snap.last_device_evidence_age_s : null;
   const firstOpen = f.open.find((i) => i.deviceId === (m && m.id));
-  return html`<section class="hero panel tone-${p.tone}" aria-labelledby="posture-title" data-reveal>
+  return html`<section class="hero panel tone-${p.tone} ${m && flashTo(m.id) === "SUSPICIOUS" ? "is-sweep" : ""}" aria-labelledby="posture-title" data-reveal>
     <div class="hero-main">
       <div class="posture">
         <span class="posture-icon">${icon(p.icon)}</span>

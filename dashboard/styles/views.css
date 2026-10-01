@@ -168,6 +168,14 @@ body.is-live .toasts { display: none; }
 .lc.is-restored { background: var(--ok-tint); border-color: var(--ok-fill); box-shadow: 0 0 0 3px var(--ok-tint); }
 .lc.is-restored.is-new { animation: restored 1.8s var(--ease) 1; }
 @keyframes restored { 0% { box-shadow: 0 0 0 0 rgba(26, 154, 108, 0.45); } 60% { box-shadow: 0 0 0 14px rgba(26, 154, 108, 0); } 100% { box-shadow: 0 0 0 3px var(--ok-tint); } }
+/* suspicion moment: one amber pass across the posture card (overview hero, presentation state card) */
+.hero.is-sweep::after, .live-state.is-sweep::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(225, 154, 44, 0.16) 50%, transparent 70%);
+  transform: translateX(-100%); animation: amber-sweep 760ms var(--ease-out) 1 forwards;
+}
+@keyframes amber-sweep { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .hero.is-sweep::after, .live-state.is-sweep::after { display: none; } }
 /* access restored: a short emerald wash behind the stage, and the "Normal channel restored" callout rises in */
 .live { position: relative; isolation: isolate; }
 .live.is-restoring::before {

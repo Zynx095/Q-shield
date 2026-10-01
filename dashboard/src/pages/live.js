@@ -148,7 +148,7 @@ export function render() {
         <span class="lr-node">${icon(now || past ? sm.icon : "dot")}</span><span class="lr-label">${s}</span></li>`;
     })}</ol>
     <div class="live-main">
-      <section class="live-state" aria-live="polite">
+      <section class="live-state ${recent && recent.to === "SUSPICIOUS" ? "is-sweep" : ""}" aria-live="polite">
         ${recent ? html`<div class="live-change">${recent.from} → ${recent.to}</div>` : html`<div class="live-change is-quiet">Current state</div>`}
         <div class="live-word">${icon(meta.icon)}${state || "NO DATA"}</div>
         <div class="live-score"><span class="num" data-tween="score">${snap && Number.isFinite(snap.score) ? snap.score : "—"}</span><span class="live-of">trust score</span></div>
