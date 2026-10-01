@@ -129,7 +129,7 @@ export function render() {
   const justRestored = restoredNow && recent && recent.to === "RECOVERED";
   const sealing = !!(recent && recent.to === "QUARANTINED");
   const v = S.evidence.verify;
-  return html`<div class="live tone-${meta.tone}">
+  return html`<div class="live tone-${meta.tone} ${justRestored ? "is-restoring" : ""}">
     <header class="live-top">
       <div class="row" style="gap:12px">${brandMark}<span class="live-brand">Q-SHIELD</span><span class="live-tag">Live</span></div>
       <div class="live-device">${id || "No device"}${m && m.device && m.device.hw === "software-agent" ? html` <span class="tag sim">Simulated device</span>` : ""}</div>

@@ -168,6 +168,16 @@ body.is-live .toasts { display: none; }
 .lc.is-restored { background: var(--ok-tint); border-color: var(--ok-fill); box-shadow: 0 0 0 3px var(--ok-tint); }
 .lc.is-restored.is-new { animation: restored 1.8s var(--ease) 1; }
 @keyframes restored { 0% { box-shadow: 0 0 0 0 rgba(26, 154, 108, 0.45); } 60% { box-shadow: 0 0 0 14px rgba(26, 154, 108, 0); } 100% { box-shadow: 0 0 0 3px var(--ok-tint); } }
+/* access restored: a short emerald wash behind the stage, and the "Normal channel restored" callout rises in */
+.live { position: relative; isolation: isolate; }
+.live.is-restoring::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(70% 60% at 28% 62%, rgba(26, 154, 108, 0.14), transparent 70%);
+  animation: lv-wash 2.4s var(--ease-out) forwards;
+}
+@keyframes lv-wash { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+.live.is-restoring .lv-restored { animation: lv-rise 600ms var(--ease-out) 1 backwards; }
+@keyframes lv-rise { from { opacity: 0; transform: translateY(8px); } }
 
 .live-feed { display: flex; flex-direction: column; gap: clamp(8px, 1.5vh, 16px); min-width: 0; }
 .live-h { font-size: clamp(16px, 2.4vh, 20px); font-weight: 600; color: var(--slate); }
@@ -214,4 +224,4 @@ body.is-live .toasts { display: none; }
   .lf-item { grid-template-columns: minmax(0, 1fr) auto; }
   .lf-time { grid-column: 1 / -1; font-size: var(--t-sm); }
 }
-@media (prefers-reduced-motion: reduce) { .lf-item, .live-change, .lc.is-restored.is-new { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .lf-item, .live-change, .lc.is-restored.is-new, .live.is-restoring .lv-restored { animation: none; } .live.is-restoring::before { display: none; } }

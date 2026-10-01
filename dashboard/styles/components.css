@@ -189,9 +189,14 @@
 @keyframes ch-seal { 0% { box-shadow: 0 0 0 9px rgba(194, 51, 76, 0.24); } 100% { box-shadow: 0 0 0 0 rgba(194, 51, 76, 0); } }
 @keyframes ch-open { 0% { box-shadow: 0 0 0 0 rgba(45, 69, 196, 0.34); } 100% { box-shadow: 0 0 0 12px rgba(45, 69, 196, 0); } }
 @keyframes draw-stroke { to { stroke-dashoffset: 0; } }
+/* restored moment: the normal channel's check draws in as an emerald ring settles around it */
+.channel.is-restoring { animation: ch-restore 1.2s var(--ease-out) 1; }
+.channel.is-restoring .channel-icon svg path, .lc.is-restored.is-new > svg path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw-stroke 420ms var(--ease-out) 120ms forwards; }
+@keyframes ch-restore { 0% { box-shadow: 0 0 0 0 rgba(26, 154, 108, 0.40); } 100% { box-shadow: 0 0 0 12px rgba(26, 154, 108, 0); } }
 @media (prefers-reduced-motion: reduce) {
-  .channel.is-sealing, .lc.is-sealing, .channel.is-opening, .lc.is-opening { animation: none; }
-  .channel.is-sealing .channel-icon svg path, .lc.is-sealing > svg path { animation: none; stroke-dashoffset: 0; }
+  .channel.is-sealing, .lc.is-sealing, .channel.is-opening, .lc.is-opening, .channel.is-restoring { animation: none; }
+  .channel.is-sealing .channel-icon svg path, .lc.is-sealing > svg path,
+  .channel.is-restoring .channel-icon svg path, .lc.is-restored.is-new > svg path { animation: none; stroke-dashoffset: 0; }
 }
 
 /* ---------- trust lattice (hero visual) ---------- */

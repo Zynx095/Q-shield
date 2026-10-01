@@ -50,13 +50,13 @@ const REASONS = {
 
 const BLOCKED_WHY = { QUARANTINED: "Blocked: device is quarantined", RECOVERING: "Blocked until recovery restores access", VERIFIED: "Blocked until trust is rebuilt" };
 
-/** `change`: the state the device has just moved to (model.flashTo); drives the one-shot seal / open moment. */
+/** `change`: the state the device has just moved to (model.flashTo); drives the one-shot seal / open / restore moment. */
 export function channels(access, { change = null } = {}) {
   if (!access) return html`<div class="channels"><div class="channel"><span class="channel-icon">${icon("minus")}</span><span class="channel-name">Normal channel</span><span class="channel-state">Unknown</span></div><div class="channel"><span class="channel-icon">${icon("minus")}</span><span class="channel-name">Recovery channel</span><span class="channel-state">Unknown</span></div></div>`;
   const n = access.normal || {}, r = access.recovery || {};
-  const sealing = change === "QUARANTINED";
+  const sealing = change === "QUARANTINED", restoring = change === "RECOVERED";
   return html`<div class="channels" role="group" aria-label="Gateway enforcement">
-    <div class="channel ${n.allowed ? "is-open" : "is-blocked"} ${sealing && !n.allowed ? "is-sealing" : ""}">
+    <div class="channel ${n.allowed ? "is-open" : "is-blocked"} ${sealing && !n.allowed ? "is-sealing" : ""} ${restoring && n.allowed ? "is-restoring" : ""}">
       <span class="channel-icon">${icon(n.allowed ? "check" : "x")}</span>
       <span class="channel-name">Normal channel</span>
       <span class="channel-state">${n.allowed ? "Open" : "Blocked"}</span>
