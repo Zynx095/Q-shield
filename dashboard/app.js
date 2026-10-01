@@ -7,7 +7,7 @@ const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const fmtT = (ts) => (ts ? new Date(ts * 1000).toLocaleTimeString() : "—");
 const short = (h) => (h ? `${h.slice(0, 10)}…` : "—");
 
-const S = { token: "", device: "", timer: null, seenEvents: new Set(), seenEvidence: new Set() };
+const S = { token: "", device: "", me: null, timer: null, seenEvents: new Set(), seenEvidence: new Set() };
 
 function loadToken() {
   const m = location.hash.match(/token=([^&]+)/);
@@ -30,7 +30,8 @@ async function act(method, path, body) {
   try { data = await r.json(); } catch { /* non-JSON error body */ }
   if (!r.ok) {
     const d = data && data.detail;
-    throw new Error(r.status === 401 ? "unauthorised (operator token rejected)"
+    throw new Error(r.status === 401 ? "unauthorised (operator token rejected, revoked or expired)"
+      : r.status === 403 ? "forbidden (your role does not allow this action)"
       : `${r.status}: ${typeof d === "string" ? d : JSON.stringify(d ?? data)}`);
   }
   return data;
@@ -146,12 +147,13 @@ function renderActions(t, rec, tw) {
   const st = (t && t.state) || "NO DATA";
   const cur = rec && rec.current;
   const active = !!(cur && cur.status === "active");
+  const canAct = !!(S.me && (S.me.role === "operator" || S.me.role === "admin"));
   $("act-state").textContent = st;
   $("act-rec").textContent = cur ? `${cur.status}${cur.status === "active" ? ` · ${cur.stage}` : ""}${cur.failure_reason ? ` (${cur.failure_reason})` : ""}` : "none";
   // Hints only: the gateway re-checks every precondition and refuses with 409 if they do not hold.
-  $("btn-start").disabled = A.busy || st !== "QUARANTINED" || active;
-  $("btn-abort").disabled = A.busy || !active;
-  $("btn-twin").disabled = A.busy || active;
+  $("btn-start").disabled = !canAct || A.busy || st !== "QUARANTINED" || active;
+  $("btn-abort").disabled = !canAct || A.busy || !active;
+  $("btn-twin").disabled = !canAct || A.busy || active;
   A.expected = (tw && tw.expected) || {};
   if (!A.dirty) { $("exp-fw").value = A.expected.fw_version || ""; $("exp-cfg").value = A.expected.cfg_hash || ""; }
 }
@@ -192,6 +194,10 @@ async function refresh() {
       if (!S.device && devices.length) S.device = devices[0].device_id;
       sel.value = S.device;
     }
+    if (!S.me) {
+      S.me = await api("/api/v1/operators/me");
+      $("operator").textContent = S.me ? `${S.me.operator_id} (${S.me.role})${S.me.bootstrap ? " · shared bootstrap token" : ""}` : "—";
+    }
     if (!S.device) { setConn(true, "connected · no devices"); return; }
     const d = encodeURIComponent(S.device);
     const [t, hist, events, access, rec, twin, evid, verify] = await Promise.all([
@@ -211,6 +217,7 @@ function start() {
   S.token = $("token").value.trim() || S.token;
   if (!S.token) { setConn(false, "enter operator token"); return; }
   saveToken(S.token);
+  S.me = null;
   clearInterval(S.timer);
   refresh();
   S.timer = setInterval(refresh, 1500);

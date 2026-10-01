@@ -10,6 +10,7 @@ from backend.security.credentials import load_or_create_master_key
 from backend.security.keystore import KIND_SIG, PqcKeyStore, signer_kek
 from backend.security.pqc import get_backend
 from backend.security.pqc_gateway import PqcGateway
+from backend.security.tls import TlsConfigError, tls_options
 from backend.trust.config import TrustConfig
 from backend.trust.service import TrustService
 from backend.twin.twin import DigitalTwin
@@ -60,7 +61,19 @@ def main() -> None:
     except Exception as e:  # missing/corrupt PQC keys: say what to do, do not start half-secured
         raise SystemExit(f"PQC is enabled but a gateway key cannot be loaded: {e}\n"
                          "Run: python scripts/pqc_provision.py init-gateway   (or set PQC_ENABLED=false)")
-    uvicorn.run(create_app(settings, store=store, pqc=pqc, **services), host=settings.host, port=settings.port)
+    try:
+        tls = tls_options(settings.tls_cert, settings.tls_key, settings.require_tls)
+    except TlsConfigError as e:
+        raise SystemExit(f"TLS configuration error: {e}. Development cert: python scripts/gen_dev_cert.py")
+    if tls:
+        print(f"Q-SHIELD gateway: HTTPS on {settings.host}:{settings.port} (cert {settings.tls_cert})")
+    else:
+        print("WARNING: Q-SHIELD gateway in development HTTP mode: operator/ingest tokens travel in CLEARTEXT. "
+              "Set QSHIELD_TLS_CERT/QSHIELD_TLS_KEY (python scripts/gen_dev_cert.py) for HTTPS.")
+    if settings.allow_shared_operator_token:
+        print("NOTE: the shared operator token is enabled as 'bootstrap-admin'. Create named operators "
+              "(python scripts/operators.py create ...) and set ALLOW_SHARED_OPERATOR_TOKEN=false.")
+    uvicorn.run(create_app(settings, store=store, pqc=pqc, **services), host=settings.host, port=settings.port, **tls)
 
 
 if __name__ == "__main__":

@@ -36,6 +36,7 @@ from backend.evidence.chain import EvidenceRecorder
 from backend.api.security_routes import register_security_routes
 from backend.security.credentials import CredentialStore, EncryptedCredentialStore, load_or_create_master_key
 from backend.security.tokens import bearer_from_header, load_or_create_token, token_matches
+from backend.security.operators import BOOTSTRAP, OperatorStore
 
 DASHBOARD_DIR = Path(__file__).resolve().parents[2] / "dashboard"
 AUTH_FAIL_LOG_INTERVAL_S = 10.0  # throttle so unauthenticated callers cannot flood the event table
@@ -124,18 +125,45 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
     last_block_log: dict[str, float] = {}
     last_fail_log = {"t": -1e18}
 
+    def _auth_failed(scope: str, request: Request):
+        now = clock()
+        if now - last_fail_log["t"] >= AUTH_FAIL_LOG_INTERVAL_S:
+            last_fail_log["t"] = now
+            store.add_event(now, None, f"{scope}_auth_failed", "medium", {"path": request.url.path})
+        raise HTTPException(401, "authentication_required", headers={"WWW-Authenticate": "Bearer"})
+
     def _token_guard(scope: str, expected: str):
         def guard(request: Request) -> None:
             if token_matches(bearer_from_header(request.headers.get("authorization")), expected):
                 return
-            now = clock()
-            if now - last_fail_log["t"] >= AUTH_FAIL_LOG_INTERVAL_S:
-                last_fail_log["t"] = now
-                store.add_event(now, None, f"{scope}_auth_failed", "medium", {"path": request.url.path})
-            raise HTTPException(401, "authentication_required", headers={"WWW-Authenticate": "Bearer"})
+            _auth_failed(scope, request)
         return guard
 
-    require_operator = Depends(_token_guard("operator", operator_token))
+    operators = OperatorStore(store)
+    app.state.operators = operators
+
+    def _operator_guard(role: str):
+        """Authenticate a named operator (or the bootstrap shared token) and check its role. The identity is put on
+        request.state.operator; it is the ONLY source of operator_id for attribution (never the request body)."""
+        def guard(request: Request):
+            presented = bearer_from_header(request.headers.get("authorization"))
+            op = operators.authenticate(presented, clock())
+            if op is None and settings.allow_shared_operator_token and token_matches(presented, operator_token):
+                op = BOOTSTRAP
+            if op is None:
+                _auth_failed("operator", request)
+            if not op.allows(role):
+                store.add_event(clock(), None, "operator_forbidden", "medium",
+                                {"operator_id": op.operator_id, "role": op.role, "required": role,
+                                 "path": request.url.path, "method": request.method})
+                raise HTTPException(403, f"forbidden: role {role} required")
+            request.state.operator = op
+            return op
+        return guard
+
+    require_operator = Depends(_operator_guard("viewer"))       # read-only operator API
+    require_actor = Depends(_operator_guard("operator"))        # security actions
+    require_admin = Depends(_operator_guard("admin"))           # operator management
     require_ingest = Depends(_token_guard("ingest", ingest_token))
 
     def enforce(device_id: str, channel: str, now: float) -> None:
@@ -346,7 +374,8 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
             trust.process_pending()
             return trust.history(device_id, limit)
 
-    register_security_routes(app, store=store, clock=clock, require_operator=require_operator, handle=handle,
+    register_security_routes(app, store=store, clock=clock, require_operator=require_operator, require_actor=require_actor,
+                             require_admin=require_admin, operators=operators, handle=handle,
                              trust=trust, twin=twin, evidence=evidence, recorder=recorder, recovery=recovery)
     if (DASHBOARD_DIR / "index.html").is_file():
         # Static files only; every datum shown is fetched from the operator API with the operator token.

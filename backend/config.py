@@ -31,6 +31,10 @@ class Settings:
     require_signed_observations: bool = False
     trust_enabled: bool = True
     trust_config_path: str | None = None
+    allow_shared_operator_token: bool = True   # bootstrap-admin; disable once named operators exist
+    tls_cert: str | None = None
+    tls_key: str | None = None
+    require_tls: bool = False
     recovery_tick_s: float = 5.0   # background recovery-deadline timer; 0 disables
     # Optional overrides from the environment; otherwise generated under keys_dir on first use.
     master_key_hex: str | None = field(default=None, repr=False)
@@ -65,6 +69,10 @@ class Settings:
             require_signed_observations=get("REQUIRE_SIGNED_OBSERVATIONS", "false").lower() in ("1", "true", "yes"),
             trust_enabled=get("TRUST_ENABLED", "true").lower() in ("1", "true", "yes"),
             trust_config_path=get("TRUST_CONFIG_PATH", "") or None,
+            allow_shared_operator_token=get("ALLOW_SHARED_OPERATOR_TOKEN", "true").lower() in ("1", "true", "yes"),
+            tls_cert=get("QSHIELD_TLS_CERT", "") or None,
+            tls_key=get("QSHIELD_TLS_KEY", "") or None,
+            require_tls=get("QSHIELD_REQUIRE_TLS", "false").lower() in ("1", "true", "yes"),
             recovery_tick_s=float(get("RECOVERY_TICK_S", str(cls.recovery_tick_s))),
             master_key_hex=get("QSHIELD_MASTER_KEY_HEX", "") or None,
             operator_token=get("QSHIELD_OPERATOR_TOKEN", "") or None,

@@ -64,7 +64,8 @@ def test_abort_from_verified_returns_to_quarantined_and_is_recorded(stack):
     reach_verified(stack)
     r = stack.op.post(f"{DEV}/recovery/abort", json={"reason": "operator: new indicator of compromise"})
     assert r.status_code == 200 and r.json()["status"] == "failed"
-    assert r.json()["failure_reason"] == "aborted: operator: new indicator of compromise"
+    # Phase 13: the abort reason carries the authenticated operator identity
+    assert r.json()["failure_reason"] == "aborted: operator: new indicator of compromise (by bootstrap-admin)"
     assert state(stack) == "QUARANTINED"
     evs = [e for e in stack.store.list_events(200) if e["event_type"] == "recovery_failed"]
     assert evs and evs[0]["device_id"] == "DEVICE-001"

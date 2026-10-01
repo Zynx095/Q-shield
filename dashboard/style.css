@@ -106,3 +106,4 @@ tr.flash td { animation: flash 1.6s ease-out; }
 .actions button:disabled { opacity: .45; cursor: not-allowed; }
 .actions button.danger { border-color: #c0392b; color: #e74c3c; }
 .act-msg { min-height: 1.2em; font-size: 12px; word-break: break-word; }
+.who { font-size: 12px; margin-left: 8px; }

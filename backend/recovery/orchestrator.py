@@ -167,7 +167,7 @@ class RecoveryOrchestrator:
              "command_acked": False, "consecutive_clean": 0}
         if not self._transition(r, State.RECOVERING, f"recovery started: {reason}"):
             raise RecoveryError("transition to RECOVERING refused")
-        self._log(r, "recovery_started", now, reason=reason, command=r["command"])
+        self._log(r, "recovery_started", now, reason=reason, requested_by=requested_by, command=r["command"])
         self._save(r)
         return r
 

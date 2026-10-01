@@ -233,6 +233,9 @@ Three separate mechanisms that never substitute for one another:
 
 Tokens: random 256-bit (`secrets.token_urlsafe(32)`) from `QSHIELD_OPERATOR_TOKEN` / `QSHIELD_INGEST_TOKEN` or a gitignored file under `keys/` created on first start; constant-time comparison; failures return `401` with no detail and are logged as throttled security events (one per 10 s) that never contain the token. `/api/v1/health` stays open. Deliberately no OAuth, sessions, roles or expiry; rotate by deleting the token file and restarting. **Limitations:** tokens travel in cleartext over HTTP (trusted LAN only until TLS), a single shared operator token (no per-user audit), no lockout.
 
+
+**Update (Phase 13): per-operator identities and TLS.** The single operator token became the `bootstrap-admin` identity (can be disabled with `ALLOW_SHARED_OPERATOR_TOKEN=false`). Named operators have hashed (SHA-256) `qso_` tokens, the roles viewer/operator/admin, revocation and optional expiry. Every control action is attributed (an `operator_action` event plus an evidence entry; `operator_id` comes from the authenticated identity only). Optional TLS uses `QSHIELD_TLS_CERT`/`QSHIELD_TLS_KEY` (`QSHIELD_REQUIRE_TLS` to enforce), with a self-signed dev cert from `scripts/gen_dev_cert.py`. Still no MFA, lockout, per-device roles, PKI or mTLS. See IMPLEMENTATION_STATUS.
+
 ---
 
 ## TD-18 — PQC integration scope (*Phase 3*)
