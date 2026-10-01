@@ -4,7 +4,7 @@ import { html } from "../lib/html.js";
 import { AUTH_PROFILES, stateMeta } from "../lib/copy.js";
 import { ago, short } from "../lib/format.js";
 import { S, focusId } from "../store.js";
-import { UI, deviceModel, evidenceBlocks, fleet, limitOf, thresholds } from "../model.js";
+import { UI, deviceModel, evidenceBlocks, flashTo, fleet, limitOf, thresholds } from "../model.js";
 import { icon } from "../components/icons.js";
 import { trustLattice } from "../components/lattice.js";
 import { channels, stateRail } from "../components/rail.js";
@@ -69,7 +69,7 @@ function hero(f, m) {
         </div>
         <p class="meta hero-stateline">${meta.line}</p>
         ${stateRail(m.path, snap && snap.state)}
-        ${channels(m.access)}
+        ${channels(m.access, { change: flashTo(m.id) })}
         <div class="facts">
           <div class="fact"><div class="fact-label">Last authenticated message</div><div class="fact-value">${age === null ? "—" : ago(age)}</div></div>
           <div class="fact"><div class="fact-label">Device authentication</div><div class="fact-value">${m.device ? (AUTH_PROFILES[m.device.auth_profile] || m.device.auth_profile).replace(" (pre-shared key)", "") : "—"}</div></div>

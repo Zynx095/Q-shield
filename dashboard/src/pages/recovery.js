@@ -3,7 +3,7 @@ import { html } from "../lib/html.js";
 import { STAGES, failureLabel, stateMeta } from "../lib/copy.js";
 import { clock, countdown, dateTime, duration } from "../lib/format.js";
 import { S, focusId, gatewayNow } from "../store.js";
-import { deviceModel } from "../model.js";
+import { deviceModel, flashTo } from "../model.js";
 import { icon } from "../components/icons.js";
 import { stepper } from "../components/recovery.js";
 import { channels } from "../components/rail.js";
@@ -52,7 +52,7 @@ function currentPanel(m) {
           : html`<span class="caption">None yet. Checks start after the device acknowledges remediation.</span>`}</dd>
         <dt>Current trust</dt><dd>${stateBadge(m.snapshot && m.snapshot.state)} <span class="num strong">${m.snapshot ? m.snapshot.score : "—"}</span></dd>
       </dl>
-      ${channels(m.access)}
+      ${channels(m.access, { change: flashTo(m.id) })}
     </div>
   </section>`;
 }

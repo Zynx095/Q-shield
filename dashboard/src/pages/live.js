@@ -127,6 +127,7 @@ export function render() {
   const recent = UI.flash && UI.flash.until > Date.now() && UI.flash.deviceId === id ? UI.flash : null;
   const restoredNow = !!(n && n.allowed && (state === "RECOVERED" || (state === "TRUSTED" && m && afterRecovery(m))));
   const justRestored = restoredNow && recent && recent.to === "RECOVERED";
+  const sealing = !!(recent && recent.to === "QUARANTINED");
   const v = S.evidence.verify;
   return html`<div class="live tone-${meta.tone}">
     <header class="live-top">
@@ -153,8 +154,8 @@ export function render() {
         <div class="live-score"><span class="num" data-tween="score">${snap && Number.isFinite(snap.score) ? snap.score : "—"}</span><span class="live-of">trust score</span></div>
         ${snap && snap.status === "TRACKED" ? context(m, state, meta) : ""}
         <div class="live-channels">
-          <div class="lc ${n ? (n.allowed ? "ok" : "crit") : ""} ${restoredNow ? "is-restored" : ""} ${justRestored ? "is-new" : ""}">${icon(n && !n.allowed ? "x" : "check")}<span>Normal channel</span><b>${n ? (n.allowed ? (restoredNow ? "Restored" : "Open") : "Blocked") : "—"}</b></div>
-          <div class="lc ${r ? (r.allowed ? "ok" : "") : ""}">${icon(r && r.allowed ? "refresh" : "minus")}<span>Recovery channel</span><b>${r ? (r.allowed ? "Available" : "Closed") : "—"}</b></div>
+          <div class="lc ${n ? (n.allowed ? "ok" : "crit") : ""} ${restoredNow ? "is-restored" : ""} ${justRestored ? "is-new" : ""} ${sealing && n && !n.allowed ? "is-sealing" : ""}">${icon(n && !n.allowed ? "x" : "check")}<span>Normal channel</span><b>${n ? (n.allowed ? (restoredNow ? "Restored" : "Open") : "Blocked") : "—"}</b></div>
+          <div class="lc ${r ? (r.allowed ? "ok" : "") : ""} ${sealing && r && r.allowed ? "is-opening" : ""}">${icon(r && r.allowed ? "refresh" : "minus")}<span>Recovery channel</span><b>${r ? (r.allowed ? "Available" : "Closed") : "—"}</b></div>
         </div>
       </section>
       <section class="live-feed" aria-label="Latest decisions">

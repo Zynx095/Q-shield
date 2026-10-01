@@ -3,7 +3,7 @@ import { html } from "../lib/html.js";
 import { AUTH_PROFILES, stateMeta } from "../lib/copy.js";
 import { clock, isoToTs, ago } from "../lib/format.js";
 import { S } from "../store.js";
-import { UI, deviceModel, evidenceBlocks, limitOf, thresholds } from "../model.js";
+import { UI, deviceModel, evidenceBlocks, flashTo, limitOf, thresholds } from "../model.js";
 import { availability } from "../actions.js";
 import { icon } from "../components/icons.js";
 import { trustLattice } from "../components/lattice.js";
@@ -68,7 +68,7 @@ export function render({ params }) {
     </section>
     <div class="stack" data-reveal>
       <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("shield")}Trust factors</h2></div><div class="panel-body">${factorList(m.factors)}</div></section>
-      <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("lock")}Enforcement</h2></div><div class="panel-body stack-sm">${stateRail(m.path, snap && snap.state)}${channels(m.access)}</div></section>
+      <section class="panel"><div class="panel-head"><h2 class="panel-title">${icon("lock")}Enforcement</h2></div><div class="panel-body stack-sm">${stateRail(m.path, snap && snap.state)}${channels(m.access, { change: flashTo(id) })}</div></section>
     </div>
   </div>
 

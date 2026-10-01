@@ -181,6 +181,18 @@
 .channel.is-blocked .channel-state { color: var(--crit); }
 .channel.is-closed .channel-state { color: var(--slate); }
 .channel-why { grid-column: 2; font-size: var(--t-xs); color: var(--slate); }
+/* quarantine moment (only while a real transition is fresh): the normal channel seals as its X draws in, then the
+   recovery channel opens. Shared with presentation mode's tiles (.lc). */
+.channel.is-sealing, .lc.is-sealing { animation: ch-seal 520ms var(--ease-out) 1; }
+.channel.is-sealing .channel-icon svg path, .lc.is-sealing > svg path { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw-stroke 460ms var(--ease-out) 140ms forwards; }
+.channel.is-opening, .lc.is-opening { animation: ch-open 900ms var(--ease-out) 200ms 1 backwards; }
+@keyframes ch-seal { 0% { box-shadow: 0 0 0 9px rgba(194, 51, 76, 0.24); } 100% { box-shadow: 0 0 0 0 rgba(194, 51, 76, 0); } }
+@keyframes ch-open { 0% { box-shadow: 0 0 0 0 rgba(45, 69, 196, 0.34); } 100% { box-shadow: 0 0 0 12px rgba(45, 69, 196, 0); } }
+@keyframes draw-stroke { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .channel.is-sealing, .lc.is-sealing, .channel.is-opening, .lc.is-opening { animation: none; }
+  .channel.is-sealing .channel-icon svg path, .lc.is-sealing > svg path { animation: none; stroke-dashoffset: 0; }
+}
 
 /* ---------- trust lattice (hero visual) ---------- */
 .lattice { width: 100%; max-width: 440px; margin-inline: auto; aspect-ratio: 1 / 1; }

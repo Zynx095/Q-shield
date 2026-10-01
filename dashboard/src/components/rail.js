@@ -50,17 +50,19 @@ const REASONS = {
 
 const BLOCKED_WHY = { QUARANTINED: "Blocked: device is quarantined", RECOVERING: "Blocked until recovery restores access", VERIFIED: "Blocked until trust is rebuilt" };
 
-export function channels(access) {
+/** `change`: the state the device has just moved to (model.flashTo); drives the one-shot seal / open moment. */
+export function channels(access, { change = null } = {}) {
   if (!access) return html`<div class="channels"><div class="channel"><span class="channel-icon">${icon("minus")}</span><span class="channel-name">Normal channel</span><span class="channel-state">Unknown</span></div><div class="channel"><span class="channel-icon">${icon("minus")}</span><span class="channel-name">Recovery channel</span><span class="channel-state">Unknown</span></div></div>`;
   const n = access.normal || {}, r = access.recovery || {};
+  const sealing = change === "QUARANTINED";
   return html`<div class="channels" role="group" aria-label="Gateway enforcement">
-    <div class="channel ${n.allowed ? "is-open" : "is-blocked"}">
+    <div class="channel ${n.allowed ? "is-open" : "is-blocked"} ${sealing && !n.allowed ? "is-sealing" : ""}">
       <span class="channel-icon">${icon(n.allowed ? "check" : "x")}</span>
       <span class="channel-name">Normal channel</span>
       <span class="channel-state">${n.allowed ? "Open" : "Blocked"}</span>
       <span class="channel-why">${!n.allowed && BLOCKED_WHY[access.trust_state] ? BLOCKED_WHY[access.trust_state] : REASONS[n.reason] || n.reason || ""}</span>
     </div>
-    <div class="channel ${r.allowed ? "is-open" : "is-closed"}">
+    <div class="channel ${r.allowed ? "is-open" : "is-closed"} ${sealing && r.allowed ? "is-opening" : ""}">
       <span class="channel-icon">${icon(r.allowed ? "refresh" : "minus")}</span>
       <span class="channel-name">Recovery channel</span>
       <span class="channel-state">${r.allowed ? "Available" : "Closed"}</span>

@@ -20,6 +20,12 @@ export const UI = {
 
 export const limitOf = (key, dflt) => UI.limits[key] ?? dflt;
 
+/** The state a device just changed to, while the transition is fresh (UI.flash, set in main.js); otherwise null. */
+export function flashTo(id) {
+  const f = UI.flash;
+  return f && f.deviceId === id && f.until > Date.now() ? f.to : null;
+}
+
 export function thresholds() {
   const t = S.system && S.system.trust;
   return t && t.enabled ? t : null;
