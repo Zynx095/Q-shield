@@ -526,3 +526,15 @@ a.chip { transition: border-color var(--dur-1) var(--ease); }
   }
   .rail-step.is-now .rail-label, .rail-step.is-now .rail-when { overflow: visible; max-width: none; }
 }
+
+/* ---------- scroll reveal (src/lib/reveal.js) ----------
+   A section is hidden only while <html> is reveal-ready (the controller is running and motion is allowed); the
+   controller reveals each one once. The transition lives on the revealed state, so a route reset hides instantly. */
+.reveal-ready [data-reveal]:not([data-revealed]) { opacity: 0; transform: translateY(var(--reveal-shift)); }
+.reveal-ready [data-reveal][data-revealed] { transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out); }
+.reveal-ready [data-reveal][data-revealed="1"] { transition-delay: var(--reveal-stagger); }
+.reveal-ready [data-reveal][data-revealed="2"] { transition-delay: calc(var(--reveal-stagger) * 2); }
+.reveal-ready [data-reveal][data-revealed="3"] { transition-delay: calc(var(--reveal-stagger) * 3); }
+@media (max-width: 640px) { :root { --reveal-shift: 8px; --reveal-stagger: 0ms; } }
+@media (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1 !important; transform: none !important; } }
+@media print { [data-reveal] { opacity: 1 !important; transform: none !important; } }
