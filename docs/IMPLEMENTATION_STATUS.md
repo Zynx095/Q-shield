@@ -1,13 +1,13 @@
 # Q-SHIELD — Implementation Status
 
 Persistent project memory. Read together with `docs/BUILD_CHECKPOINT.md`.
-Last updated: 2026-10-01.
+Last updated: 2026-10-02.
 
 ## CURRENT PHASE
-Phases 0–14 implemented and tested. Phase 14 is the command-center UI rework (see **COMMAND CENTER UI (Phase 14)**). Remaining work is listed under **WHAT IS LEFT**.
+Phases 0–15 implemented and tested. Phase 14 is the command-center UI rework (see **COMMAND CENTER UI (Phase 14)**); Phase 15 is the premium visual pass and the Camera & vision page (see **PREMIUM VISUAL PASS + CAMERA (Phase 15)**). Remaining work is listed under **WHAT IS LEFT**.
 
 ## TEST COUNT
-**683 passed, 0 failed** (`python -m pytest -o addopts="" -q`, ~2 min; this includes the dashboard JavaScript unit tests, run through Node). The baseline before the continuous build was 544.
+**686 passed, 0 failed** (`python -m pytest -o addopts="" -q`, ~1.5 min). This includes the 34 dashboard JavaScript unit tests (`node --test dashboard/tests/*.test.mjs`: derive 17, reveal 4, ambient 4, camera 9), run through Node. The baseline before the continuous build was 544.
 
 ## COMPLETED
 | Phase | Feature | Status | Key code | Tests |
@@ -75,6 +75,58 @@ trust-engine.md §6.4 and covered by regression tests.
 - **Browser QA (Edge, headless Playwright, outside the repo):** the full story was driven on a live gateway through the UI. Steps checked: bad-token sign-in rejected; the token is removed from the URL; TRUSTED → SUSPICIOUS → QUARANTINED rendered live; a viewer's controls are disabled; operator `alice` started recovery through the dialog (validation, then success); aborted (the device returned to QUARANTINED); started again; the twin edit is locked during recovery; VERIFIED → RECOVERED → TRUSTED; the evidence ledger shows `alice started recovery` and `alice aborted recovery`; a known-good edit produced a visible MISMATCH; with the gateway stopped, the offline banner appeared. Layout was checked at 1440/1280/1024/768/390 px. There was no horizontal overflow from 768 px up; the 390 px overflow found during QA was fixed. Keyboard checks: skip link, nav order, dialog focus and Escape with focus return.
 - **Not verified:** the webcam path in the UI (no camera here); screen-reader output (only structure and ARIA were checked).
 
+## PREMIUM VISUAL PASS + CAMERA (Phase 15)
+**Implemented and tested, frontend only.** Nothing changed in the backend, API, trust, enforcement, recovery or evidence code, and no dependency was added. The work is a series of small commits starting at `67066da`; see `git log`.
+- **Interaction system:**
+  - motion and glow tokens
+  - hover lift with a glow tinted by the button's meaning; press settle
+  - unclipped focus rings
+  - hover only on clickable ledger entries and device rows
+  - animated nav indicator; success check-mark draw
+  - hover applies to pointer devices only, and all of it is off under reduced motion
+- **Scroll reveal:**
+  - `dashboard/src/lib/reveal.js` uses an IntersectionObserver: each section reveals once, the stagger is capped at 4, and a 1.2 s safety net shows anything left. Sections are hidden only while `html.reveal-ready` is set.
+  - `lib/morph.js` keeps the `data-revealed` marker, so refreshes never replay a reveal.
+  - Marked: overview, devices/device, incidents, recovery, the evidence header, twin, crypto.
+  - Never marked: the topbar, sidebar, dialogs, ledger blocks, timeline items, presentation mode.
+- **Ambient background** (`components/ambient.js` + `styles/ambient.css`):
+  - algorithm names plus 8-digit decorative hex from a fixed seed (mulberry32; no random source)
+  - at most 5% opacity, transform-only drift
+  - tint and speed follow the posture; speed changes use Web Animations `updatePlaybackRate`, so rows never jump
+  - static under reduced motion; masked behind page headings; the topbar is near-solid while it runs
+  - Settings switch (sessionStorage)
+  - The module imports nothing (checked by node and contract tests).
+- **State moments**, driven by `UI.flash` on real transitions only, with no layout change:
+  - SUSPICIOUS: amber sweep
+  - QUARANTINED: the normal channel's X draws in and the recovery channel opens
+  - RECOVERING / VERIFIED: the active recovery step pulses
+  - RECOVERED: the check mark draws in, with an emerald wash
+- **Camera & vision page (`#/vision`):**
+  - `components/camera.js` holds the controller and the view.
+  - The preview is **local only**: it is not analysed, signed, recorded or sent, and nothing is drawn over the video.
+  - It never starts on its own. Cameras can be listed and switched (the old stream is stopped first).
+  - Camera permission is read before the browser asks, and there is a secure-context check.
+  - The camera is released on Stop, route change, sign-out, page hide, and while the tab is hidden.
+  - Errors are explained: denied, no camera, in use (possibly by the vision service), insecure page, unsupported browser.
+  - Beside the preview: the vision service's **signed** observations from `/api/v1/observations` with the gateway's ML-DSA-65 label, the signers from `/api/v1/system`, and the pipeline. Synthetic detections are tagged Simulated.
+- **Found and fixed in browser QA:** at phone width the topbar's right-hand chips widened every page to 511 px. This was pre-existing. They now wrap to a second row.
+- **Tests:**
+  - `dashboard/tests/{reveal,ambient,camera}.test.mjs`, plus an observation test in `derive.test.mjs`
+  - contract tests: ambient has no imports and no network calls; camera has no network, recording or frame-capture API and requests `audio: false`; the `#/vision` route, nav entry, mount and labels exist, and the camera is released
+- **Browser QA** (headless Edge, with Playwright kept outside the repo):
+  - hover, press, focus, nav and card states measured
+  - reveal on every marked page: entrance, scroll, no replay on refresh, deep link
+  - ambient: built once, at most 5%, drifts, ignores the pointer; posture checked through full live attack-to-recovery cycles
+  - every state moment captured on the overview and in presentation mode, with normal and reduced motion
+  - Camera & vision with Edge's fake camera: no auto-start; 1280×720 live; the `<video>` node and stream stay the same across refreshes; Stop, leaving the page and signing out each end every track; a refused permission is explained
+  - no horizontal scroll on ten pages at 390, 700 and 1024 px
+  - presentation-mode 7-viewport regression: 83 of 83 checks passed
+  - 4× CPU-throttled overview: same frame cadence and refresh long tasks as the dashboard before this pass. Renders of about 100 ms at 4× throttle existed before and after; the ambient layer adds none.
+- **Not verified:**
+  - the preview with a physical webcam (only Edge's fake camera was available here)
+  - camera contention with the running vision service on real hardware
+  - screen-reader output
+
 ## HOW TO RUN
 ```
 python -m pytest -o addopts="" -q                   # full suite
@@ -89,6 +141,7 @@ python scripts/operators.py create alice "Alice" operator   # prints alice's tok
 The demo prints the dashboard URL with the operator token.
 
 ## KNOWN LIMITATIONS (honest)
+- The browser camera preview is a local convenience. It is not evidence, and the signed observations never come from it. It needs HTTPS or localhost, and on most webcams it cannot share a camera with the vision service.
 - All device data is SIMULATED (software agent). The ESP32 firmware has never been compiled or flashed, and its path is HMAC-SHA256 only (not PQC).
 - No physical tamper test was ever performed.
 - The webcam step of the new demo was **not** re-run live this session because no camera was attached. The vision pipeline was live-verified in Phases 3–4.
