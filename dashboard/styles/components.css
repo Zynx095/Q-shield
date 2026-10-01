@@ -285,6 +285,18 @@
 .table tbody tr.is-link:focus-within td { background: var(--surface-2); }   /* keyboard parity with row hover */
 .table-wrap { overflow-x: auto; }
 
+/* ---------- interactive surfaces: only things that open or navigate react to the pointer ---------- */
+.block-card { transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease), transform var(--dur-release) var(--ease-out); }
+.table tbody tr.is-link td:first-child { transition: box-shadow var(--dur-1) var(--ease); }
+.table tbody tr.is-link:focus-within td:first-child { box-shadow: inset 3px 0 0 var(--cobalt); }
+a.chip { transition: border-color var(--dur-1) var(--ease); }
+@media (hover: hover) {
+  .block-card:has(> .block-head:hover) { border-color: var(--line-strong); box-shadow: var(--glow-neutral); transform: translateY(var(--lift)); }
+  .table tbody tr.is-link:hover td:first-child { box-shadow: inset 3px 0 0 var(--cobalt); }
+  a.chip:hover { border-color: var(--line-strong); }
+  a.chip.crit:hover { border-color: var(--crit-fill); }
+}
+
 /* ---------- digital twin ---------- */
 .twin-verdict { display: flex; gap: var(--s4); align-items: flex-start; padding: var(--s4) var(--s5); border-radius: var(--r-md); border: 1px solid var(--line); }
 .twin-verdict svg { width: 26px; height: 26px; flex: none; }
