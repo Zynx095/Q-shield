@@ -82,6 +82,34 @@ def _in_range(value, lo, hi) -> bool:
     return (lo is None or value >= lo) and (hi is None or value <= hi)
 
 
+def _compare(device_id: str, exp: dict, obs: dict) -> Comparison:
+    cmp = Comparison(device_id)
+    for k in ("fw_version", "cfg_hash"):
+        if k in exp:
+            o = obs.get(k)
+            status = UNKNOWN if o is None else (MATCH if o == exp[k] else MISMATCH)
+            cmp.fields[k] = {"expected": exp[k], "observed": o, "status": status}
+    if "capabilities" in exp:
+        o = obs.get("capabilities")
+        status = UNKNOWN if o is None else (MATCH if sorted(o) == exp["capabilities"] else MISMATCH)
+        cmp.fields["capabilities"] = {"expected": exp["capabilities"], "observed": o, "status": status}
+    sensors = obs.get("sensors", {})
+    for f, (lo, hi) in exp.get("sensor_ranges", {}).items():
+        o = sensors.get(f)
+        status = UNKNOWN if o is None else (MATCH if _in_range(o, lo, hi) else MISMATCH)
+        cmp.fields[f"sensor:{f}"] = {"expected": [lo, hi], "observed": o, "status": status}
+    statuses = [v["status"] for v in cmp.fields.values()]
+    if not statuses or all(s == UNKNOWN for s in statuses):
+        cmp.overall = UNKNOWN
+    elif MISMATCH in statuses:
+        cmp.overall = MISMATCH
+    elif UNKNOWN in statuses:
+        cmp.overall = UNKNOWN          # partially observed: not enough to call it a match
+    else:
+        cmp.overall = MATCH
+    return cmp
+
+
 class DigitalTwin:
     def __init__(self, store: Store):
         self.store = store
@@ -129,32 +157,26 @@ class DigitalTwin:
                            (device_id, json.dumps(exp), json.dumps(obs), now))
 
     def compare(self, device_id: str) -> Comparison:
+        """Expected state against the accumulated observed state (the latest value reported for each field)."""
         exp, obs = self._row(device_id)
-        cmp = Comparison(device_id)
-        for k in ("fw_version", "cfg_hash"):
-            if k in exp:
-                o = obs.get(k)
-                status = UNKNOWN if o is None else (MATCH if o == exp[k] else MISMATCH)
-                cmp.fields[k] = {"expected": exp[k], "observed": o, "status": status}
-        if "capabilities" in exp:
-            o = obs.get("capabilities")
-            status = UNKNOWN if o is None else (MATCH if sorted(o) == exp["capabilities"] else MISMATCH)
-            cmp.fields["capabilities"] = {"expected": exp["capabilities"], "observed": o, "status": status}
-        sensors = obs.get("sensors", {})
-        for f, (lo, hi) in exp.get("sensor_ranges", {}).items():
-            o = sensors.get(f)
-            status = UNKNOWN if o is None else (MATCH if _in_range(o, lo, hi) else MISMATCH)
-            cmp.fields[f"sensor:{f}"] = {"expected": [lo, hi], "observed": o, "status": status}
-        statuses = [v["status"] for v in cmp.fields.values()]
-        if not statuses or all(s == UNKNOWN for s in statuses):
-            cmp.overall = UNKNOWN
-        elif MISMATCH in statuses:
-            cmp.overall = MISMATCH
-        elif UNKNOWN in statuses:
-            cmp.overall = UNKNOWN          # partially observed: not enough to call it a match
-        else:
-            cmp.overall = MATCH
-        return cmp
+        return _compare(device_id, exp, obs)
+
+    def compare_report(self, device_id: str, report: dict) -> Comparison:
+        """Expected state against ONE authenticated report, judged on what that report itself says.
+
+        Used for recovery health checks: a field the report does not carry is UNKNOWN, never filled in from an
+        earlier report (a device that stops reporting its configuration must not pass on the value it reported
+        before the incident). Capabilities are the exception: only registration reports them, and registration is
+        on the normal channel, which quarantine blocks, so the last authenticated registration is used."""
+        exp, stored = self._row(device_id)
+        obs: dict = {k: report[k] for k in ("fw_version", "cfg_hash") if report.get(k) is not None}
+        if "capabilities" in stored:
+            obs["capabilities"] = stored["capabilities"]
+        sensors = {k: v for k, v in report.items() if k not in ("fw_version", "cfg_hash", "tamper", "ack_command_id")
+                   and v is not None}
+        if sensors:
+            obs["sensors"] = sensors
+        return _compare(device_id, exp, obs)
 
     def trust_expectations(self, device_id: str) -> dict:
         """Per-device expectations for the trust adapters (overrides the global trust config when present)."""

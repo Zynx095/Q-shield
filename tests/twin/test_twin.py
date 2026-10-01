@@ -74,3 +74,19 @@ def test_set_expected_preserves_observed(twin):
     twin.observe("D", 2.0, telemetry={"cfg_hash": "abc"})
     twin.set_expected("D", {"cfg_hash": "abc"}, 3.0)
     assert twin.observed("D")["cfg_hash"] == "abc" and twin.compare("D").overall == MATCH
+
+
+def test_compare_report_judges_only_what_the_report_says(twin):
+    """Recovery health checks: a field missing from the report is UNKNOWN, never borrowed from an older report."""
+    twin.set_expected("D", EXP, 1.0)
+    twin.observe("D", 2.0, info={"fw_version": "1.2", "capabilities": ["temperature", "tamper"]})
+    twin.observe("D", 3.0, telemetry={"fw_version": "1.2", "cfg_hash": "abc", "temperature_c": 20.0, "tamper": False})
+    assert twin.compare("D").overall == MATCH
+    silent = twin.compare_report("D", {"fw_version": "1.2", "temperature_c": 20.0, "tamper": False, "cfg_hash": None})
+    assert silent.overall == UNKNOWN and silent.fields["cfg_hash"]["status"] == UNKNOWN
+    assert twin.compare("D").fields["cfg_hash"]["status"] == MATCH          # the accumulated view still remembers it
+    full = twin.compare_report("D", {"fw_version": "1.2", "cfg_hash": "abc", "temperature_c": 21.0, "tamper": False,
+                                     "ack_command_id": "CMD-1"})
+    assert full.overall == MATCH and full.fields["capabilities"]["status"] == MATCH   # from the last registration
+    bad = twin.compare_report("D", {"fw_version": "1.2", "cfg_hash": "abc", "temperature_c": 99.0, "tamper": False})
+    assert bad.overall == MISMATCH and bad.fields["sensor:temperature_c"]["status"] == MISMATCH

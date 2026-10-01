@@ -7,8 +7,9 @@
      (target cfg_hash / fw_version from the twin). It is delivered in the response to the device's next
      authenticated recovery-channel report. It cannot repair hardware and cannot reflash firmware;
   3. the device must acknowledge the command in a later authenticated report;
-  4. health checks: N consecutive authenticated recovery reports after the acknowledgement, each with
-     tamper=false and a digital-twin comparison of MATCH (firmware, config, capabilities, sensor ranges);
+  4. health checks: N consecutive authenticated recovery reports after the acknowledgement, each judged on its own
+     content: tamper=false and every expected field reported and matching (firmware, config, sensor ranges;
+     capabilities from the last authenticated registration);
   5. VERIFIED (explicit, validated transition with the check evidence);
   6. trust ramp: fresh authenticated evidence credits time; RECOVERED once score >= 50 (normal access restored);
   7. TRUSTED once score >= 85 -> recovery completed.
@@ -220,11 +221,14 @@ class RecoveryOrchestrator:
                         r["command_acked"], r["stage"] = True, "health_checks"
                         self._log(r, "remediation_acknowledged", now, msg_id=row["id"])
                     continue
-                cmp = self.twin.compare(r["device_id"])
+                # Judge THIS report on what it says (not the twin's accumulated state, which keeps the last value
+                # ever reported for a field and would let a device pass on configuration it reported before the
+                # incident, or let several reports consumed in one tick all borrow the newest one).
+                cmp = self.twin.compare_report(r["device_id"], rep)
                 clean = rep.get("tamper") is False and cmp.overall == MATCH
                 r["consecutive_clean"] = r["consecutive_clean"] + 1 if clean else 0
                 r["health"].append({"msg_id": row["id"], "t": now, "tamper": rep.get("tamper"), "twin": cmp.overall,
-                                    "clean": clean})
+                                    "fields": {k: v["status"] for k, v in cmp.fields.items()}, "clean": clean})
             state = self.trust.state_of(r["device_id"])       # a report just consumed may have tripped a fault
             if state is State.QUARANTINED:
                 return self._fail(r, "fault_reported_during_recovery (trust engine returned the device to QUARANTINED)",

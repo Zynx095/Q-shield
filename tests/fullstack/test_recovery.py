@@ -131,3 +131,32 @@ def test_verified_is_not_trusted_until_score_rebuilt(stack):
     quarantine_by_correlated_attack(stack)
     reach_verified(stack)
     assert stack.trust.score_of("DEVICE-001") < 50 and state(stack) == "VERIFIED"
+
+
+def test_health_checks_judge_each_report_not_a_stale_twin_field(stack):
+    """Regression: the twin keeps the last value ever reported for a field. A device that stops reporting its
+    configuration after the attack must not pass health checks on the cfg_hash it reported BEFORE quarantine."""
+    quarantine_by_correlated_attack(stack)                 # cfg-good-1 was reported while still trusted
+    start(stack)
+    report(stack)                                          # receives the remediation command
+    for _ in range(5):
+        report(stack, cfg_hash=None)                       # acknowledges, but never reports a configuration again
+    r = rec(stack)
+    assert r["stage"] == "health_checks" and state(stack) == "RECOVERING", r
+    assert r["health"] and not any(h["clean"] for h in r["health"])
+    assert all(h["fields"]["cfg_hash"] == "UNKNOWN" for h in r["health"])
+
+
+def test_each_health_check_records_what_that_report_said(stack):
+    quarantine_by_correlated_attack(stack)
+    start(stack)
+    report(stack)
+    report(stack)                                          # ack: the agent now reports the known-good cfg_hash
+    report(stack, temperature_c=None)                      # this report leaves out a sensor the twin expects
+    report(stack)
+    r = rec(stack)
+    first, second = r["health"]
+    assert first["fields"]["sensor:temperature_c"] == "UNKNOWN" and not first["clean"]
+    assert second["fields"] == {"fw_version": "MATCH", "cfg_hash": "MATCH", "capabilities": "MATCH",
+                                "sensor:temperature_c": "MATCH"} and second["clean"]
+    assert r["consecutive_clean"] == 1 and r["stage"] == "health_checks"
