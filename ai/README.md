@@ -34,7 +34,7 @@ python -c "from ultralytics import YOLO; YOLO('ai/models/yolo11n.pt')"
 
 ## Configuration (`config/vision.json`)
 
-Camera: `source` (device index, file path or URL), `backend` (auto/dshow/msmf), width/height, `target_fps`. Model: path, `conf_threshold`, `imgsz`, `device`, `classes_of_interest`. `zones`: polygons in normalized 0..1 image coordinates with `kind` `restricted` or `monitored`; `zone_anchor` (`bottom_center` default, or `center`). `restricted_classes`: object classes that are flagged when inside a restricted zone. `health`: camera-obstruction thresholds. `emit`: repeat suppression. Validation is strict (unknown keys, bad ranges, duplicate zone names, degenerate polygons are rejected).
+Camera: `source` (device index, file path or URL), `backend` (auto/dshow/msmf), width/height, `target_fps`, `warmup_frames` (default 15: frames a live camera discards at start while auto-exposure settles, so they are not reported as an obstructed lens). Model: path, `conf_threshold`, `imgsz`, `device`, `classes_of_interest`. `zones`: polygons in normalized 0..1 image coordinates with `kind` `restricted` or `monitored`; `zone_anchor` (`bottom_center` default, or `center`). `restricted_classes`: object classes that are flagged when inside a restricted zone. `health`: camera-obstruction thresholds. `emit`: repeat suppression. Validation is strict (unknown keys, bad ranges, duplicate zone names, degenerate polygons are rejected).
 
 The shipped default splits the frame vertically (right half `restricted_zone`, left half `monitored_zone`) purely as a demo; **draw zones to match your real camera view.**
 

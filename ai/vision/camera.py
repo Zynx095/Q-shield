@@ -33,6 +33,18 @@ class OpenCVSource:
         self._cap.release()
 
 
+def warm_up(source: FrameSource, frames: int) -> int:
+    """Read and discard a live camera's first frames while auto-exposure and white balance settle.
+
+    Webcams commonly deliver dark or black frames for about a second after opening. Fed to the camera-health monitor
+    those read as an obstructed lens, and the resulting (signed) observation would cost the device trust before
+    anything happened. A lens that is really covered stays dark after the warm-up and is still reported.
+    Returns the number of frames read."""
+    for _ in range(max(0, frames)):
+        source.read()
+    return max(0, frames)
+
+
 class SequenceSource:
     """Yields preloaded frames (None entries simulate read failures); for tests and replays."""
 

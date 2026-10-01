@@ -85,3 +85,38 @@ def test_runner_honours_stop_flag():
         return calls["n"] > 2
 
     assert run(p, SequenceSource([normal_frame()] * 10), ListSink(), 1000, should_stop=stop, sleep=lambda s: None) == 2
+
+
+def test_camera_warm_up_keeps_auto_exposure_frames_out_of_health():
+    """Regression: webcams deliver dark frames for about a second while auto-exposure settles. Fed straight into the
+    pipeline they read as an obstructed lens, and the signed 'obstructed' observation cost the device trust before
+    any attack (seen in a live --webcam demo). Live cameras discard their warm-up frames first."""
+    from ai.vision.camera import warm_up
+    from tests.ai.helpers import dark_frame
+
+    startup = [dark_frame()] * 8 + [normal_frame(i) for i in range(6)]
+    cold = ListSink()
+    run(VisionPipeline(make_config(), FakeDetector(), Clock()), SequenceSource(startup), cold, 1000, max_frames=14,
+        sleep=lambda s: None)
+    assert [o.details["state"] for o in cold.items if o.event_type.value == "camera_health"] == ["obstructed", "ok"]
+
+    src, warm = SequenceSource(startup), ListSink()
+    assert warm_up(src, 10) == 10
+    run(VisionPipeline(make_config(), FakeDetector(), Clock()), src, warm, 1000, max_frames=4, sleep=lambda s: None)
+    assert not [o for o in warm.items if o.event_type.value == "camera_health"]
+
+    covered = SequenceSource([dark_frame()] * 30)                   # a lens that is really covered is still reported
+    warm_up(covered, 10)
+    out = ListSink()
+    run(VisionPipeline(make_config(), FakeDetector(), Clock()), covered, out, 1000, max_frames=10, sleep=lambda s: None)
+    assert [o.details["state"] for o in out.items] == ["obstructed"]
+
+
+def test_warm_up_frames_is_configurable_and_validated():
+    from ai.vision.config import ConfigError
+    import pytest
+
+    assert make_config().camera.warmup_frames == 15
+    assert make_config(camera={"source": 0, "warmup_frames": 0}).camera.warmup_frames == 0
+    with pytest.raises(ConfigError):
+        make_config(camera={"source": 0, "warmup_frames": -1})

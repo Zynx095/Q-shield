@@ -14,7 +14,7 @@ import os
 import sys
 from pathlib import Path
 
-from ai.vision.camera import OpenCVSource
+from ai.vision.camera import OpenCVSource, warm_up
 from ai.vision.config import ConfigError, VisionConfig, load_config
 from ai.vision.detector import YoloDetector
 from ai.vision.health import frame_stats
@@ -115,6 +115,8 @@ def main() -> int:
         if not sinks:
             sinks.append(JsonlSink("evidence/runtime/observations.jsonl"))
         pipeline = VisionPipeline(cfg, detector)
+        if isinstance(cfg.camera.source, int):          # live camera: let auto-exposure settle first
+            warm_up(src, cfg.camera.warmup_frames)
         n = run(pipeline, src, FanoutSink(*sinks), cfg.camera.target_fps, a.max_frames)
         print(f"processed {n} frames")
         return 0

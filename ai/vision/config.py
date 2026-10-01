@@ -24,6 +24,7 @@ class CameraConfig:
     width: int = 640
     height: int = 480
     target_fps: float = 5.0          # loop pacing for `run`; benchmark ignores it
+    warmup_frames: int = 15          # live cameras only: frames discarded at start while auto-exposure settles
 
 
 @dataclass(frozen=True)
@@ -99,6 +100,8 @@ def parse_config(data: dict[str, Any]) -> VisionConfig:
         raise ConfigError("camera width/height out of range")
     if not (0 < camera.target_fps <= 120):
         raise ConfigError("camera.target_fps must be in (0, 120]")
+    if isinstance(camera.warmup_frames, bool) or not isinstance(camera.warmup_frames, int) or not (0 <= camera.warmup_frames <= 300):
+        raise ConfigError("camera.warmup_frames must be an integer in [0, 300]")
     if not (0.0 < model.conf_threshold <= 1.0):
         raise ConfigError("model.conf_threshold must be in (0, 1]")
     if not (32 <= model.imgsz <= 2048):

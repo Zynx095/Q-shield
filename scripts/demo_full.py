@@ -229,7 +229,7 @@ class Demo:
         return self.recover()
 
     def webcam(self) -> None:
-        from ai.vision.camera import OpenCVSource
+        from ai.vision.camera import OpenCVSource, warm_up
         from ai.vision.config import load_config
         from ai.vision.detector import YoloDetector
         from ai.vision.pipeline import VisionPipeline
@@ -247,6 +247,8 @@ class Demo:
         listing = lambda: self.op.get("/api/v1/observations", params={"device_id": DEVICE, "limit": 500}).json()  # noqa: E731
         before = len(listing())
         try:
+            if isinstance(cam.source, int):              # discard auto-exposure frames (they read as a covered lens)
+                warm_up(src, cam.warmup_frames)
             n = run(VisionPipeline(cfg, det), src, sink, cam.target_fps, self.a.frames)
         finally:
             src.release()
