@@ -35,7 +35,7 @@ function storageOf(storage) {
 
 export function createCameraController({
   media = NAV && NAV.mediaDevices, permissions = NAV && NAV.permissions, secure = globalThis.isSecureContext !== false,
-  storage = globalThis.sessionStorage, onChange = () => {},
+  storage = globalThis.sessionStorage, doc = globalThis.document, win = globalThis.window, onChange = () => {},
 } = {}) {
   const pref = storageOf(storage);
   // permission: "granted" | "prompt" | "denied" | null (unknown). The camera is only ever opened by start().
@@ -110,7 +110,9 @@ export function createCameraController({
       const stream = await media.getUserMedia({ video, audio: false });
       if (mine !== seq) { for (const t of stream.getTracks()) t.stop(); return; }
       st.stream = stream;
-      st.info = describeTrack(stream.getVideoTracks()[0]);
+      const track = stream.getVideoTracks()[0];
+      st.info = describeTrack(track);
+      if (track && typeof track.addEventListener === "function") track.addEventListener("ended", () => onEnded(stream));
       st.status = "live";
       st.permission = "granted";
       refreshDevices();                             // names become readable once permission is granted
@@ -121,6 +123,32 @@ export function createCameraController({
     }
     emit();
   }
+
+  // The camera vanished under us (unplugged, or the system handed it to another program).
+  function onEnded(stream) {
+    if (st.stream !== stream) return;               // an old stream we stopped ourselves
+    seq++;
+    stopTracks();
+    st.status = "ended";
+    emit();
+    refreshDevices();
+  }
+
+  // A hidden tab releases the camera (for the vision service, and the privacy light); it resumes on return.
+  const onVisibility = () => {
+    if (!doc) return;
+    if (doc.hidden && st.status === "live") {
+      seq++;
+      stopTracks();
+      st.status = "paused";
+      emit();
+    } else if (!doc.hidden && st.status === "paused") {
+      start();
+    }
+  };
+  if (doc && typeof doc.addEventListener === "function") doc.addEventListener("visibilitychange", onVisibility);
+  const onPageHide = () => stop();
+  if (win && typeof win.addEventListener === "function") win.addEventListener("pagehide", onPageHide);
 
   /** Stop the preview and release the camera (the light goes off; another program can open it). */
   function stop() {
@@ -136,6 +164,8 @@ export function createCameraController({
     stop();
     if (media && typeof media.removeEventListener === "function") media.removeEventListener("devicechange", onDeviceChange);
     if (permStatus && typeof permStatus.removeEventListener === "function") permStatus.removeEventListener("change", onPermission);
+    if (doc && typeof doc.removeEventListener === "function") doc.removeEventListener("visibilitychange", onVisibility);
+    if (win && typeof win.removeEventListener === "function") win.removeEventListener("pagehide", onPageHide);
   }
 
   return { start, stop, choose, refreshDevices, release, get state() { return snapshot(); } };
@@ -154,6 +184,8 @@ const STATUS_TEXT = {
   requesting: "Asking the browser for the camera…",
   live: "Preview running in this browser only.",
   error: "The camera could not be opened.",
+  paused: "Paused while this tab is hidden. The camera is released and the preview resumes when you come back.",
+  ended: "The camera stopped sending video: unplugged, or taken by another program. Pick a camera and press Start preview.",
 };
 
 function mountCameraView(host, ctl) {
@@ -209,7 +241,7 @@ function mountCameraView(host, ctl) {
         ? "Camera access is blocked for this site. Allow it in the browser's site settings (the camera icon in the address bar), then press Start preview."
         : s.status === "live" ? "" : "Nothing starts until you press Start preview. The browser then asks for camera access; video only, no microphone.";
     startBtn.disabled = !s.secure || s.status === "requesting" || s.status === "live";
-    stopBtn.disabled = s.status !== "live" && s.status !== "requesting";
+    stopBtn.disabled = s.status !== "live" && s.status !== "requesting" && s.status !== "paused";
   }
   return { update };
 }
