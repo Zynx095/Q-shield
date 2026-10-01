@@ -16,6 +16,7 @@ import { installModal, isModalOpen } from "./components/modal.js";
 import { installChartHover } from "./components/chart.js";
 import { sidebar, topbar } from "./components/shell.js";
 import { icon } from "./components/icons.js";
+import { mountAmbient } from "./components/ambient.js";
 import { signInView } from "./pages/signin.js";
 import * as overview from "./pages/overview.js";
 import * as devices from "./pages/devices.js";
@@ -221,6 +222,7 @@ setSignedOutHandler((reason) => {
 subscribe(scheduleRender);
 installModal();
 installChartHover(document.body);
+mountAmbient(document.getElementById("ambient"));
 
 async function boot() {
   const fromUrl = takeTokenFromUrl();

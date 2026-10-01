@@ -1,0 +1,35 @@
+/* Ambient background (src/components/ambient.js): faint monospace rows of algorithm names drifting behind the
+   panels. At most 5% opacity, page gutters only (panels are solid), transform-only motion on the compositor,
+   static under reduced motion, hidden when printing. */
+
+#ambient {
+  position: fixed; inset: 0; z-index: 0;
+  overflow: hidden; pointer-events: none; user-select: none;
+  contain: strict;
+}
+#app { position: relative; z-index: 1; }
+
+.amb-layer {
+  position: absolute; inset: 0;
+  display: grid; align-content: space-around;
+  font-family: var(--mono); color: var(--ink); white-space: nowrap;
+  word-spacing: 2.4em; letter-spacing: 0.04em; line-height: 1;
+}
+.amb-d1 { font-size: 12px; opacity: 0.035; padding-top: 2vh; }
+.amb-d2 { font-size: 13px; opacity: 0.045; padding-top: 8vh; }
+.amb-d3 { font-size: 15px; opacity: 0.05; padding-top: 14vh; }
+
+.amb-row { width: max-content; animation: amb-drift var(--amb-dur) linear infinite; }
+.amb-d1 .amb-row { --amb-dur: 240s; }
+.amb-d2 .amb-row { --amb-dur: 200s; }
+.amb-d3 .amb-row { --amb-dur: 160s; }
+.amb-row:nth-child(even) { animation-direction: reverse; }
+.amb-row:nth-child(3n + 2) { animation-delay: -37s; }
+.amb-row:nth-child(3n) { animation-delay: -81s; }
+@keyframes amb-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .amb-row { animation: none; }
+  #ambient { opacity: 0.7; }
+}
+@media print { #ambient { display: none; } }
