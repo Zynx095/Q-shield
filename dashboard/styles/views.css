@@ -76,6 +76,22 @@
 .pq-note.pq { fill: var(--cobalt-strong); }
 .pq-note.warn { fill: var(--warn); }
 
+/* ---------- camera & vision ---------- */
+.pipe { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: var(--t-xs); }
+.pipe-step { padding: 3px 9px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); font-weight: 600; color: var(--ink-2); }
+.pipe-step.pq { background: var(--cobalt-tint); border-color: var(--cobalt-line); color: var(--cobalt-strong); }
+.pipe-step.warn { background: var(--warn-tint); border-color: var(--warn-line); color: var(--warn); }
+.pipe-arrow svg { width: 13px; height: 13px; color: var(--muted); }
+.obs { display: flex; flex-direction: column; }
+.obs-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 2px var(--s3); align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
+.obs-item:first-child { border-top: 0; }
+.obs-time { font-size: var(--t-xs); color: var(--slate); padding-top: 2px; }
+.obs-title { font-weight: 600; font-size: var(--t-sm); }
+.obs-sub { font-size: var(--t-xs); color: var(--slate); overflow-wrap: anywhere; }
+.obs-item.is-rule .obs-title { color: var(--crit); }
+.obs-tags { display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 520px) { .obs-item { grid-template-columns: minmax(0, 1fr); } .obs-tags { justify-content: flex-start; } }
+
 body.is-live .toasts { display: none; }
 
 /* ---------- presentation mode ----------

@@ -471,3 +471,29 @@ export function connectionView({ device = null, state = null, events = [], now =
   if (status === "OFFLINE") return { tone: "warn", label: "Offline", caption: "" };
   return { tone: "neutral", label: status === "ENROLLED" ? "Never connected" : status || "—", caption: "" };
 }
+
+/**
+ * One stored vision observation as the Camera & vision page shows it: only what the gateway stored. `auth` is the
+ * gateway's own verdict label ("ML-DSA-65:vision-1" for a verified signature; null when posted with the ingest
+ * token). Synthetic detections (attack simulation) are flagged, never passed off as camera output.
+ */
+export function observationView(o) {
+  const auth = o.auth || null;
+  const [alg, signer] = auth && auth.includes(":") ? auth.split(":", 2) : [auth, null];
+  const health = o.event_type === "camera_health";
+  const details = o.details || {};
+  return {
+    key: o.observation_id,
+    ts: o.received_at,
+    deviceId: o.device_id,
+    health,
+    title: health ? `Camera health: ${(details.state || "unknown").replace(/_/g, " ")}` : `${cap(o.object || "object")} detected`,
+    confidence: health || !Number.isFinite(o.confidence) ? null : o.confidence,
+    zone: o.zone ? `${o.zone.replace(/_/g, " ")}${o.zone_kind && !o.zone.includes(o.zone_kind) ? ` (${o.zone_kind})` : ""}` : null,
+    rule: o.anomaly ? (o.anomaly_reason || "rule matched").replace(/_/g, " ") : null,
+    model: o.model ? `${o.model.name} ${o.model.version}` : null,
+    signed: !!(alg && /ML-DSA/i.test(alg)),
+    alg, signer,
+    synthetic: !!((o.model && o.model.name === "synthetic") || details.simulated),
+  };
+}
