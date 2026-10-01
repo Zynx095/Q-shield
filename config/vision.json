@@ -1,6 +1,6 @@
 {
   "device_id": "DEVICE-001",
-  "camera": { "source": 0, "backend": "auto", "width": 640, "height": 480, "target_fps": 5 },
+  "camera": { "source": 1, "backend": "auto", "width": 640, "height": 480, "target_fps": 5 },
   "model": {
     "path": "ai/models/yolo11n.pt",
     "name": "yolo11n",
