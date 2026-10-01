@@ -95,6 +95,16 @@
   .btn.danger:hover:not(:disabled), .btn.danger-solid:hover:not(:disabled) { box-shadow: var(--glow-danger); }
   .btn.ghost:hover:not(:disabled) { transform: none; box-shadow: none; }
 }
+/* press: a quick physical settle (no ripple); the release eases back over --dur-release */
+.btn:active:not(:disabled), .btn.ghost:active:not(:disabled), .btn.primary:active:not(:disabled), .btn.accent:active:not(:disabled),
+.btn.danger:active:not(:disabled), .btn.danger-solid:active:not(:disabled) {
+  transform: scale(0.98); box-shadow: none;
+  transition-duration: var(--dur-press); transition-timing-function: var(--ease-press);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn:active:not(:disabled), .btn.ghost:active:not(:disabled), .btn.primary:active:not(:disabled), .btn.accent:active:not(:disabled),
+  .btn.danger:active:not(:disabled), .btn.danger-solid:active:not(:disabled) { transform: none; }
+}
 .btn:disabled, .btn.primary:disabled, .btn.accent:disabled, .btn.danger:disabled, .btn.danger-solid:disabled {
   cursor: not-allowed; background: var(--surface-2); border-color: var(--line); color: var(--muted);
 }
