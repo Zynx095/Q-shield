@@ -73,4 +73,5 @@ export function mountAmbient(host) {
     }
     host.appendChild(layer);
   });
+  document.documentElement.classList.add("ambient-on");
 }

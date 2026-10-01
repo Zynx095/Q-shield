@@ -8,6 +8,8 @@
   contain: strict;
 }
 #app { position: relative; z-index: 1; }
+/* a blurred, translucent topbar would re-blur the moving rows every frame: go near-solid while they are on */
+.ambient-on .topbar { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(244, 246, 248, 0.97); }
 
 .amb-layer {
   position: absolute; inset: 0;
