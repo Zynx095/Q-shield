@@ -131,3 +131,45 @@ def test_append_only_head_advances(chain):
     h = chain.head()
     chain.append_event("x", {}, ts=5.0)
     assert chain.head()["seq"] == h["seq"] + 1
+
+
+class _CountingSigner(EvidenceSigner):
+    calls = 0
+
+    def verify(self, digest_hex, sig_hex):
+        type(self).calls += 1
+        return super().verify(digest_hex, sig_hex)
+
+
+def test_repeat_verification_skips_unchanged_signatures_but_still_catches_tampering(store, pqc_backend, keys):
+    """The dashboard re-verifies the chain often. A signature already verified for an unchanged (event_hash,
+    signature, key) is not re-verified; every hash is still recomputed, so any edit is still found."""
+    k, _ = keys
+    _CountingSigner.calls = 0
+    chain = EvidenceChain(store, _CountingSigner(pqc_backend, k.secret_key, k.public_key, "ev-1"))
+    es = fill(chain, 5)
+    assert chain.verify_chain().ok and _CountingSigner.calls == 5
+    assert chain.verify_chain().ok and _CountingSigner.calls == 5            # nothing changed: no ML-DSA work
+    fill(chain, 1)
+    assert chain.verify_chain().ok and _CountingSigner.calls == 6            # only the new entry is verified
+
+    store.execute("UPDATE evidence_chain SET payload=? WHERE seq=2", (json.dumps({"i": 99}),))
+    v = chain.verify_chain()
+    assert not v.ok and v.first_bad_seq == 2 and v.reason == "hash_mismatch"
+    store.execute("UPDATE evidence_chain SET payload=? WHERE seq=2", (es[1]["payload"],))
+    assert chain.verify_chain().ok
+
+    # rewrite entry 4 consistently (new payload, recomputed hash) but keep its old signature: the cache key changes,
+    # so the signature is checked again and fails
+    e4 = es[3]
+    body = {k2: e4[k2] for k2 in ("seq", "event_id", "ts", "device_id", "event_type", "source", "trust_state",
+                                  "trust_score", "payload", "prev_hash", "key_id")} | {"payload": json.dumps({"i": 7})}
+    store.execute("UPDATE evidence_chain SET payload=?, event_hash=? WHERE seq=4", (body["payload"], compute_hash(e4["prev_hash"], body)))
+    v = chain.verify_chain()
+    assert not v.ok and v.first_bad_seq == 4 and v.reason == "invalid_signature"
+
+    store.execute("UPDATE evidence_chain SET payload=?, event_hash=? WHERE seq=4", (e4["payload"], e4["event_hash"]))
+    assert chain.verify_chain().ok
+    store.execute("UPDATE evidence_chain SET signature=? WHERE seq=5", (es[0]["signature"],))   # a real but wrong signature
+    v = chain.verify_chain()
+    assert not v.ok and v.first_bad_seq == 5 and v.reason == "invalid_signature"

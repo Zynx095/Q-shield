@@ -94,6 +94,10 @@ class EvidenceChain:
         signed chain whenever PQC keys are provisioned."""
         self.store, self.signer = store, signer
         self._lock = threading.Lock()
+        # (event_hash, SHA-256(signature), key_id) triples whose ML-DSA signature already verified. A repeat
+        # verification recomputes every hash but skips the signature check for an unchanged triple: any edit to an
+        # entry changes its recomputed hash, its stored hash or its signature, and so misses this cache.
+        self._sig_ok: set[tuple[str, str, str]] = set()
         store.ensure_schema(SCHEMA)
 
     # ------------------------------------------------------------------ write
@@ -152,8 +156,11 @@ class EvidenceChain:
         if self.signer is not None:
             if entry["key_id"] != self.signer.key_id:
                 return "unknown_key"
-            if not self.signer.verify(entry["event_hash"], entry["signature"]):
-                return "invalid_signature"
+            seen = (entry["event_hash"], hashlib.sha256(str(entry["signature"]).encode()).hexdigest(), entry["key_id"])
+            if seen not in self._sig_ok:
+                if not self.signer.verify(entry["event_hash"], entry["signature"]):
+                    return "invalid_signature"
+                self._sig_ok.add(seen)
         return None
 
     def verify_chain(self, entries: list[dict] | None = None) -> VerifyReport:
