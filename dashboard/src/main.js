@@ -16,7 +16,7 @@ import { installModal, isModalOpen } from "./components/modal.js";
 import { installChartHover } from "./components/chart.js";
 import { sidebar, topbar } from "./components/shell.js";
 import { icon } from "./components/icons.js";
-import { mountAmbient, setPosture } from "./components/ambient.js";
+import { mountAmbient, setAmbientEnabled, setPosture } from "./components/ambient.js";
 import { signInView } from "./pages/signin.js";
 import * as overview from "./pages/overview.js";
 import * as devices from "./pages/devices.js";
@@ -177,6 +177,7 @@ document.addEventListener("change", (e) => {
   if (!a) return;
   if (a.dataset.action === "focus") setFocus(a.value);
   else if (a.dataset.action === "ev-device") { UI.evidenceDevice = a.value; scheduleRender(); }
+  else if (a.dataset.action === "ambient") { setAmbientEnabled(a.checked); scheduleRender(); }
 });
 
 document.addEventListener("keydown", (e) => {

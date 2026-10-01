@@ -4,6 +4,7 @@ import { dateTime, duration } from "../lib/format.js";
 import { explain } from "../lib/api.js";
 import { S, listOperators } from "../store.js";
 import { icon } from "../components/icons.js";
+import { ambientEnabled } from "../components/ambient.js";
 import { banner, loadingPanel } from "../components/states.js";
 import { st } from "../components/status.js";
 
@@ -50,6 +51,13 @@ export function render({ rerender }) {
         ${!tls ? banner("warn", "alert", "Not encrypted.", "Use HTTPS (QSHIELD_TLS_CERT, QSHIELD_TLS_KEY) outside a trusted network.") : ""}
       </div></section>
   </div>
+  <section class="panel section"><div class="panel-head"><h2 class="panel-title">${icon("eye")}Display</h2></div>
+    <div class="panel-body stack-sm">
+      <label class="check-row"><input type="checkbox" data-action="ambient" ${ambientEnabled() ? "checked" : ""}>
+        <span><span class="strong">Ambient background</span>
+        <span class="caption">Faint algorithm names drifting behind the panels, tinted by the security posture. Turn it off on low-power machines. Remembered for this tab.</span></span></label>
+      ${matchMedia("(prefers-reduced-motion: reduce)").matches ? html`<p class="caption">This system asks for reduced motion: the background stays still and sections appear without animation.</p>` : ""}
+    </div></section>
   ${me.role === "admin" ? html`<section class="panel section"><div class="panel-head"><h2 class="panel-title">${icon("user")}Operators</h2><span class="meta">Managed with python scripts/operators.py or the admin API</span></div>
     <div class="panel-body table-wrap">${roster.error ? banner("crit", "xCircle", "Could not load operators.", explain(roster.error))
       : !roster.data ? loadingPanel(3)

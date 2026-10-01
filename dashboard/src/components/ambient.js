@@ -73,5 +73,25 @@ export function mountAmbient(host) {
     }
     host.appendChild(layer);
   });
-  document.documentElement.classList.add("ambient-on");
+  apply(ambientEnabled());
+}
+
+// ---------------------------------------------------------------------------------------------- on / off (Settings)
+const PREF = "qshield_ambient";             // per tab, like the operator session; "off" when switched off
+
+export function ambientEnabled() {
+  try { return sessionStorage.getItem(PREF) !== "off"; } catch { return true; }
+}
+
+export function setAmbientEnabled(on) {
+  try { if (on) sessionStorage.removeItem(PREF); else sessionStorage.setItem(PREF, "off"); } catch { /* memory only */ }
+  apply(on);
+}
+
+function apply(on) {
+  const host = document.getElementById("ambient");
+  if (!host) return;
+  host.hidden = !on;                                       // display:none: nothing painted, animations stop
+  document.documentElement.classList.toggle("ambient-on", on);
+  if (on && posture) setPosture(posture, { force: true }); // restarted animations need their posture rate again
 }

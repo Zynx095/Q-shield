@@ -459,6 +459,9 @@ a.chip { transition: border-color var(--dur-1) var(--ease); }
 .modal-body { padding: var(--s2) var(--s6) var(--s5); display: flex; flex-direction: column; gap: var(--s4); }
 .modal-foot { padding: var(--s4) var(--s6); border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: var(--s3); background: var(--surface-2); border-radius: 0 0 var(--r-lg) var(--r-lg); }
 .field { display: flex; flex-direction: column; gap: 6px; }
+.check-row { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--s3); align-items: start; cursor: pointer; max-width: 72ch; }
+.check-row input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--cobalt); cursor: pointer; }
+.check-row .caption { display: block; margin-top: 2px; }
 .field label { font-weight: 600; font-size: var(--t-sm); }
 .field .hint { font-size: var(--t-xs); color: var(--slate); }
 .input, .textarea {
