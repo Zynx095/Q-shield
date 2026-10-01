@@ -34,7 +34,7 @@ export function render({ params }) {
   const limit = highlight ? Math.max(UI.evidenceLimit, blocks.filter((b) => b.seq >= highlight).length + 2) : UI.evidenceLimit;
 
   return html`${head}
-  <section class="panel">
+  <section class="panel" data-reveal>
     <div class="chain-head">
       ${seal(v, ev)}
       <div class="stack-sm" style="align-items:flex-end">
@@ -49,8 +49,8 @@ export function render({ params }) {
       <div class="fact"><div class="fact-label">Head</div><div class="fact-value"><span class="mono">#${v && v.head ? v.head.seq : "—"} ${v ? short(v.head_hash, 14) : ""}</span></div></div>
     </div>
   </section>
-  <div class="section">${banner("info", "info", "Scope of this guarantee.", "The gateway recomputes every hash and checks every signature; the browser re-checks only that each entry points at the hash before it. The chain is not anchored externally, so someone holding both the database and the signing key could rewrite it.")}</div>
-  <div class="row-between section">
+  <div class="section" data-reveal>${banner("info", "info", "Scope of this guarantee.", "The gateway recomputes every hash and checks every signature; the browser re-checks only that each entry points at the hash before it. The chain is not anchored externally, so someone holding both the database and the signing key could rewrite it.")}</div>
+  <div class="row-between section" data-reveal>
     <div class="seg" role="group" aria-label="Filter entries">${FILTERS.map(([k, label]) => html`<button type="button" data-action="ev-filter" data-filter="${k}" aria-pressed="${UI.evidenceFilter === k}">${label}</button>`)}</div>
     ${S.devices.length ? html`<label class="row" style="gap:8px"><span class="caption">Device</span><select class="select" data-action="ev-device" aria-label="Filter by device">
       <option value="all" ${UI.evidenceDevice === "all" ? "selected" : ""}>All devices</option>
