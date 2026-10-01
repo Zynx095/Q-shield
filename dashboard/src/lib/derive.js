@@ -129,7 +129,37 @@ function primaryReason(reasons) {
   return [...pool].sort((a, b) => Math.abs(b.impact || 0) - Math.abs(a.impact || 0))[0] || null;
 }
 
-function changeItem(c, eventsById, consumed, evidenceByTrustEvent) {
+/**
+ * Messages the gateway REJECTED and the trust engine counts only as bounded attack pressure (their authenticity class
+ * is UNAUTHENTICATED: any network party could have sent them). The note says what the gateway actually checked.
+ */
+export function rejectionNote(eventType, sigAlg = "ML-DSA") {
+  switch (eventType) {
+    case "pqc_invalid_signature":
+    case "pqc_handshake_invalid_signature":
+      return `${sigAlg} signature did not verify; bounded pressure only.`;
+    case "pqc_malformed_signature":
+      return "Signature could not be parsed; bounded pressure only.";
+    case "pqc_observation_replay":
+      return "Previously accepted signed observation was replayed; replay rejected.";
+    case "pqc_handshake_replay":
+      return "Session handshake was replayed; replay rejected.";
+    case "pqc_session_replayed_or_reordered_message":
+      return "Encrypted session message was replayed or reordered; rejected.";
+    case "pqc_session_decryption_failed":
+      return "Session message failed AES-256-GCM authentication; rejected.";
+    case "invalid_tag":
+      return "HMAC-SHA256 tag did not verify (forged or corrupted message); bounded pressure only.";
+    case "replay_or_stale_counter":
+      return "Device message counter was replayed or stale; replay rejected.";
+    case "auth_profile_mismatch":
+      return "Message used a different authentication profile than the device enrolled with; rejected.";
+    default:
+      return null;
+  }
+}
+
+function changeItem(c, eventsById, consumed, evidenceByTrustEvent, sigAlg) {
   const stateChange = c.kind === "created" || c.previous_state !== c.new_state;
   const primary = primaryReason(c.reasons);
   const linked = [];
@@ -138,6 +168,8 @@ function changeItem(c, eventsById, consumed, evidenceByTrustEvent) {
     if (m && eventsById.has(Number(m[1]))) { linked.push(eventsById.get(Number(m[1]))); consumed.add(Number(m[1])); }
   }
   const delta = (c.new_score ?? 0) - (c.previous_score ?? c.new_score ?? 0);
+  const rejectedBy = linked.find((e) => rejectionNote(e.event_type));
+  const rejected = !!rejectedBy || (primary && primary.authenticity === "UNAUTHENTICATED");
   let title, sub = null, tone;
   if (stateChange) {
     title = transitionTitle(c.previous_state, c.new_state, c.kind);
@@ -146,13 +178,14 @@ function changeItem(c, eventsById, consumed, evidenceByTrustEvent) {
     else if (primary && primary.reason) sub = cleanReason(primary.reason);
   } else {
     title = linked[0] ? eventLabel(linked[0].event_type) : signalLabel(primary && primary.signal);
+    if (rejectedBy) sub = rejectionNote(rejectedBy.event_type, sigAlg);
     if (primary && primary.signal === "network_liveness") {
       title = primary.impact < 0 ? "Liveness fading: no accepted device messages" : "Liveness restored";
     }
     tone = delta < 0 ? "warn" : delta > 0 ? "ok" : "neutral";
   }
   return {
-    key: c.event_id, ts: c.timestamp, type: stateChange ? "state" : "score", title, sub: cap(sub), tone,
+    key: c.event_id, ts: c.timestamp, type: stateChange ? "state" : "score", title, sub: cap(sub), tone, rejected,
     isState: stateChange, stateFrom: c.previous_state, stateTo: c.new_state,
     scoreFrom: c.previous_score, scoreTo: c.new_score, delta,
     signals: (c.reasons || []).map((r) => ({ ...r, label: signalLabel(r.signal), authLabel: r.authenticity ? (AUTH[r.authenticity] || {}).label || r.authenticity : null })),
@@ -163,9 +196,9 @@ function changeItem(c, eventsById, consumed, evidenceByTrustEvent) {
   };
 }
 
-function eventItem(e) {
+function eventItem(e, sigAlg) {
   const d = e.details || {};
-  let title = eventLabel(e.event_type), sub = null;
+  let title = eventLabel(e.event_type), sub = rejectionNote(e.event_type, sigAlg);
   let tone = e.severity === "high" ? "crit" : e.severity === "medium" ? "warn" : "neutral";
   if (e.event_type === "operator_action") {
     title = `${d.operator_id || "Operator"} ${OPERATOR_ACTIONS[d.action] || String(d.action || "acted").toLowerCase()}`;
@@ -179,10 +212,8 @@ function eventItem(e) {
     tone = "crit"; sub = failureLabel(d.reason);
   } else if (e.event_type === "recovery_completed") {
     tone = "ok";
-  } else if (e.event_type === "invalid_tag") {
-    sub = "HMAC tag did not verify: forged or corrupted";
   }
-  return { key: `ev-${e.id}`, ts: e.received_at, type: "event", title, sub, tone, isState: false, events: [e],
+  return { key: `ev-${e.id}`, ts: e.received_at, type: "event", title, sub, tone, rejected: !!rejectionNote(e.event_type), isState: false, events: [e],
     signals: [], triggers: [], caps: [], evidence: null, operator: d.operator_id || null, related: [] };
 }
 
@@ -190,11 +221,11 @@ function eventItem(e) {
  * One chronological story for a device: trust changes joined with the gateway events that caused them, the
  * operator who acted, and the evidence-chain entry that seals each change. Newest first.
  */
-export function buildTimeline({ history = [], events = [], deviceId = null, evidenceByTrustEvent = null, includeSystem = false }) {
+export function buildTimeline({ history = [], events = [], deviceId = null, evidenceByTrustEvent = null, includeSystem = false, sigAlg = "ML-DSA" }) {
   const eventsById = new Map(events.map((e) => [e.id, e]));
   const consumed = new Set();
   const asc = [...history].sort((a, b) => a.timestamp - b.timestamp);
-  let items = asc.map((c) => changeItem(c, eventsById, consumed, evidenceByTrustEvent));
+  let items = asc.map((c) => changeItem(c, eventsById, consumed, evidenceByTrustEvent, sigAlg));
 
   // Fold runs of small "clean evidence rebuilt trust" steps into one readable entry.
   const folded = [];
@@ -236,7 +267,7 @@ export function buildTimeline({ history = [], events = [], deviceId = null, evid
         && events.some((x) => x.event_type === "twin_expected_updated" && x.device_id === e.device_id && Math.abs(x.received_at - e.received_at) < 2)) {
       continue;                                       // the "Known-good state updated" entry already names the operator
     }
-    standalone.push(eventItem(e));
+    standalone.push(eventItem(e, sigAlg));
   }
   // Enforcement repeats for every refused message: show one entry per containment episode, with the count.
   const episodes = [];
@@ -408,4 +439,35 @@ export function statePath(historyDesc = []) {
     out.push({ state: c.new_state, ts: c.timestamp });
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------------------------- connection
+const RESTRICTED = new Set(["QUARANTINED", "RECOVERING", "VERIFIED"]);
+
+/**
+ * What to say about a device's connection. A quarantined device whose normal-channel messages the gateway is
+ * refusing is not "offline": the gateway authenticated those messages and logged the refusal (throttled, about one
+ * record per 10 s). Only a restricted device that is neither accepted on the recovery channel nor refused recently is
+ * reported offline.
+ */
+export function connectionView({ device = null, state = null, events = [], now = null, windowS = 30 } = {}) {
+  if (!device) return { tone: "neutral", label: "—", caption: "" };
+  const status = device.status;
+  if (RESTRICTED.has(state)) {
+    let lastRefused = -Infinity;
+    for (const e of events) {
+      if (e.device_id === device.device_id && e.event_type === "quarantine_access_blocked") lastRefused = Math.max(lastRefused, e.received_at);
+    }
+    const refusedRecently = Number.isFinite(now) && now - lastRefused <= windowS;
+    if (status === "ONLINE" && state !== "QUARANTINED") {
+      return { tone: "crit", label: "Blocked by quarantine", caption: "Reporting on the recovery channel only" };
+    }
+    if (refusedRecently || status === "ONLINE") {
+      return { tone: "crit", label: "Blocked by quarantine", caption: "Normal-channel messages are refused at the gateway" };
+    }
+    return { tone: "warn", label: "Offline", caption: "Quarantined and silent: no messages received recently" };
+  }
+  if (status === "ONLINE") return { tone: "ok", label: "Online", caption: "" };
+  if (status === "OFFLINE") return { tone: "warn", label: "Offline", caption: "" };
+  return { tone: "neutral", label: status === "ENROLLED" ? "Never connected" : status || "—", caption: "" };
 }

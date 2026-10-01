@@ -53,7 +53,7 @@ export function render({ params }) {
     <div class="fact"><div class="fact-label">Hardware</div><div class="fact-value">${d.hw || "—"}</div></div>
     <div class="fact"><div class="fact-label">Authentication</div><div class="fact-value">${AUTH_PROFILES[d.auth_profile] || d.auth_profile || "—"}</div></div>
     <div class="fact"><div class="fact-label">Firmware</div><div class="fact-value mono">${d.fw_version || "—"}</div></div>
-    <div class="fact"><div class="fact-label">Connection</div><div class="fact-value">${d.status === "ONLINE" ? "Online" : d.status === "OFFLINE" ? "Offline" : "Never connected"}${d.revoked ? html` <span class="tag crit">Revoked</span>` : ""}</div></div>
+    <div class="fact"><div class="fact-label">Connection</div><div class="fact-value">${m.connection.label}${d.revoked ? html` <span class="tag crit">Revoked</span>` : ""}${m.connection.caption ? html`<div class="caption">${m.connection.caption}</div>` : ""}</div></div>
     <div class="fact"><div class="fact-label">Last seen</div><div class="fact-value">${d.last_seen ? clock(isoToTs(d.last_seen)) : "Never"}${snap && Number.isFinite(snap.last_device_evidence_age_s) ? html` <span class="caption">${ago(snap.last_device_evidence_age_s)}</span>` : ""}</div></div>
     <div class="fact"><div class="fact-label">Vision signer</div><div class="fact-value">${signers.length ? signers.map((s) => `${s.signer_id} (${s.algorithm}, ${s.status})`).join(", ") : "None authorised"}</div></div>
   </div>

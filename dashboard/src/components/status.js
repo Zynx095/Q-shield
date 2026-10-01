@@ -33,10 +33,13 @@ export function authTag(auth) {
   if (!auth) return "";
   if (auth === "DEVICE_HMAC" || /hmac/i.test(auth)) return html`<span class="tag hmac">HMAC-SHA256</span>`;
   if (auth === "SIGNER_MLDSA" || /ML-DSA/i.test(auth)) return html`<span class="tag pqc">ML-DSA-65</span>`;
-  if (auth === "UNAUTHENTICATED") return html`<span class="tag crit">Unauthenticated</span>`;
+  // UNAUTHENTICATED signals exist only because the gateway rejected the message (forged, replayed...): say so.
+  if (auth === "UNAUTHENTICATED") return rejectedTag();
   if (auth === "TOKEN_ONLY") return html`<span class="tag">Token only</span>`;
   return html`<span class="tag">${auth}</span>`;
 }
+
+export const rejectedTag = () => html`<span class="tag crit" title="The gateway rejected this message; it counts only as bounded attack pressure">Attack rejected</span>`;
 
 export const simTag = (title = "Data from the software agent, not physical hardware") =>
   html`<span class="tag sim" title="${title}">Simulated</span>`;

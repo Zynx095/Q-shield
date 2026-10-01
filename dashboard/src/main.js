@@ -69,6 +69,7 @@ function paint() {
   const [page, title] = PAGES[route.name];
   const f = fleet();
   const bare = route.name === "live";
+  document.body.classList.toggle("is-live", bare);      // presentation mode: no toasts (see views.css)
   const counts = { incidents: f.open.length, recovery: f.activeRecoveries.length };
   const body = page.render({ params: route.params, rerender: scheduleRender });
   const shell = bare
@@ -138,7 +139,8 @@ function toast(tone, iconName, title, sub) {
 onStateChange((c) => {
   const m = stateMeta(c.to);
   UI.flash = { deviceId: c.deviceId, from: c.from, to: c.to, until: Date.now() + 6000 };
-  toast(m.tone === "ok-soft" ? "ok" : m.tone, m.icon, `${c.deviceId}: ${c.from} → ${c.to}`, m.line);
+  // Presentation mode shows the transition in its own state card; a toast would only cover the screen.
+  if (parseRoute().name !== "live") toast(m.tone === "ok-soft" ? "ok" : m.tone, m.icon, `${c.deviceId}: ${c.from} → ${c.to}`, m.line);
   setTimeout(scheduleRender, 6100);
 });
 

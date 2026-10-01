@@ -1,7 +1,8 @@
 // View models: everything a screen needs about a device, derived from the live store in one place.
 import { S, gatewayNow } from "./store.js";
 import {
-  buildIncidents, buildTimeline, chainView, factorView, posture, recoverySteps, scoreBreakdown, scoreSeries, statePath,
+  buildIncidents, buildTimeline, chainView, connectionView, factorView, posture, recoverySteps, scoreBreakdown, scoreSeries,
+  statePath,
 } from "./lib/derive.js";
 
 export const UI = {
@@ -38,13 +39,16 @@ export function deviceModel(id) {
   const current = rec ? rec.current : null;
   const recoveries = rec ? rec.history || [] : [];
   const evIndex = S.evidence.index;
-  const timeline = buildTimeline({ history, events: S.events, deviceId: id, evidenceByTrustEvent: evIndex });
+  const sigAlg = (S.system && S.system.pqc && S.system.pqc.sig_algorithm) || "ML-DSA";
+  const timeline = buildTimeline({ history, events: S.events, deviceId: id, evidenceByTrustEvent: evIndex, sigAlg });
   const incidents = buildIncidents({ deviceId: id, history, snapshot, recoveries, events: S.events, observations: S.observations,
     windowS: thresholds() ? thresholds().correlation_window_s : 60 });
   return {
     id, device, snapshot, history, access: d.access || null, twin: d.twin || null,
     recovery: current, recoveries, recoveryUnavailable: !!d.unavailable,
     factors: factorView(snapshot, history),
+    connection: connectionView({ device, state: snapshot && snapshot.state, events: S.events, now: gatewayNow() }),
+    sigAlg,
     breakdown: scoreBreakdown(snapshot),
     timeline, incidents,
     path: statePath(history),

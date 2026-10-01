@@ -254,7 +254,10 @@ class Demo:
         obs = after[: max(0, len(after) - before)]          # newest first
         self.say(f"{n} frames processed, {len(obs)} signed observations accepted over the ML-KEM session")
         for o in obs[:4]:
-            self.say(c("d", f"  {o.get('object')} conf {o.get('confidence', 0):.2f} rule_violation={o.get('anomaly')} "
+            if o.get("event_type") == "camera_health":       # by protocol: no object/confidence, only details.state
+                self.say(c("d", f"  camera health: {(o.get('details') or {}).get('state')} auth={o.get('auth', '')[:18]}"))
+                continue
+            self.say(c("d", f"  {o.get('object')} conf {o.get('confidence') or 0:.2f} rule_violation={o.get('anomaly')} "
                             f"auth={o.get('auth', '')[:18]}"))
 
     def show_chain(self) -> None:

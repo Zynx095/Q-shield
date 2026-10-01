@@ -3,7 +3,7 @@
 import { html } from "../lib/html.js";
 import { capLabel, eventLabel, factorLabel, stateMeta } from "../lib/copy.js";
 import { clock, dateTime, dayKey, dayLabel, duration, fixed, short } from "../lib/format.js";
-import { authTag, deltaText, stateBadge } from "./status.js";
+import { authTag, deltaText, rejectedTag, stateBadge } from "./status.js";
 import { icon } from "./icons.js";
 
 function causeList(it) {
@@ -59,7 +59,7 @@ export function timeline(items, { expanded = new Set(), limit = 30, deviceId = n
         <button class="tl-head" type="button" aria-expanded="${open}" aria-controls="${id}-d" data-action="toggle" data-id="${id}">
           <span class="tl-title">${it.title}${it.isState && it.stateTo ? html` ${stateBadge(it.stateTo)}` : ""}${it.group && it.group.count > 1 ? html` <span class="caption">${it.type === "event" ? `×${it.group.count}` : `${it.group.count} updates`}</span>` : ""}</span>
           ${Number.isFinite(it.scoreTo) ? html`<span class="tl-score"><span class="strong">${it.scoreTo}</span>${deltaText(it.delta)}</span>` : html`<span></span>`}
-          <span class="tl-sub">${sub}${auth ? html` ${authTag(auth)}` : ""}</span>
+          <span class="tl-sub">${sub}${it.rejected ? html` ${rejectedTag()}` : auth ? html` ${authTag(auth)}` : ""}</span>
         </button>
         <div class="tl-detail" id="${id}-d" ${open ? "" : "hidden"}>${open ? detail(it, deviceId) : ""}</div>
       </div>

@@ -8,8 +8,6 @@ import { icon } from "../components/icons.js";
 import { empty, loadingPanel } from "../components/states.js";
 import { simTag, stateBadge } from "../components/status.js";
 
-const CONN = { ONLINE: ["ok", "Online"], OFFLINE: ["warn", "Offline"], ENROLLED: ["neutral", "Never connected"] };
-
 export function render() {
   const head = html`<div class="page-head"><div><h1 class="h-page">Devices</h1><p class="lead">Every enrolled device, its trust and how it authenticates.</p></div></div>`;
   if (!S.loaded) return html`${head}${loadingPanel(6)}`;
@@ -22,13 +20,12 @@ export function render() {
       <thead><tr><th scope="col">Device</th><th scope="col">State</th><th scope="col">Trust</th><th scope="col">Connection</th><th scope="col">Hardware</th><th scope="col">Authentication</th><th scope="col">Firmware</th><th scope="col">Last seen</th><th scope="col">Incident</th></tr></thead>
       <tbody>${f.models.map((m) => {
         const d = m.device || {};
-        const [tone, word] = CONN[d.status] || ["neutral", d.status || "—"];
         const inc = m.incidents.find((i) => i.status !== "resolved");
         return html`<tr class="is-link" data-href="#/devices/${encodeURIComponent(m.id)}" data-key="dev-${m.id}">
           <td><a class="strong" href="#/devices/${encodeURIComponent(m.id)}">${m.id}</a>${d.revoked ? html` <span class="tag crit">Revoked</span>` : ""}</td>
           <td>${stateBadge(m.snapshot && m.snapshot.state)}</td>
           <td class="num strong">${m.snapshot && Number.isFinite(m.snapshot.score) ? m.snapshot.score : "—"}</td>
-          <td><span class="chip ${tone}" style="height:24px"><span class="dot"></span>${word}</span></td>
+          <td><span class="chip ${m.connection.tone}" style="height:24px" title="${m.connection.caption}"><span class="dot"></span>${m.connection.label}</span></td>
           <td>${d.hw || "—"} ${d.hw === "software-agent" ? simTag() : ""}</td>
           <td>${AUTH_PROFILES[d.auth_profile] || d.auth_profile || "—"}</td>
           <td class="mono">${d.fw_version || "—"}</td>

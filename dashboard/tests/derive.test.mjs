@@ -185,3 +185,45 @@ test("abort cycle: incident resolved by the second recovery, failed attempt coun
   assert.ok(path.includes("QUARANTINED", 3));              // back to quarantine after the abort
   assert.equal(storyProgress(statePath(AB.history), "TRUSTED").pos, 6);
 });
+
+// ---- presentation polish: rejected attacks, connection wording, presentation feed ----
+import { connectionView, rejectionNote } from "../src/lib/derive.js";
+import { meaningful } from "../src/pages/live.js";
+
+test("forged and replayed observations read as rejected attacks, with what the gateway checked", () => {
+  const items = buildTimeline({ history: FX.history, events: FX.events, deviceId: DEV, sigAlg: "ML-DSA-65" });
+  const forged = items.find((i) => i.title === "Forged observation rejected");
+  const replay = items.find((i) => i.title === "Replayed observation rejected");
+  assert.ok(forged.rejected && replay.rejected);
+  assert.equal(forged.sub, "ML-DSA-65 signature did not verify; bounded pressure only.");
+  assert.equal(replay.sub, "Previously accepted signed observation was replayed; replay rejected.");
+  const tag = items.find((i) => i.title === "Device message failed authentication");     // forged "all clear" while quarantined
+  assert.ok(tag.rejected && /HMAC-SHA256 tag did not verify/.test(tag.sub));
+  // genuine evidence is never labelled as a rejected attack
+  assert.ok(!items.find((i) => i.stateTo === "QUARANTINED" && i.isState).rejected);
+  assert.ok(!items.find((i) => i.stateTo === "SUSPICIOUS" && i.isState).rejected);
+  assert.equal(rejectionNote("visual_observation"), null);
+});
+
+test("presentation feed keeps security decisions and drops entries that changed nothing", () => {
+  const items = buildTimeline({ history: AB.history, events: AB.events, deviceId: DEV });
+  const feed = items.filter(meaningful);
+  assert.ok(items.some((i) => i.type === "score" && i.delta === 0));                // e.g. "Liveness fading ±0" exists ...
+  assert.ok(!feed.some((i) => i.type === "score" && i.delta === 0));                // ... but never takes a slot
+  assert.equal(feed.filter((i) => i.isState).length, items.filter((i) => i.isState).length);
+  assert.ok(feed.some((i) => i.type === "event" && i.events[0].event_type === "quarantine_access_blocked"));
+  assert.ok(feed.some((i) => i.rejected));
+});
+
+test("a quarantined device that is still talking is 'Blocked by quarantine', a silent one is offline", () => {
+  const dev = { device_id: DEV, status: "OFFLINE" };
+  const refused = [{ device_id: DEV, event_type: "quarantine_access_blocked", received_at: 1000 }];
+  assert.equal(connectionView({ device: dev, state: "QUARANTINED", events: refused, now: 1012 }).label, "Blocked by quarantine");
+  assert.equal(connectionView({ device: dev, state: "QUARANTINED", events: refused, now: 1200 }).label, "Offline");
+  assert.equal(connectionView({ device: dev, state: "QUARANTINED", events: [], now: 1012 }).label, "Offline");
+  const rec = connectionView({ device: { ...dev, status: "ONLINE" }, state: "RECOVERING", events: [], now: 1012 });
+  assert.deepEqual([rec.label, rec.caption], ["Blocked by quarantine", "Reporting on the recovery channel only"]);
+  assert.equal(connectionView({ device: { ...dev, status: "ONLINE" }, state: "TRUSTED" }).label, "Online");
+  assert.equal(connectionView({ device: dev, state: "TRUSTED" }).label, "Offline");               // genuine offline kept
+  assert.equal(connectionView({ device: { ...dev, status: "ENROLLED" }, state: null }).label, "Never connected");
+});
