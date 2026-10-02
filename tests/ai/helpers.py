@@ -29,6 +29,18 @@ class Clock:
         self.t += timedelta(seconds=s)
 
 
+class TickClock(Clock):
+    """Advances `step` seconds every time it is read: the pipeline reads it once per frame (step 0.2 = 5 fps)."""
+
+    def __init__(self, step: float = 0.2):
+        super().__init__()
+        self.step = step
+
+    def __call__(self):
+        self.t += timedelta(seconds=self.step)
+        return self.t
+
+
 def normal_frame(seed: int = 0) -> np.ndarray:
     return np.random.default_rng(seed).integers(60, 200, (48, 64, 3), dtype=np.uint8)
 

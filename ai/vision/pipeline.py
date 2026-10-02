@@ -1,7 +1,9 @@
 """Frames -> normalized observations. This module makes NO trust decisions.
 
 `anomaly` on an observation means only "matched a configured rule" (an object of a
-restricted class inside a restricted zone; a camera that is obstructed or lost). What that
+restricted class inside a restricted zone; a subject too close to the camera or approaching it
+fast, by image-space heuristics; a camera that is obstructed, lost, frozen, moved or degraded,
+see ai/vision/health.py). What that
 means for a device's trust is decided later, by the Phase 4 trust engine, together with
 other evidence. YOLO reports what it sees; it does not decide whether a device is
 compromised.
@@ -18,6 +20,7 @@ from typing import Callable
 from ai.vision.config import VisionConfig
 from ai.vision.detector import Detection, Detector
 from ai.vision.health import CameraHealthMonitor
+from ai.vision.proximity import ProximityTracker
 from ai.vision.zones import ZoneSet
 from backend.protocol.observation import (
     BBox, CameraState, EventType, ModelInfo, Observation, Source, ZoneKind,
@@ -37,6 +40,7 @@ class VisionPipeline:
         self.detector = detector
         self.zones = ZoneSet(cfg.zones, cfg.zone_anchor)
         self.health = CameraHealthMonitor(cfg.health)
+        self.proximity = ProximityTracker(cfg.proximity)
         self._clock = clock
         self._source = source
         self._last_seen: dict[tuple[str, str | None], datetime] = {}
@@ -49,18 +53,22 @@ class VisionPipeline:
         """frame: BGR ndarray, or None if the source failed to deliver one."""
         now = self._clock()
         out: list[Observation] = []
+        found = [] if frame is None else [d for d in self.detector.detect(frame)
+                                          if d.label in self._interest and d.confidence >= self.cfg.model.conf_threshold]
 
-        t = self.health.update(frame)
+        # Detected subjects are masked out of the viewpoint check: someone walking through is not a moved camera.
+        t = self.health.update(frame, now.timestamp(), [d.box for d in found])
         if t is not None:
             out.append(self._health_observation(now, t))
         if frame is None:
             return out
 
+        for reason, det, metrics in self.proximity.update(now.timestamp(), found):
+            out.append(self._visual_observation(now, det, self.zones.classify(det.box), reason, metrics))
+
         # Keep only the highest-confidence detection per (object, zone) key.
         best: dict[tuple[str, str | None], tuple[Detection, object]] = {}
-        for det in self.detector.detect(frame):
-            if det.label not in self._interest or det.confidence < self.cfg.model.conf_threshold:
-                continue
+        for det in found:
             zone = self.zones.classify(det.box)
             if zone is None and not self.cfg.emit.outside_zones:
                 continue
@@ -82,8 +90,12 @@ class VisionPipeline:
         last = self._last_emit.get(key)
         return last is None or (now - last).total_seconds() >= self.cfg.emit.repeat_interval_s
 
-    def _visual_observation(self, now: datetime, det: Detection, zone) -> Observation:
+    def _visual_observation(self, now: datetime, det: Detection, zone, proximity: str | None = None,
+                            metrics: dict | None = None) -> Observation:
         anomaly = bool(zone and zone.kind is ZoneKind.RESTRICTED and det.label in self._restricted)
+        reason = "restricted_class_in_restricted_zone" if anomaly else None
+        if proximity:                                  # an image-space proximity heuristic, reported separately
+            anomaly, reason = True, proximity
         x1, y1, x2, y2 = det.box
         return Observation(
             event_type=EventType.VISUAL_OBSERVATION,
@@ -96,9 +108,9 @@ class VisionPipeline:
             zone_kind=zone.kind if zone else None,
             bbox=BBox(x1=x1, y1=y1, x2=x2, y2=y2),
             anomaly=anomaly,
-            anomaly_reason="restricted_class_in_restricted_zone" if anomaly else None,
+            anomaly_reason=reason,
             model=self._model,
-            details={"anchor": self.cfg.zone_anchor},
+            details={"anchor": self.cfg.zone_anchor, **(metrics or {})},
         )
 
     def _health_observation(self, now: datetime, t) -> Observation:
@@ -107,6 +119,7 @@ class VisionPipeline:
         if t.stats is not None:
             details["mean_brightness"] = round(t.stats.mean_brightness, 2)
             details["texture"] = round(t.stats.texture, 3)
+        details.update(t.metrics)
         return Observation(
             event_type=EventType.CAMERA_HEALTH,
             device_id=self.cfg.device_id,

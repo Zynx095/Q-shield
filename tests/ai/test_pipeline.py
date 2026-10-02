@@ -93,27 +93,32 @@ def test_same_object_in_two_zones_gives_two_observations():
     assert {o.zone for o in p.process_frame(normal_frame())} == {"restricted_zone", "monitored_zone"}
 
 
-def test_camera_obstruction_reported_once_then_restored():
-    p, _, _ = setup()
+def frames(p, clock, frame, n, step=1.0):
     out = []
-    for _ in range(3):                       # consecutive_frames = 3 in the test config
+    for _ in range(n):
+        out += p.process_frame(frame)
+        clock.advance(step)
+    return out
+
+
+def test_camera_obstruction_reported_once_then_restored():
+    p, _, clock = setup()
+    out = []
+    for _ in range(3):                       # consecutive_frames = 3 and sustain_s = 2 (1 s apart) in the test config
         out += p.process_frame(dark_frame())
+        clock.advance(1)
     (o,) = out
     assert o.event_type is EventType.CAMERA_HEALTH and o.anomaly and o.details["state"] == "obstructed"
     assert o.details["reason"] == "dark_frame" and o.object is None and o.confidence is None
     assert p.process_frame(dark_frame()) == []           # no repeat while state unchanged
-    out = []
-    for _ in range(3):
-        out += p.process_frame(normal_frame())
-    (r,) = out
+    clock.advance(1)
+    (r,) = frames(p, clock, normal_frame(), 3)
     assert r.details["state"] == "ok" and r.anomaly is False
 
 
 def test_flat_frame_counts_as_obstruction():
-    p, _, _ = setup()
-    out = []
-    for _ in range(3):
-        out += p.process_frame(flat_frame())
+    p, _, clock = setup()
+    out = frames(p, clock, flat_frame(), 3)
     assert out[0].details["reason"] == "flat_frame"
 
 
@@ -125,15 +130,10 @@ def test_single_bad_frame_does_not_flap():
 
 
 def test_source_lost_and_recovery():
-    p, _, _ = setup()
-    out = []
-    for _ in range(3):                       # source_lost_after_failures = 3
-        out += p.process_frame(None)
-    (o,) = out
+    p, _, clock = setup()
+    (o,) = frames(p, clock, None, 3)          # source_lost_after_failures = 3
     assert o.details["state"] == "source_lost" and o.anomaly and o.anomaly_reason == "camera_source_lost"
-    out = []
-    for _ in range(3):
-        out += p.process_frame(normal_frame())
+    out = frames(p, clock, normal_frame(), 3)
     assert out[-1].details["state"] == "ok"
 
 

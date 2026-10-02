@@ -92,23 +92,23 @@ def test_camera_warm_up_keeps_auto_exposure_frames_out_of_health():
     pipeline they read as an obstructed lens, and the signed 'obstructed' observation cost the device trust before
     any attack (seen in a live --webcam demo). Live cameras discard their warm-up frames first."""
     from ai.vision.camera import warm_up
-    from tests.ai.helpers import dark_frame
+    from tests.ai.helpers import TickClock, dark_frame
 
     startup = [dark_frame()] * 8 + [normal_frame(i) for i in range(6)]
     cold = ListSink()
-    run(VisionPipeline(make_config(), FakeDetector(), Clock()), SequenceSource(startup), cold, 1000, max_frames=14,
+    run(VisionPipeline(make_config(), FakeDetector(), TickClock(0.5)), SequenceSource(startup), cold, 1000, max_frames=14,
         sleep=lambda s: None)
     assert [o.details["state"] for o in cold.items if o.event_type.value == "camera_health"] == ["obstructed", "ok"]
 
     src, warm = SequenceSource(startup), ListSink()
     assert warm_up(src, 10) == 10
-    run(VisionPipeline(make_config(), FakeDetector(), Clock()), src, warm, 1000, max_frames=4, sleep=lambda s: None)
+    run(VisionPipeline(make_config(), FakeDetector(), TickClock(0.5)), src, warm, 1000, max_frames=4, sleep=lambda s: None)
     assert not [o for o in warm.items if o.event_type.value == "camera_health"]
 
     covered = SequenceSource([dark_frame()] * 30)                   # a lens that is really covered is still reported
     warm_up(covered, 10)
     out = ListSink()
-    run(VisionPipeline(make_config(), FakeDetector(), Clock()), covered, out, 1000, max_frames=10, sleep=lambda s: None)
+    run(VisionPipeline(make_config(), FakeDetector(), TickClock(0.5)), covered, out, 1000, max_frames=10, sleep=lambda s: None)
     assert [o.details["state"] for o in out.items] == ["obstructed"]
 
 

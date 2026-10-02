@@ -39,10 +39,34 @@ class ModelConfig:
 
 @dataclass(frozen=True)
 class HealthConfig:
+    """Camera-health thresholds (ai/vision/health.py). All are UNVALIDATED defaults for a 640x480 webcam indoors."""
     dark_mean_below: float = 12.0        # mean gray level (0-255) under which a frame counts as dark
     flat_texture_below: float = 1.5      # mean |neighbour pixel difference| under which a frame counts as flat
     consecutive_frames: int = 5          # frames of agreement before a state change is reported
     source_lost_after_failures: int = 10 # consecutive failed reads before the source counts as lost
+    sustain_s: float = 2.0               # ...and seconds of agreement: a flicker or a passing hand is not reported
+    bright_mean_above: float = 235.0     # mean gray level over which a frame counts as overexposed (blinded)
+    baseline_frames: int = 10            # healthy frames averaged into the reference view at start
+    view_similarity_below: float = 0.7   # structural similarity to the reference under which the view has changed
+    shift_min_fraction: float = 0.1      # a whole-image shift this large (share of the frame) is a viewpoint change
+    shift_peak_min: float = 0.3          # phase-correlation peak that counts as "the old scene, shifted"
+    low_light_similarity_min: float = 0.6  # a dark frame still this similar to the reference is low light, not covered
+    blur_ratio_below: float = 0.2        # sharpness below this share of the reference's counts as blurred
+    frozen_diff_below: float = 0.05      # mean |frame - previous frame| (gray levels) under which frames are identical
+    frozen_min_frames: int = 10          # identical frames in a row before the feed counts as frozen...
+    frozen_after_s: float = 3.0          # ...over at least this long
+
+
+@dataclass(frozen=True)
+class ProximityConfig:
+    """Image-space proximity heuristics (bounding-box area as a share of the frame). NOT a distance measurement."""
+    enabled: bool = True
+    classes: tuple[str, ...] = ("person",)
+    close_area_fraction: float = 0.35    # a subject's box covering this share of the frame is "too close"
+    close_frames: int = 2                # ...for this many frames in a row
+    approach_growth: float = 2.0         # box area grew this many times...
+    approach_window_s: float = 2.0       # ...within this window...
+    approach_min_area_fraction: float = 0.12  # ...ending at least this large: "rapid approach"
 
 
 @dataclass(frozen=True)
@@ -62,6 +86,7 @@ class VisionConfig:
     restricted_classes: tuple[str, ...] = ("person",)
     health: HealthConfig = field(default_factory=HealthConfig)
     emit: EmitConfig = field(default_factory=EmitConfig)
+    proximity: ProximityConfig = field(default_factory=ProximityConfig)
 
 
 def _sub(cls, data: dict[str, Any] | None, where: str):
@@ -77,7 +102,7 @@ def _sub(cls, data: dict[str, Any] | None, where: str):
 def parse_config(data: dict[str, Any]) -> VisionConfig:
     if not isinstance(data, dict):
         raise ConfigError("config must be a JSON object")
-    known = {"device_id", "camera", "model", "zones", "zone_anchor", "restricted_classes", "health", "emit"}
+    known = {"device_id", "camera", "model", "zones", "zone_anchor", "restricted_classes", "health", "emit", "proximity"}
     if set(data) - known:
         raise ConfigError(f"unknown top-level keys: {sorted(set(data) - known)}")
     device_id = data.get("device_id")
@@ -91,6 +116,10 @@ def parse_config(data: dict[str, Any]) -> VisionConfig:
     model = _sub(ModelConfig, model_raw, "model")
     health = _sub(HealthConfig, data.get("health"), "health")
     emit = _sub(EmitConfig, data.get("emit"), "emit")
+    prox_raw = dict(data.get("proximity") or {})
+    if "classes" in prox_raw:
+        prox_raw["classes"] = tuple(prox_raw["classes"])
+    proximity = _sub(ProximityConfig, prox_raw, "proximity")
 
     if not isinstance(camera.source, (int, str)) or isinstance(camera.source, bool):
         raise ConfigError("camera.source must be an index or a path/URL")
@@ -110,6 +139,21 @@ def parse_config(data: dict[str, Any]) -> VisionConfig:
         raise ConfigError("model.classes_of_interest must be a non-empty list of names")
     if health.consecutive_frames < 1 or health.source_lost_after_failures < 1:
         raise ConfigError("health frame counts must be >= 1")
+    if health.baseline_frames < 1 or health.frozen_min_frames < 2:
+        raise ConfigError("health.baseline_frames must be >= 1 and health.frozen_min_frames >= 2")
+    if health.sustain_s < 0 or health.frozen_after_s < 0 or health.frozen_diff_below < 0:
+        raise ConfigError("health durations and frozen_diff_below must be >= 0")
+    if not (0 <= health.dark_mean_below < health.bright_mean_above <= 255):
+        raise ConfigError("health: need 0 <= dark_mean_below < bright_mean_above <= 255")
+    for name in ("view_similarity_below", "shift_min_fraction", "shift_peak_min", "low_light_similarity_min", "blur_ratio_below"):
+        if not (0.0 < getattr(health, name) <= 1.0):
+            raise ConfigError(f"health.{name} must be in (0, 1]")
+    if not (0.0 < proximity.approach_min_area_fraction <= 1.0 and 0.0 < proximity.close_area_fraction <= 1.0):
+        raise ConfigError("proximity area fractions must be in (0, 1]")
+    if proximity.approach_growth <= 1.0 or proximity.approach_window_s <= 0 or proximity.close_frames < 1:
+        raise ConfigError("proximity: approach_growth must be > 1, approach_window_s > 0, close_frames >= 1")
+    if not all(isinstance(c, str) and c for c in proximity.classes):
+        raise ConfigError("proximity.classes must be a list of names")
     if emit.repeat_interval_s <= 0 or emit.absence_gap_s < 0:
         raise ConfigError("emit intervals invalid")
 
@@ -126,7 +170,7 @@ def parse_config(data: dict[str, Any]) -> VisionConfig:
     if len(set(names)) != len(names):
         raise ConfigError("zone names must be unique")
 
-    return VisionConfig(device_id, camera, model, zones, anchor, restricted, health, emit)
+    return VisionConfig(device_id, camera, model, zones, anchor, restricted, health, emit, proximity)
 
 
 def load_config(path: str | Path) -> VisionConfig:
