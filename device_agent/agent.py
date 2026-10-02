@@ -2,17 +2,18 @@
 
 Values are SIMULATED and the agent registers with hw="software-agent" so gateway data is
 never mistaken for real ESP32 sensor readings. It uses the same hmac-sha256-psk profile
-as the ESP32 (symmetric, not post-quantum).
+as the ESP32 (symmetric, not post-quantum). Readings come from a SensorSource
+(device_agent/sensors.py): simulated by default, or replayed from a recording.
 """
 from __future__ import annotations
 
 import json
-import random
 from typing import Protocol
 
 from backend.protocol.envelope import (
     MSG_HEARTBEAT, MSG_RECOVERY, MSG_REGISTER, MSG_TELEMETRY, build_hmac_envelope,
 )
+from device_agent.sensors import SensorSource, SimulatedSensors
 
 
 class Transport(Protocol):
@@ -21,7 +22,8 @@ class Transport(Protocol):
 
 class DeviceAgent:
     def __init__(self, device_id: str, secret: bytes, transport: Transport,
-                 fw_version: str = "agent-0.1", seed: int = 1, start_counter: int = 0):
+                 fw_version: str = "agent-0.1", seed: int = 1, start_counter: int = 0,
+                 sensors: SensorSource | None = None, hw: str = "software-agent"):
         self.device_id = device_id
         self._secret = secret
         self._t = transport
@@ -30,7 +32,8 @@ class DeviceAgent:
         self.tamper = False
         self.cfg_hash: str | None = None      # simulated configuration identity (None = not reported)
         self.pending_ack: str | None = None
-        self._rng = random.Random(seed)
+        self.sensors = sensors or SimulatedSensors(seed)
+        self.hw = hw                          # "software-agent" unless the readings really come from hardware
         self._uptime_ms = 0
 
     def _send(self, path: str, msg_type: str, payload: dict):
@@ -41,8 +44,7 @@ class DeviceAgent:
 
     def register(self):
         return self._send("register", MSG_REGISTER, {
-            "fw_version": self.fw_version, "hw": "software-agent",
-            "capabilities": ["temperature", "vibration", "tamper"],
+            "fw_version": self.fw_version, "hw": self.hw, "capabilities": list(self.sensors.capabilities),
         })
 
     def heartbeat(self, advance_ms: int = 5000):
@@ -50,10 +52,11 @@ class DeviceAgent:
         return self._send("heartbeat", MSG_HEARTBEAT, {"uptime_ms": self._uptime_ms})
 
     def sample(self) -> dict:
+        reading = self.sensors.read()
+        if isinstance(self.sensors, SimulatedSensors):
+            reading["tamper"] = self.tamper      # the simulated switch is driven by the agent (attack simulation)
         return {
-            "temperature_c": round(27.4 + self._rng.uniform(-0.3, 0.3), 2),
-            "vibration_g": round(abs(self._rng.gauss(0.02, 0.005)), 3),
-            "tamper": self.tamper,
+            **reading,
             "fw_version": self.fw_version,
             **({"cfg_hash": self.cfg_hash} if self.cfg_hash is not None else {}),
         }

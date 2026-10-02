@@ -63,6 +63,7 @@ class TelemetryPayload(BaseModel):
     humidity_pct: float | None = None
     pressure_hpa: float | None = None
     vibration_g: float | None = None
+    rssi_dbm: float | None = None        # network telemetry: Wi-Fi signal strength (informational unless a range is set)
     tamper: bool
     fw_version: str | None = None
     cfg_hash: str | None = None
@@ -89,6 +90,7 @@ def device_view(d: DeviceRecord, now: float, offline_after: float) -> dict:
         "humidity_pct": t.get("humidity_pct"),
         "pressure_hpa": t.get("pressure_hpa"),
         "vibration_g": t.get("vibration_g"),
+        "rssi_dbm": t.get("rssi_dbm"),
         "tamper": t.get("tamper"),
         "last_seen": _iso(d.last_seen),
     }

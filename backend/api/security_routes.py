@@ -21,6 +21,7 @@ class RecoveryReport(BaseModel):
     humidity_pct: float | None = None
     pressure_hpa: float | None = None
     vibration_g: float | None = None
+    rssi_dbm: float | None = None
     tamper: bool
     fw_version: str | None = None
     cfg_hash: str | None = None
