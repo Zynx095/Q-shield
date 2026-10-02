@@ -14,7 +14,7 @@ import os
 import sys
 from pathlib import Path
 
-from ai.vision.camera import OpenCVSource, warm_up
+from ai.vision.camera import OpenCVSource, describe_source, warm_up
 from ai.vision.config import ConfigError, VisionConfig, load_config
 from ai.vision.detector import YoloDetector
 from ai.vision.health import frame_stats
@@ -60,7 +60,7 @@ def _signed_sink(a, cfg: VisionConfig):
         pin = Path(a.gateway_key) if a.gateway_key else Path(a.keys_dir) / "pqc" / "gateway-kem-1.pub.json"
         rec = PqcKeyStore(pin.parent).load_public(pin.name[:-len(".pub.json")])
         gw_id, gw_pk = rec.key_id, rec.public_key
-    source_id = f"usb_webcam:{cfg.camera.source}" if isinstance(cfg.camera.source, int) else "usb_webcam:file"
+    _, source_id, _ = describe_source(cfg.camera.source)
     return SignedHttpSink(a.gateway, backend, a.signer_id, source_id, sk, secure=a.secure,
                           gateway_key_id=gw_id, gateway_public_key=gw_pk)
 
@@ -114,8 +114,9 @@ def main() -> int:
             sinks.append(HttpSink(a.gateway, _ingest_token()))
         if not sinks:
             sinks.append(JsonlSink("evidence/runtime/observations.jsonl"))
-        pipeline = VisionPipeline(cfg, detector)
-        if isinstance(cfg.camera.source, int):          # live camera: let auto-exposure settle first
+        kind, _, live = describe_source(cfg.camera.source)
+        pipeline = VisionPipeline(cfg, detector, source=kind)
+        if live:                                         # live camera or stream: let auto-exposure settle first
             warm_up(src, cfg.camera.warmup_frames)
         n = run(pipeline, src, FanoutSink(*sinks), cfg.camera.target_fps, a.max_frames)
         print(f"processed {n} frames")

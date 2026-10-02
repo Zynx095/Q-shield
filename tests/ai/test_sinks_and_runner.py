@@ -120,3 +120,23 @@ def test_warm_up_frames_is_configurable_and_validated():
     assert make_config(camera={"source": 0, "warmup_frames": 0}).camera.warmup_frames == 0
     with pytest.raises(ConfigError):
         make_config(camera={"source": 0, "warmup_frames": -1})
+
+
+def test_camera_sources_are_labelled_by_what_they_are():
+    from ai.vision.camera import describe_source
+    from backend.protocol.observation import Source
+
+    assert describe_source(1) == (Source.USB_WEBCAM, "usb_webcam:1", True)
+    assert describe_source("http://admin:pw@192.168.1.40:81/stream") == (Source.NETWORK_CAMERA, "network_camera:192.168.1.40:81", True)
+    assert describe_source("rtsp://cam.local/live") == (Source.NETWORK_CAMERA, "network_camera:cam.local", True)
+    assert describe_source("evidence/clip.mp4") == (Source.VIDEO_FILE, "video_file", False)
+
+
+def test_a_network_camera_observation_says_so():
+    from backend.protocol.observation import Source
+
+    p = VisionPipeline(make_config(), FakeDetector(), Clock(), source=Source.NETWORK_CAMERA)
+    out = [o for _ in range(3) for o in p.process_frame(None)]        # source_lost_after_failures = 3
+    (o,) = out
+    assert o.details["state"] == "source_lost" and o.source is Source.NETWORK_CAMERA
+    assert o.to_wire()["source"] == "network_camera"

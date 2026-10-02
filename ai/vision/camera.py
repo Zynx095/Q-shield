@@ -9,6 +9,23 @@ class FrameSource(Protocol):
     def release(self) -> None: ...
 
 
+STREAM_SCHEMES = ("http://", "https://", "rtsp://", "rtmp://", "udp://", "tcp://")
+
+
+def describe_source(source: int | str):
+    """What a configured camera source is, for the observation's `source` field and the signer's source id:
+    a device index is a local (USB or built-in) camera, a URL is a network camera stream (an ESP32-CAM serves MJPEG
+    over HTTP), anything else is a video file. Returns (Source, source_id, live)."""
+    from backend.protocol.observation import Source
+
+    if isinstance(source, int):
+        return Source.USB_WEBCAM, f"usb_webcam:{source}", True
+    if source.lower().startswith(STREAM_SCHEMES):
+        host = source.split("://", 1)[1].split("/", 1)[0].rsplit("@", 1)[-1]     # never keep credentials in an id
+        return Source.NETWORK_CAMERA, f"network_camera:{host}", True
+    return Source.VIDEO_FILE, "video_file", False
+
+
 class OpenCVSource:
     """USB webcam (index), video file, or stream URL via OpenCV. Frames are not saved."""
 

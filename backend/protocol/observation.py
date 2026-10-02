@@ -27,6 +27,8 @@ class EventType(str, Enum):
 
 class Source(str, Enum):
     USB_WEBCAM = "usb_webcam"
+    NETWORK_CAMERA = "network_camera"    # a camera stream over the network (e.g. an ESP32-CAM MJPEG endpoint)
+    VIDEO_FILE = "video_file"            # a recorded video: replay and tests, never live evidence
 
 
 class ZoneKind(str, Enum):
