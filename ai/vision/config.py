@@ -67,6 +67,7 @@ class ProximityConfig:
     approach_growth: float = 2.0         # box area grew this many times...
     approach_window_s: float = 2.0       # ...within this window...
     approach_min_area_fraction: float = 0.12  # ...ending at least this large: "rapid approach"
+    clear_after_s: float = 3.0           # an episode ends after the subject is gone or further away this long
 
 
 @dataclass(frozen=True)
@@ -150,8 +151,10 @@ def parse_config(data: dict[str, Any]) -> VisionConfig:
             raise ConfigError(f"health.{name} must be in (0, 1]")
     if not (0.0 < proximity.approach_min_area_fraction <= 1.0 and 0.0 < proximity.close_area_fraction <= 1.0):
         raise ConfigError("proximity area fractions must be in (0, 1]")
-    if proximity.approach_growth <= 1.0 or proximity.approach_window_s <= 0 or proximity.close_frames < 1:
-        raise ConfigError("proximity: approach_growth must be > 1, approach_window_s > 0, close_frames >= 1")
+    if proximity.approach_growth <= 1.0 or proximity.approach_window_s <= 0 or proximity.close_frames < 1 \
+            or proximity.clear_after_s < 0:
+        raise ConfigError("proximity: approach_growth must be > 1, approach_window_s > 0, close_frames >= 1, "
+                          "clear_after_s >= 0")
     if not all(isinstance(c, str) and c for c in proximity.classes):
         raise ConfigError("proximity.classes must be a list of names")
     if emit.repeat_interval_s <= 0 or emit.absence_gap_s < 0:

@@ -259,6 +259,25 @@ def test_slow_approach_is_not_rapid_and_too_close_is_reported_once():
     assert out[0].details["area_fraction"] >= 0.35
 
 
+def test_a_close_subject_the_detector_keeps_missing_is_one_episode():
+    """Regression (USB camera, Phase 17): a seated person at ~37% of the frame, missed by the detector in some frames
+    and with a jittering box, was reported as 'too close' 25 times in 90 s. It is one episode."""
+    p, det = setup()
+    learned(p)
+    rng = np.random.default_rng(9)
+    out = []
+    for i in range(150):                                              # 30 s at 5 fps
+        a = float(rng.uniform(0.3, 0.45))
+        side = a ** 0.5
+        det.next = [] if rng.random() < 0.3 else [person(0.5 - side / 2, 0.02, 0.5 + side / 2, 0.02 + side, conf=0.5)]
+        out += p.process_frame(view())
+    assert [o.anomaly_reason for o in out if o.anomaly_reason == "subject_too_close"] == ["subject_too_close"]
+    det.next = []
+    assert [o for o in feed(p, view, 4) if o.anomaly_reason] == []      # leaves: nothing reported...
+    out = _approach(p, det, [0.4, 0.42, 0.41])                       # ...and comes back close: a new episode
+    assert [o.anomaly_reason for o in out] == ["subject_too_close"]
+
+
 def test_a_far_subject_is_never_a_proximity_event():
     p, det = setup()
     learned(p)
