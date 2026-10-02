@@ -22,5 +22,6 @@ try {
     $pres.Close()
 }
 finally {
-    $app.Quit()
+    # PowerPoint is a single shared instance: quit only if nothing else (for example a deck the user has open) remains.
+    if ($app.Presentations.Count -eq 0) { $app.Quit() }
 }
