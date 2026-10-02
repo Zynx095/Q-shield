@@ -275,6 +275,26 @@ Tokens: random 256-bit (`secrets.token_urlsafe(32)`) from `QSHIELD_OPERATOR_TOKE
 - **Demo (Phase 11):** `scripts/demo_full.py` runs the real gateway (uvicorn) on scratch state and tells the whole story over HTTP. The trust ramp needs ~40 min of clean evidence at the documented parameters; the demo advances the gateway clock and labels it TIME-LAPSE instead of changing parameters.
 - **Engine correction found by the live demo:** see trust-engine.md §6.4 (out-of-order definition).
 
+## TD-21 — Final software hardening (*Phase 17*)
+
+- **Routine rejections are sampled, not dropped.** An unauthenticated flood must not grow storage without bound.
+  The trust engine's decisions must not change either. Each (event type, claimed identity) keeps 3 samples per 10 s
+  window, and the rest become one coalesced row carrying the count and the last time. That row is written before
+  the device's next authenticated message, so "time since the last violation" is unchanged. Retention prunes only
+  rows the engine has consumed. Alternatives rejected:
+  - per-IP rate limiting in the gateway: there is no reliable client IP behind proxies, and it adds state;
+  - dropping rejections: this loses forensic counts;
+  - aggregating on read: storage still grows.
+- **Camera interference is visual evidence.** A signed report that the camera is obstructed, frozen or turned away
+  makes the VISUAL modality present, so the existing fusion rules apply unchanged: with tamper it is a confirmed
+  incident, and alone it is a penalty only. No new cap or class was added, to avoid arbitrary scoring. Source loss,
+  degradation and proximity are excluded because they are ambiguous. Camera reports and rule matches from the same
+  signer are one modality.
+- **Proximity is an image-space heuristic.** There is no depth sensor or calibration, so no distance is claimed: only
+  the bounding-box share of the frame and its growth, labelled as such in every report. The trust weight is LOW.
+- **Hardware via adapters.** The gateway contract (`docs/hardware/device-protocol.md`) and byte-exact test vectors
+  are the interface. The simulated agent, replayed recordings and a future ESP32 are interchangeable senders.
+
 ---
 
 ## TD-16 — Testing

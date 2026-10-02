@@ -12,12 +12,17 @@ python scripts/demo_full.py --webcam --pace 2 --hold
    - `camera.source` is usually `0` for the built-in camera and `1` for the first USB camera.
    - If the configured camera is missing, the webcam step says so and the rest of the demo runs.
    - Another config can be used with `--vision-config <file>`.
-2. **Restricted zone.** By default the restricted zone is the **right half** of the camera frame. A person there is a
-   *real* rule violation: trust drops during the webcam step and the real detection drives the incident. For the
-   scripted story, keep the right half clear and point the camera at the protected area.
-3. **Screen.** Open the dashboard link the demo prints and choose **Presentation mode**, or go to `#/live`. It fits
+2. **Restricted zone and distance.** By default the restricted zone is the **right half** of the camera frame. A
+   person there is a *real* rule violation: trust drops during the webcam step and the real detection drives the
+   incident. A person whose box covers more than 35% of the frame is also reported once as a proximity heuristic,
+   which is a small penalty. For the scripted story, keep the right half clear, stand back from the camera and point
+   it at the protected area.
+3. **Do not cover or turn the camera during the run** unless you mean to show it. After 2 s it is reported as
+   obstructed or view changed, which is real evidence. Together with step 6's tamper report it is a confirmed
+   incident.
+4. **Screen.** Open the dashboard link the demo prints and choose **Presentation mode**, or go to `#/live`. It fits
    one screen at 1280x720, 1366x768 and 1440x900. Escape returns to the full console.
-4. **Second camera for the browser.** The browser preview on **Camera & vision** is local only. Most webcams serve
+5. **Second camera for the browser.** The browser preview on **Camera & vision** is local only. Most webcams serve
    one program at a time, so preview the *other* camera (for example the built-in one while the USB camera feeds the
    vision service). Preview needs `localhost` or HTTPS.
 
@@ -26,7 +31,7 @@ python scripts/demo_full.py --webcam --pace 2 --hold
 | Step | What happens (real gateway, over HTTP) | Point at |
 |---|---|---|
 | 1-2 | The simulated device joins with HMAC-SHA256 and sends telemetry. The digital twin matches the known-good state. | "Verified continuously": device, vision, twin |
-| 3 | The real webcam feeds YOLO11n. Observations are ML-DSA-65 signed and sent inside an ML-KEM-768 session. | Camera & vision page: pipeline strip, "ML-KEM session" tags |
+| 3 | The real webcam feeds YOLO11n. Observations are ML-DSA-65 signed and sent inside an ML-KEM-768 session. The demo counts clear observations, rule matches, proximity heuristics and camera-health reports separately. | Camera & vision page: pipeline strip, "ML-KEM session" tags, what each camera report measured |
 | 4 | A forged observation is rejected: its signature did not verify. | Feed: "Attack rejected" and the reason |
 | 5 | A replayed observation is rejected. Forged traffic is bounded pressure only. | Score dips but stays above quarantine |
 | 6 | The device reports its tamper switch open. The message is authentic; its content is abnormal. | SUSPICIOUS, tamper cap |
@@ -51,6 +56,7 @@ python scripts/demo_full.py --webcam --pace 2 --hold
 | Symptom | Fix |
 |---|---|
 | `webcam step NOT run: cannot open camera source N` | Wrong index or camera in use: run the probe, change `camera.source` or use `--vision-config`. Close the browser preview. |
-| Trust drops during step 3 | A person or object is in the restricted zone: real evidence. Explain it, or clear the right half and rerun. |
+| Trust drops during step 3 | A person or object is in the restricted zone, or a person is very close to the camera: real evidence. Explain it, or clear the right half, stand back and rerun. |
+| `transport: ... refused` after step 3 | The gateway refused observations (for example, a clock skew over 5 minutes). The line gives the reason. |
 | Dashboard asks for a token | Use the link the demo prints. The token is removed from the address bar after loading. |
 | Port in use | `--port 8766` |

@@ -20,9 +20,11 @@ it stops.
    - The gateway signs every evidence-chain entry with ML-DSA-65.
    - The **device** path is HMAC-SHA256 and is **not** post-quantum. ESP32 PQC feasibility is an open research item.
 
-4. **Vision as evidence, not as a verdict.** YOLO11n reports what the camera sees, and camera health reports
-   obstruction or loss. Only the trust engine decides what that means for a device. Sensor checks are configured
-   ranges, not machine learning.
+4. **Vision as evidence, not as a verdict, and the camera as part of the boundary.** YOLO11n reports what the camera
+   sees. The vision service also watches the camera itself: covered or blinded, frozen, turned or redirected,
+   degraded, and subjects very close to the lens (an image-space heuristic, not a distance). Only the trust engine
+   decides what that means. A blinded or turned camera plus an enclosure tamper report is a confirmed incident; the
+   camera alone never quarantines a device. Sensor checks are configured ranges, not machine learning.
 
 5. **Digital twin.** The expected (known-good) state, set by an operator, is compared with the device's
    authenticated self-reports, field by field and with the time each field was last reported. A match is evidence,

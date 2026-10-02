@@ -4,10 +4,10 @@ Persistent project memory. Read together with `docs/BUILD_CHECKPOINT.md`.
 Last updated: 2026-10-02.
 
 ## CURRENT PHASE
-Phases 0–16 implemented and tested. Phase 14 is the command-center UI rework (see **COMMAND CENTER UI (Phase 14)**); Phase 15 is the premium visual pass and the Camera & vision page (see **PREMIUM VISUAL PASS + CAMERA (Phase 15)**); Phase 16 is the final hardening and demo-readiness pass (see **FINAL HARDENING + DEMO READINESS (Phase 16)**). Remaining work is listed under **WHAT IS LEFT**.
+Phases 0–17 implemented and tested. Phase 17 is the final software hardening (see **FINAL SOFTWARE HARDENING (Phase 17)**). Phase 14 is the command-center UI rework (see **COMMAND CENTER UI (Phase 14)**); Phase 15 is the premium visual pass and the Camera & vision page (see **PREMIUM VISUAL PASS + CAMERA (Phase 15)**); Phase 16 is the final hardening and demo-readiness pass (see **FINAL HARDENING + DEMO READINESS (Phase 16)**). Remaining work is listed under **WHAT IS LEFT**.
 
 ## TEST COUNT
-**695 passed, 0 failed** (`python -m pytest -o addopts="" -q`, ~1.5 min). This includes the 38 dashboard JavaScript unit tests (`node --test dashboard/tests/*.test.mjs`: derive 21, reveal 4, ambient 4, camera 9), run through Node. The baseline before the continuous build was 544.
+**785 passed, 0 failed** (`python -m pytest -o addopts="" -q`, about 1.5 to 3 minutes depending on machine load). This includes the 40 dashboard JavaScript unit tests (`node --test dashboard/tests/*.test.mjs`: derive 23, reveal 4, ambient 4, camera 9), run through Node. Phase 16 ended at 695; the baseline before the continuous build was 544.
 
 ## COMPLETED
 | Phase | Feature | Status | Key code | Tests |
@@ -186,6 +186,48 @@ trust-engine.md §6.4 and covered by regression tests.
 - Reduced motion on all routes.
 - Gateway API: every dashboard endpoint under 15 ms on the demo gateway.
 
+## FINAL SOFTWARE HARDENING (Phase 17)
+
+No physical ESP32 was available. The USB webcam (index 1, "USB Video Device") and the built-in camera were.
+
+| Area | Change | Tests |
+|---|---|---|
+| Rejected traffic | An unauthenticated flood used to add one `security_events` row per message. `backend/security/rejections.py` now does three things. It keeps 3 samples per sender per 10 s window, with at most 120 per window. It coalesces the rest into a representative row with `aggregated`, `first_ts` and `last_ts`; that row is written before the device's next authenticated message. It prunes routine rows past 20 000, but only rows the trust engine has consumed. High-value events are never sampled. The dashboard shows `×count`. | `tests/fullstack/test_rejection_flood.py` (7). Trust state is identical with and without sampling. 5 of the 7 fail with sampling disabled. |
+| Vision session churn | The gateway answers 401 `session_expired` only for an unknown or expired session. The client then re-handshakes once, and only then. Any other refusal drops the observation and keeps the session. Backoff runs from 1 s to 60 s, with a budget of 20 handshakes per hour. `status()` reports diagnostics, printed by the vision CLI and the demo. | `tests/integration/test_vision_session_churn.py` (7, all fail against the previous client); `test_pqc_session.py` |
+| Camera as security boundary | New camera states: `frozen`, `view_changed` (`viewpoint_shift` with the measured shift, `scene_replaced`, `view_altered`) and `degraded` (`low_light`, `blurred`). Obstruction now distinguishes dark, flat and overexposed. A state is reported after 2 s and 5 frames of agreement. Detected people are masked out of the viewpoint check. Image-space proximity heuristics: `subject_too_close` and `rapid_approach`. All thresholds are config keys with defaults, so `config/vision.json` is unchanged. | `tests/ai/test_camera_security.py` (23) |
+| Trust integration | New kinds `camera_frozen`, `camera_view_changed` (both HIGH), `camera_degraded` (MEDIUM) and `subject_proximity` (LOW). Signed camera interference counts as VISUAL modality evidence. With tamper it gives `confirmed_incident`; with a sensor excursion, `correlated_incident`. Alone it is a penalty only. Weak evidence never confirms. The spec is updated first (trust-engine.md sections 3, 4.4, 6.3, 7.1, 9, 12, 13, 15, 16). | `tests/trust/test_camera_boundary.py` (35); `tests/fullstack/test_camera_boundary_e2e.py` (3, including the real pipeline, the ML-DSA sink, the gateway and quarantine) |
+| Hardware-ready interfaces | `device_agent/sensors.py` (`SimulatedSensors`, `ReplaySensors`); `rssi_dbm` network telemetry; device protocol test vectors (7 cases, byte-exact, gateway-accepted); `docs/hardware/device-protocol.md`, `hardware-architecture.md`, `wiring-plan.md`; network-camera labelling for an ESP32-CAM stream. Firmware: the JSON escaping syntax error is fixed; telemetry is compiled only once the wiring is declared; a 403 backs off. Still not compiled. | `tests/security/test_device_vectors.py` (5), `tests/integration/test_device_sensors.py` (7), `tests/ai/test_sinks_and_runner.py` |
+
+**Bugs found and fixed, each with a regression test that failed before the fix:**
+- Unbounded event growth from unauthenticated floods.
+- Session churn: every refused observation opened a new ML-KEM session.
+- Proximity flapping, found on the live USB camera: a seated person missed in some frames was reported as "too
+  close" 25 times in 90 s. It is now once.
+- The demo counted a proximity heuristic as a restricted-zone rule match.
+- The firmware's `jsonEscape` had a C++ syntax error.
+
+**Verified live (USB camera, index 1, YOLO11n on CPU):**
+- `python -m ai.vision probe --config config/vision.json` prints a 480x640 frame.
+- Two 90 s pipeline runs with the full health and proximity checks:
+  - warm-up of 15 frames in 1.6 s;
+  - about 5 frames/s, about 126 ms per frame at p50 (inference included);
+  - no failed reads and no camera-health events while a person sat and moved in view;
+  - the reference view learned, with the person masked out;
+  - person detections at confidence 0.40 to 0.83;
+  - restricted-zone rule matches every 5 s;
+  - one `subject_too_close`, at a box of 36 to 60% of the frame (after the fix).
+- Built-in camera, static scene, 75 frames: no events. The smallest frame-to-frame difference was 0.59 gray levels,
+  against the frozen threshold of 0.05.
+- **Not validated physically:** covering, turning, freezing or unplugging the camera. Nobody manipulated the camera
+  during these runs; those states are tested on synthetic frames only.
+- `python scripts/demo_full.py --webcam --pace 2 --hold` on the USB camera ran end to end:
+  - presentation mode at 1366x768 and 1280x720 showed TRUSTED → SUSPICIOUS → QUARANTINED → RECOVERING → VERIFIED
+    → RECOVERED → TRUSTED, with every check passed;
+  - a dashboard-against-API comparison passed 7 of 7: score and state on the overview and device pages, the
+    proximity explanation and rule-match count on Camera & vision, the chain length on Evidence, and no page
+    errors;
+  - the final state was TRUSTED 85, with the chain VERIFIED at 26 entries.
+
 ## HOW TO RUN
 ```
 python -m pytest -o addopts="" -q                   # full suite
@@ -203,7 +245,8 @@ The demo prints the dashboard URL with the operator token.
 - The browser camera preview is a local convenience. It is not evidence, and the signed observations never come from it. It needs HTTPS or localhost, and on most webcams it cannot share a camera with the vision service.
 - All device data is SIMULATED (software agent). The ESP32 firmware has never been compiled or flashed, and its path is HMAC-SHA256 only (not PQC).
 - No physical tamper test was ever performed.
-- The webcam step of the new demo was **not** re-run live this session because no camera was attached. The vision pipeline was live-verified in Phases 3–4.
+- The webcam step was run live on the USB camera in Phase 17 (start-up, warm-up, normal scene, person detection, proximity). Covering, turning, freezing and unplugging the camera were **not** staged physically; those camera states are tested on synthetic frames only.
+- Camera-health and proximity thresholds are unvalidated defaults. Proximity is an image-space heuristic: no distance is measured. The reference view is learned when the vision service starts.
 - Twin observed state is self-reported: it is evidence, not attestation.
 - The trust ramp takes about 40 minutes of clean evidence at the documented parameters. The demo uses a clearly labelled TIME-LAPSE clock and does not change parameters.
 - Trust parameters are design choices and have not been calibrated against data (trust-engine.md §16).
@@ -215,7 +258,8 @@ The demo prints the dashboard URL with the operator token.
 ## WHAT IS LEFT
 | Priority | Item | Notes |
 |---|---|---|
-| Done | Run `demo_full.py --webcam` live with a camera attached | Phase 16: built-in camera (index 0) via a scratch config; the configured USB camera (index 1) was not attached |
+| Done | Run `demo_full.py --webcam` live with a camera attached | Phase 17: the configured USB camera (index 1), full story to TRUSTED 85 |
+| High | Stage physical camera tests (cover, turn, unplug, approach) and set the camera thresholds from them | Thresholds in `HealthConfig` / `ProximityConfig` are unvalidated |
 | High | Real ESP32: compile, flash, wire the tamper switch and sensors, replace the software agent | Biggest credibility gap |
 | Done | Background timer for recovery deadlines | `RecoveryTimer` in `backend/recovery/orchestrator.py`, started/stopped with the gateway; tests in `tests/fullstack/test_recovery_timer.py` |
 | Done | Dashboard operator actions | See "OPERATOR CONTROLS" below |
