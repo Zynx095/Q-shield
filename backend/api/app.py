@@ -41,6 +41,7 @@ from backend.security.rejections import RejectionRecorder
 
 DASHBOARD_DIR = Path(__file__).resolve().parents[2] / "dashboard"
 AUTH_FAIL_LOG_INTERVAL_S = 10.0  # throttle so unauthenticated callers cannot flood the event table
+SESSION_GONE = frozenset({"unknown_session", "session_session_expired"})   # -> 401 "session_expired"
 
 
 class RegisterPayload(BaseModel):
@@ -283,6 +284,10 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
         rejections.record(clock(), dev, f"pqc_{e.reason}", e.severity,
                           {"via": via, "claimed_signer_id": signer_id, "observation_id": observation_id, "device_id": dev})
         detail = {401: "authentication_failed", 409: "replay_detected", 422: "malformed_request"}.get(e.status, "rejected")
+        if e.reason in SESSION_GONE:
+            # The only rejection a client must answer by opening a new ML-KEM session. Saying so reveals nothing about
+            # signatures or keys (session ids are random), and it lets clients stop re-handshaking on every other 401.
+            detail = "session_expired"
         raise HTTPException(e.status, detail)
 
     def _ingest_verified(env: SignedObservationEnvelope, via: str, expected_signer: str | None = None):

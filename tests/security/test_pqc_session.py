@@ -308,6 +308,23 @@ def test_secure_endpoint_unknown_session_and_bad_base64(pqc_client, pqc_world, c
                                                                 "ciphertext": "***"}).status_code == 422
 
 
+def test_only_a_gone_session_asks_the_client_to_handshake_again(pqc_client, pqc_world, clock):
+    """401 'session_expired' for an unknown or expired session; every other rejection stays 'authentication_failed',
+    so a client re-handshakes only when that can help (no session churn on rejected observations)."""
+    ch, sid = http_session(pqc_client, pqc_world, clock)
+    c, ct = ch.seal(b"{}")
+    r = pqc_client.post("/api/v1/observations/secure", json={"session_id": b64e(os.urandom(16)), "counter": c, "ciphertext": b64e(ct)})
+    assert (r.status_code, r.json()["detail"]) == (401, "session_expired")
+    bad = bytearray(ct)
+    bad[-1] ^= 1
+    r = pqc_client.post("/api/v1/observations/secure", json={"session_id": sid, "counter": c, "ciphertext": b64e(bytes(bad))})
+    assert (r.status_code, r.json()["detail"]) == (401, "authentication_failed")       # tampering is not "expired"
+    clock.advance(3601)
+    c2, ct2 = ch.seal(b"{}")
+    r = pqc_client.post("/api/v1/observations/secure", json={"session_id": sid, "counter": c2, "ciphertext": b64e(ct2)})
+    assert (r.status_code, r.json()["detail"]) == (401, "session_expired")
+
+
 def test_inner_signature_still_required_inside_session(pqc_client, pqc_operator, pqc_world, clock):
     ch, sid = http_session(pqc_client, pqc_world, clock)
     env = signed_env(pqc_world, clock)
