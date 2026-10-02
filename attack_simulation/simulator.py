@@ -252,6 +252,38 @@ class AttackSimulator:
         return self._run("correlated_multi_signal", "confirmed_incident (cap 30) -> QUARANTINED; normal access blocked",
                          act, lambda ev, b, a: a.get("state") == "QUARANTINED")
 
+    def _camera_report(self, state: str, reason: str) -> dict:
+        """A signed camera-health report as the vision service sends it (synthetic: no frame was analysed)."""
+        now = datetime.fromtimestamp(self.clock(), timezone.utc)
+        obs = Observation(event_type="camera_health", device_id=self.device_id, timestamp=iso_utc(now), source="usb_webcam",
+                          anomaly=state != "ok", anomaly_reason=f"camera_{state}" if state != "ok" else None,
+                          details={"state": state, "previous_state": "ok", "reason": reason, "simulated": True})
+        return self._signed(obs)
+
+    def camera_interference(self, state: str = "obstructed", reason: str = "dark_frame") -> AttackResult:
+        """The camera is covered, frozen or turned away (state: obstructed | frozen | view_changed). Alone it lowers
+        trust and never quarantines."""
+        def act():
+            env = self._camera_report(state, reason)
+            r = self.gw.post("/api/v1/observations/signed", json=env)
+            return [r.status_code], {"camera_state": state, "reason": reason, "observation_id": env["observation_id"]}
+        return self._run(f"camera_{state}", "HTTP 200; visual penalty (HIGH, 60 points on the visual factor); no "
+                         "incident, never QUARANTINED on its own", act,
+                         lambda ev, b, a: (a.get("factors", {}).get("visual", {}).get("penalty") or 0) > 0)
+
+    def blinded_tamper(self, state: str = "obstructed", reason: str = "dark_frame") -> AttackResult:
+        """Someone covers or turns the camera, then opens the enclosure: signed camera interference plus a tamper
+        report within the correlation window."""
+        agent = self._need_agent()
+
+        def act():
+            env = self._camera_report(state, reason)
+            r1 = self.gw.post("/api/v1/observations/signed", json=env)
+            r2 = agent.telemetry(tamper=True)
+            return [r1.status_code, r2.status_code], {"camera_state": state, "tamper": True}
+        return self._run("blinded_camera_with_tamper", "confirmed_incident (cap 30) -> QUARANTINED; normal access blocked",
+                         act, lambda ev, b, a: a.get("state") == "QUARANTINED")
+
     def quarantine_bypass(self) -> AttackResult:
         """While quarantined: (a) the device's own normal telemetry, (b) forged 'all clear' telemetry."""
         agent = self._need_agent()
