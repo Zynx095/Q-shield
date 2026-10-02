@@ -307,3 +307,12 @@ test("forensic case: an aborted recovery stays in the same case; nothing recorde
   assert.equal(forensicCase(FX.evidence.filter((e) => e.seq <= 5), DEV), null, "no quarantine, no case");
   assert.equal(forensicCase(FX.evidence, "OTHER-DEVICE"), null);
 });
+
+test("a coalesced flood record says how many rejections it stands for", () => {
+  const ev = { id: 900, received_at: 1000, device_id: DEV, event_type: "pqc_invalid_signature", severity: "high",
+    details: { aggregated: 297, claimed_signer_id: "vision-1" } };
+  const [it] = buildTimeline({ history: [], events: [ev], deviceId: DEV });
+  assert.equal(it.title, "Forged observation rejected ×297");
+  assert.match(it.sub, /297 similar rejected messages were coalesced into this record\./);
+  assert.equal(it.rejected, true);
+});

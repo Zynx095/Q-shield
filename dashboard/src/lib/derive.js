@@ -213,6 +213,11 @@ function eventItem(e, sigAlg) {
   } else if (e.event_type === "recovery_completed") {
     tone = "ok";
   }
+  if (Number.isFinite(d.aggregated) && d.aggregated > 0) {
+    // A flood of routine rejections is stored as a sample plus one coalesced record (backend/security/rejections.py).
+    title = `${title} ×${d.aggregated}`;
+    sub = `${sub ? `${sub} ` : ""}${d.aggregated} similar rejected messages were coalesced into this record.`;
+  }
   return { key: `ev-${e.id}`, ts: e.received_at, type: "event", title, sub, tone, rejected: !!rejectionNote(e.event_type), isState: false, events: [e],
     signals: [], triggers: [], caps: [], evidence: null, operator: d.operator_id || null, related: [] };
 }
