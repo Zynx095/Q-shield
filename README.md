@@ -83,7 +83,8 @@ chain, and only lets the device back after a verified, operator-started recovery
   against the device's authenticated self-reports, with the time each field was last reported.
 - **Evidence chain** (`backend/evidence/chain.py`). Every trust change, enforcement and control action is appended
   as a SHA-256 linked entry signed with ML-DSA-65 by the gateway. Verification recomputes every hash and checks every
-  signature, so an edited, reordered or removed entry is found.
+  signature, so an edited or reordered entry, or one removed from the middle, is found. Cutting
+  entries off the end is only detectable against an externally held copy of the head (not built).
 - **Operators** (`backend/security/operators.py`). Named operators hold `qso_` tokens, stored as SHA-256 hashes, with
   roles viewer, operator and admin. Every action is attributed in the evidence chain. HTTPS is optional
   (`QSHIELD_TLS_CERT`, `QSHIELD_TLS_KEY`).

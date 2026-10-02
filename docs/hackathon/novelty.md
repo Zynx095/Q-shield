@@ -31,7 +31,8 @@ it stops.
    not attestation.
 
 6. **Tamper-evident evidence chain.** It is SHA-256 linked and ML-DSA-65 signed, and verification finds an edited,
-   reordered or removed entry. It is not anchored externally.
+   reordered or removed (middle) entry. It is not anchored externally, so cutting entries off the end is only
+   detectable against an outside copy of the head.
 
 7. **Quarantine and earned recovery.**
    - Quarantine is automatic and enforced at the gateway.
