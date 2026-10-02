@@ -264,6 +264,7 @@ The demo prints the dashboard URL with the operator token.
 | Done | Background timer for recovery deadlines | `RecoveryTimer` in `backend/recovery/orchestrator.py`, started/stopped with the gateway; tests in `tests/fullstack/test_recovery_timer.py` |
 | Done | Dashboard operator actions | See "OPERATOR CONTROLS" below |
 | Done (prototype) | TLS for the gateway; per-operator tokens | Phase 13; see above |
-| Medium | Update the audit PDF and the PPT to reflect Phases 5–14 (new dashboard screenshots) | Both still describe Phases 5–10 as planned |
+| Done | Final presentation | Phase 17: `ppt/final/Q-SHIELD_QuantAMaze3.0_Final.pptx` + `.pdf` on the official Quant-A-Maze 3.O template (plan: `ppt/final/SLIDE_PLAN.md`). Team fields still `[ to fill ]` |
+| Medium | Update the audit PDF | It still describes Phases 5–10 as planned |
 | Low | External anchoring of the evidence head; key rotation | TD-09, TD-15 |
 | Research | Calibrate trust parameters; measure vision accuracy; external review of the session protocol | trust-engine.md §16 |

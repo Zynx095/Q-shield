@@ -22,6 +22,8 @@ digital twin, dashboard, integrated demo, and an engine fix for the out-of-order
 **CURRENT BLOCKER:** none.
 
 **EXACT NEXT TASK:**
+- (first) User: fill the team fields on slide 1 of `ppt/final/Q-SHIELD_QuantAMaze3.0_Final.pptx`, export the PDF
+  again (File > Export, or `ppt/tools/render_deck.ps1 -Pdf ...`), name it `<Team Name_Lead Name>` and upload it.
 - (0) User: stage the physical camera checks with the USB camera (cover the lens for 3 s, turn the camera, unplug
   it, walk up to it) while `python -m ai.vision run --jsonl evidence/runtime/cam.jsonl` runs, and keep the JSONL
   as the record. Then compile the ESP32 firmware (docs/hardware/hardware-architecture.md, section 2).
