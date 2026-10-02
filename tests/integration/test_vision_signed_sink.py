@@ -59,9 +59,12 @@ def test_sink_queues_when_gateway_down_then_flushes(pqc_app, pqc_operator, pqc_w
         def post(self, *a, **k):
             raise ConnectionError("down")
     s = sink(Down(), pqc_world, clock)
+    mono = [0.0]
+    s._mono = lambda: mono[0]            # the sink now backs off after a failure (1 s first); drive its clock
     s.emit(make_obs(clock))
     assert len(s._queue) == 1
     s._client = TestClient(pqc_app)
+    mono[0] += 1.5                       # past the first backoff
     s.emit(make_obs(clock))
     assert len(pqc_operator.get("/api/v1/observations").json()) == 2
 

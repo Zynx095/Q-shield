@@ -119,6 +119,9 @@ def main() -> int:
             warm_up(src, cfg.camera.warmup_frames)
         n = run(pipeline, src, FanoutSink(*sinks), cfg.camera.target_fps, a.max_frames)
         print(f"processed {n} frames")
+        for sk in sinks:                                # delivery diagnostics for the signed transport
+            if hasattr(sk, "status"):
+                print(json.dumps({"gateway_delivery": sk.status()}))
         return 0
     except KeyboardInterrupt:
         return 0

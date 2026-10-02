@@ -286,6 +286,10 @@ class Demo:
             self.say(c("y", "   REAL detection: the camera saw a person in the restricted zone (right half of the frame). That is "
                             "genuine evidence, so trust drops now and it can correlate with other evidence inside the 60 s window. "
                             "Keep that half of the view clear during this step for the scripted story."))
+        st = sink.status()
+        if st["rejected"] or st["queued"] or st["last_error"]:   # say why observations are missing, if they are
+            self.say(c("y", f"   transport: {st['sessions_established']} ML-KEM session(s), {st['delivered']} delivered, "
+                            f"{st['rejected']} refused, {st['queued']} still queued; last error: {st['last_error']}"))
         for o in obs[:4]:
             if o.get("event_type") == "camera_health":       # by protocol: no object/confidence, only details.state
                 self.say(c("d", f"  camera health: {(o.get('details') or {}).get('state')} auth={o.get('auth', '')[:18]}"))
