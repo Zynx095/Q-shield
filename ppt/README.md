@@ -1,6 +1,37 @@
 # Q-SHIELD presentation package
 
-## FINAL idea-submission deck (use this one)
+## FINAL deck for Quant-A-Maze 3.O (use this one)
+
+**`final/Q-SHIELD_QuantAMaze3.0_Final.pptx`**, with **`.pdf`**: 24 slides on the official Quant-A-Maze 3.O
+template (`Quant-A-Maze.pptx`). The template asks for the PDF to be uploaded.
+
+- **Template.** Every slide is a clone of one of the template's own pages, so the NITTE, Quant-A-Maze and Q-BITS
+  logos, the orange band, the halftone strip and the bottom band are the organisers' artwork. The six official
+  section headings are kept word for word; each opens its section, and every other slide carries its section as a
+  marker. The template's two reference slides are removed, as it instructs.
+- **Content.** The slide-by-slide plan, the diagram plan and the rules are in `final/SLIDE_PLAN.md`. Every number is
+  from the repository, and its source is in the slide's speaker notes. The current figures are listed in
+  `references/verified-facts.md` section 0.
+- **Team fields.** Team name, lead name and contact are left as `[ to fill ]`. They were not supplied, and they must
+  not be invented. Fill them on slide 1 in PowerPoint, then export the PDF again.
+- **Rebuild:**
+  ```
+  python ppt/tools/quantamaze_deck/build.py
+  powershell -File ppt/tools/render_deck.ps1 -Pptx ppt/final/Q-SHIELD_QuantAMaze3.0_Final.pptx -OutDir ppt/preview/quantamaze -Pdf ppt/final/Q-SHIELD_QuantAMaze3.0_Final.pdf
+  ```
+  The render uses the installed Microsoft PowerPoint. The previews in `preview/quantamaze/` are PowerPoint's own
+  renders.
+- **Fonts.** Titles use Bahnschrift SemiBold, body text Segoe UI, and technical strings Consolas; all ship with
+  Windows. Bahnschrift is a variable font, so PowerPoint draws it as vector outlines in the PDF, with the text still
+  searchable. Any other PowerPoint machine needs the fonts installed for the .pptx to look the same.
+- The earlier decks below (`final/Q-SHIELD_FINAL_PRESENTATION.pptx`, `final/Q-SHIELD_QuantAMaze3.0_Submission.pptx`,
+  and the September 24 decks) are superseded. They describe earlier phases.
+
+---
+
+## Earlier material (superseded; kept for reference)
+
+## Earlier idea-submission deck (superseded)
 
 **`Q-SHIELD_Idea_Submission_FINAL.pptx`** (+ `.pdf`): an original 6-slide deck designed from scratch. It does **not** use the sample's theme, layout, colours, fonts or shapes; the sample was used only for the constraints (max 6 slides, points and diagrams only, required headings, required title-slide fields). The required headings are kept verbatim: `IDEA TITLE`, `TECHNICAL APPROACH`, `FEASIBILITY AND VIABILITY`, `IMPACT AND BENEFITS`, `RESEARCH AND REFERENCES`, plus their sub-headings.
 - Every diagram is built from native, editable PowerPoint shapes and connectors (each slide has exactly one picture: a generated background texture). Fonts: Segoe UI + Consolas (installed with Windows/Office; substitute if the presenting machine lacks them).

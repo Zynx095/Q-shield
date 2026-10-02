@@ -1,5 +1,38 @@
 # Q-SHIELD: verified fact sheet for the presentation
 
+## 0. Current figures (Phase 17, 2026-10-02), used in the final Quant-A-Maze deck
+
+Sections 1 to 11 below are the **2026-09-24 snapshot** (Phases 0-3). They are kept because the earlier decks
+were built from them. **Where they conflict with this section, this section wins.**
+
+| Fact | Value | Source |
+|---|---|---|
+| Python tests | 785 passed, 0 failed | `python -m pytest -o addopts="" -q` (2026-10-02) |
+| JavaScript tests | 40 passed | `node --test dashboard/tests/*.test.mjs` |
+| Tests by area | trust 235, security 149, AI 135, full stack 111, PQC 74, integration 47, twin 18, evidence 15, end to end 1 | `pytest --collect-only`, `docs/testing.md` |
+| NIST ACVP vectors | 70 agree (35 ML-KEM-768 decapsulation, 20 key checks, 15 ML-DSA-65 verifications) | `pqc/README.md`, section 4 below |
+| PQC medians (ms, i7-13700HX laptop) | ML-KEM-768 keygen 0.060, encapsulate 0.069, decapsulate 0.091; ML-DSA-65 sign 9.42, verify 0.188; full handshake 10.0 | `docs/results/pqc-benchmark.json` |
+| Sizes (B) | ML-KEM-768 public key 1184, ciphertext 1088, shared secret 32; ML-DSA-65 signature 3309 | same |
+| Trust engine | 52.6 µs mean per update; about 0.7 ms per gateway record | `docs/results/trust_bench.json` |
+| Live demo (USB webcam) | 100 → 90 (real detections) → 80 (forged) → 72 SUSPICIOUS (replay) → 30 QUARANTINED (tamper + signed visual) → VERIFIED 30 → RECOVERED 80 (30 min credited, time-lapse) → TRUSTED 85 (42 min); evidence chain 26 entries, VERIFIED | `docs/IMPLEMENTATION_STATUS.md`, Phase 17 |
+| Live camera | USB webcam index 1, YOLO11n on CPU, about 5 frames/s (449 frames in 90 s), no failed reads, no false camera-health report in 2 x 90 s with a person moving | same |
+| Rejection flood | 300 forged messages leave 8 rows (6 samples + 2 coalesced); trust decisions identical to unsampled | `tests/fullstack/test_rejection_flood.py` |
+| Session churn | 30 refused observations: 1 session (was 30) | `tests/integration/test_vision_session_churn.py` |
+| Device vectors | 7 byte-exact cases, accepted in order by a gateway | `tests/vectors/envelope_v1_cases.json` |
+
+**Never claim:**
+- hardware attestation;
+- ESP32 validation (the firmware has never been compiled);
+- a distance from the camera (proximity is image-space);
+- external anchoring of the evidence chain;
+- production readiness;
+- detection accuracy;
+- that the device path is post-quantum.
+
+---
+
+## Snapshot of 2026-09-24 (historical)
+
 Everything on a slide must come from this file. Each number names the file it comes from. Verified against the repository on 2026-09-24 (`python -m pytest`: 347 passed). If a number is not here, it is not allowed on a slide.
 
 ## 1. Milestone

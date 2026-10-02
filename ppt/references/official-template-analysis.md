@@ -1,4 +1,43 @@
-# Official template: identification and compatibility
+# Official template: Quant-A-Maze 3.O (current)
+
+**File:** `ppt/Quant-A-Maze.pptx`. It is the official template for the Phase-1 round of Quant-A-Maze 3.O, a 36-hour
+national-level hackathon (NITTE, Q-BITS Quantum Tech Club). Its pages are 20 x 11.25 in (16:9).
+
+**Its rules, from its own reference slides:**
+- Make a copy, fill it in, and name the file `<Team Name_Lead Name>`.
+- Remove both reference slides.
+- Export as PDF and upload it on Unstop.
+
+**Its structure:**
+- Two reference slides.
+- Six section slides, each with a fixed heading and sub-points:
+  1. Participant Information & Topic Name (team name, lead name, contact, track: QML, PQC, Web3 & Blockchain,
+     Generative AI & ML);
+  2. Problem Definition (problem description, functional requirements, constraints);
+  3. Proposed Solution & Execution Plan (solution overview, working principle, core functionality);
+  4. Technical Design (architecture or workflow diagram, technologies and algorithms, implementation plan);
+  5. Feasibility & Innovation (technical feasibility, scalability and performance, innovation and USP);
+  6. Expected Outcome (expected results or prototype, real-world impact, future scope).
+- No slide limit is stated.
+
+**Its visual language:**
+- White background and black type.
+- Orange `#FF914D` for the header band, the bottom band and a halftone strip on the right.
+- The NITTE, Quant-A-Maze 3.0 and Q-BITS logos across the top.
+- A faint circuit, atom and Q watermark in the centre.
+
+**How the final deck maps onto it** (`ppt/tools/quantamaze_deck/build.py`, plan in `ppt/final/SLIDE_PLAN.md`):
+- Every slide clones a template page, keeping its logos, bands and halftone.
+- The six headings are kept word for word and open their sections. The other slides carry the section as a marker.
+- The reference slides are removed.
+- The watermark is kept on slide 1 only, so it never sits behind a diagram.
+- The template's serif headings are replaced by modern sans-serif type (Bahnschrift, Segoe UI), as the brief asked.
+
+---
+
+# Earlier template analysis (a different event; superseded)
+
+## Identification and compatibility (2026-09-24)
 
 ## What was found
 - **File:** `PPT SAMPLE.pptx`, located outside this repository at `..\shadowguard-main\PPT SAMPLE.pptx` (a sibling project folder). SHA-256 `0c27eada12802728aac43cf314d1e1b640d2a91adfd0ddb12b9aeca2cb4ae5e8`. It was opened read-only; the hash was re-checked after building and is unchanged. It is **not copied into this repository** (it carries organiser branding and, in its first slide, another team's details).
