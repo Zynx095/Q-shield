@@ -162,7 +162,8 @@ python -m pytest -o addopts="" -q            # backend, security, PQC (ACVP), tr
 node --test dashboard/tests/*.test.mjs       # dashboard view models, camera controller, reveal, ambient
 ```
 
-Current counts and what was verified in a browser are in `docs/IMPLEMENTATION_STATUS.md`.
+Current counts by area are in `docs/testing.md`; what was verified live (camera, demo, browser) is in
+`docs/IMPLEMENTATION_STATUS.md`.
 
 ## Limitations
 

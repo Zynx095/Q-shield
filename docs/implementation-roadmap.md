@@ -1,6 +1,9 @@
 # Q-SHIELD Implementation Roadmap
 
-Status: **plan only, no implementation yet** (2026-09-24). Companion: `docs/technical-decisions.md` (decision IDs `TD-nn` referenced below).
+> **Historical plan (2026-09-24).** Kept for the reasoning behind the phases. What was actually built, and what
+> is still simulated, is in `IMPLEMENTATION_STATUS.md`, `testing.md` and `hardware/hardware-architecture.md`.
+
+Status at the time: **plan only, no implementation yet** (2026-09-24). Companion: `docs/technical-decisions.md` (decision IDs `TD-nn` referenced below).
 
 ## 1. Architecture overview
 

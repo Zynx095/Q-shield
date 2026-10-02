@@ -115,7 +115,7 @@ Per-round medians differ by ~2% or less (see JSON). Sizes (bytes): KEM public ke
 
 ## Tests (all pass; run `python -m pytest`)
 
-`tests/pqc/` (conformance, interop, behaviour: 65 new), `tests/security/test_signed_observations.py`, `test_pqc_session.py`, `test_pqc_keystore.py`, `tests/integration/test_vision_signed_sink.py` (100 new, including the provisioning scripts and a gateway-startup path). Full suite: **347 passed**, of which the 182 pre-Phase-3 tests are unchanged. The signature-rejection tests were confirmed to fail when verification is sabotaged to always return true.
+`tests/pqc/` (conformance, interop, behaviour: 65 new), `tests/security/test_signed_observations.py`, `test_pqc_session.py`, `test_pqc_keystore.py`, `tests/integration/test_vision_signed_sink.py` (100 new, including the provisioning scripts and a gateway-startup path). Full suite at the end of Phase 3: **347 passed**, of which the 182 pre-Phase-3 tests were unchanged (the current count is in `docs/testing.md`). The signature-rejection tests were confirmed to fail when verification is sabotaged to always return true.
 
 ## Known limitations
 - Library maturity, audit status and implementation source are as noted above; only KAT/interop-level evidence exists.
