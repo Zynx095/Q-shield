@@ -36,6 +36,11 @@ class Settings:
     tls_key: str | None = None
     require_tls: bool = False
     recovery_tick_s: float = 5.0   # background recovery-deadline timer; 0 disables
+    # Routine rejected traffic (backend/security/rejections.py): sampled per window, the rest coalesced; bounded retention.
+    rejection_window_s: float = 10.0
+    rejection_sample_per_key: int = 3
+    rejection_window_cap: int = 120
+    rejection_keep_rows: int = 20_000
     # Optional overrides from the environment; otherwise generated under keys_dir on first use.
     master_key_hex: str | None = field(default=None, repr=False)
     operator_token: str | None = field(default=None, repr=False)
@@ -74,6 +79,10 @@ class Settings:
             tls_key=get("QSHIELD_TLS_KEY", "") or None,
             require_tls=get("QSHIELD_REQUIRE_TLS", "false").lower() in ("1", "true", "yes"),
             recovery_tick_s=float(get("RECOVERY_TICK_S", str(cls.recovery_tick_s))),
+            rejection_window_s=float(get("REJECTION_WINDOW_S", str(cls.rejection_window_s))),
+            rejection_sample_per_key=int(get("REJECTION_SAMPLE_PER_KEY", str(cls.rejection_sample_per_key))),
+            rejection_window_cap=int(get("REJECTION_WINDOW_CAP", str(cls.rejection_window_cap))),
+            rejection_keep_rows=int(get("REJECTION_KEEP_ROWS", str(cls.rejection_keep_rows))),
             master_key_hex=get("QSHIELD_MASTER_KEY_HEX", "") or None,
             operator_token=get("QSHIELD_OPERATOR_TOKEN", "") or None,
             ingest_token=get("QSHIELD_INGEST_TOKEN", "") or None,

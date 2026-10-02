@@ -37,6 +37,7 @@ from backend.api.security_routes import register_security_routes
 from backend.security.credentials import CredentialStore, EncryptedCredentialStore, load_or_create_master_key
 from backend.security.tokens import bearer_from_header, load_or_create_token, token_matches
 from backend.security.operators import BOOTSTRAP, OperatorStore
+from backend.security.rejections import RejectionRecorder
 
 DASHBOARD_DIR = Path(__file__).resolve().parents[2] / "dashboard"
 AUTH_FAIL_LOG_INTERVAL_S = 10.0  # throttle so unauthenticated callers cannot flood the event table
@@ -124,6 +125,13 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
         app.router.on_shutdown.append(timer.stop)
     last_block_log: dict[str, float] = {}
     last_fail_log = {"t": -1e18}
+    # Routine rejected traffic is sampled and coalesced so an unauthenticated flood cannot grow the event table without
+    # bound; high-value events pass straight through (backend/security/rejections.py).
+    rejections = RejectionRecorder(
+        store, window_s=settings.rejection_window_s, sample_per_key=settings.rejection_sample_per_key,
+        window_cap=settings.rejection_window_cap, keep_rows=settings.rejection_keep_rows,
+        consumed_upto=(lambda: store.get_cursor("security_events")) if trust is not None else None)
+    app.state.rejections = rejections
 
     def _auth_failed(scope: str, request: Request):
         now = clock()
@@ -198,9 +206,12 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
             auth = authenticate(store, creds, env, expected_type)
         except AuthError as e:
             known = store.get_device(env.device_id) is not None
-            store.add_event(now, env.device_id if known else None, e.reason, e.severity,
-                            {"claimed_device_id": env.device_id, "type": env.type, "counter": env.counter})
+            rejections.record(now, env.device_id if known else None, e.reason, e.severity,
+                              {"claimed_device_id": env.device_id, "type": env.type, "counter": env.counter})
             raise HTTPException(status_code=401, detail="authentication_failed")
+        # Authenticated: write any coalesced rejections first, so the trust engine sees the last violation BEFORE this
+        # message (credited recovery time is measured from it, exactly as with one row per rejected message).
+        rejections.flush(now)
         try:
             payload = payload_model.model_validate_json(env.payload)
         except ValidationError:
@@ -258,6 +269,7 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
 
     @app.get("/api/v1/events", dependencies=[require_operator])
     def events(limit: int = Query(100, ge=1, le=500)):
+        rejections.flush(clock())                       # an operator reading the log sees coalesced counts too
         return store.list_events(limit)
 
     # ---------------- PQC: signed observations and ML-KEM sessions ----------------
@@ -268,8 +280,8 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
 
     def _reject(e: PqcRejection, via: str, signer_id: str | None, observation_id: str | None = None):
         dev = getattr(e, "device_id", None)
-        store.add_event(clock(), dev, f"pqc_{e.reason}", e.severity,
-                        {"via": via, "claimed_signer_id": signer_id, "observation_id": observation_id, "device_id": dev})
+        rejections.record(clock(), dev, f"pqc_{e.reason}", e.severity,
+                          {"via": via, "claimed_signer_id": signer_id, "observation_id": observation_id, "device_id": dev})
         detail = {401: "authentication_failed", 409: "replay_detected", 422: "malformed_request"}.get(e.status, "rejected")
         raise HTTPException(e.status, detail)
 
@@ -282,8 +294,8 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
             _reject(e, via, env.signer_id, env.observation_id)
         device = store.get_device(obs.device_id)
         if device is None or device.revoked:
-            store.add_event(now, None, "pqc_observation_unknown_device", "low",
-                            {"via": via, "claimed_device_id": obs.device_id, "signer_id": signer.signer_id})
+            rejections.record(now, None, "pqc_observation_unknown_device", "low",
+                              {"via": via, "claimed_device_id": obs.device_id, "signer_id": signer.signer_id})
             raise HTTPException(422, "unknown_or_revoked_device")
         auth = f"{env.algorithm}:{signer.signer_id}"
         if not store.add_observation(now, obs.to_wire(), auth=auth, envelope=env.model_dump_json(), transport=via):
@@ -328,7 +340,7 @@ def create_app(settings: Settings | None = None, clock: Callable[[], float] = ti
             raise HTTPException(403, "signed_observations_required")
         device = store.get_device(obs.device_id)
         if device is None or device.revoked:
-            store.add_event(now, None, "observation_rejected_device", "low", {"claimed_device_id": obs.device_id})
+            rejections.record(now, None, "observation_rejected_device", "low", {"claimed_device_id": obs.device_id})
             raise HTTPException(422, "unknown_or_revoked_device")
         stored = store.add_observation(now, obs.to_wire())
         return {"status": "accepted" if stored else "duplicate", "observation_id": obs.observation_id}

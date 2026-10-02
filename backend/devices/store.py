@@ -86,7 +86,8 @@ CREATE TABLE IF NOT EXISTS security_events (
     device_id   TEXT,
     event_type  TEXT NOT NULL,
     severity    TEXT NOT NULL,
-    details     TEXT NOT NULL DEFAULT '{}'
+    details     TEXT NOT NULL DEFAULT '{}',
+    routine     INTEGER NOT NULL DEFAULT 0
 );
 """
 
@@ -137,6 +138,8 @@ class Store:
         for col, ddl in (("auth", "TEXT NOT NULL DEFAULT 'ingest-token'"), ("envelope", "TEXT"), ("transport", "TEXT")):
             if col not in cols:  # databases created before Phase 3 (auth, envelope) or before transport was recorded
                 self._db.execute(f"ALTER TABLE observations ADD COLUMN {col} {ddl}")
+        if "routine" not in {r["name"] for r in self._db.execute("PRAGMA table_info(security_events)")}:
+            self._db.execute("ALTER TABLE security_events ADD COLUMN routine INTEGER NOT NULL DEFAULT 0")
 
     def close(self) -> None:
         with self._lock:
@@ -353,12 +356,29 @@ class Store:
 
     # --- security events ---
     def add_event(self, now: float, device_id: str | None, event_type: str, severity: str,
-                  details: dict | None = None) -> None:
+                  details: dict | None = None, routine: bool = False) -> None:
+        """`routine`: an unauthenticated rejection sampled by backend.security.rejections (subject to retention)."""
         with self._lock, self._db:
             self._db.execute(
-                "INSERT INTO security_events(received_at, device_id, event_type, severity, details) VALUES (?,?,?,?,?)",
-                (now, device_id, event_type, severity, json.dumps(details or {})),
+                "INSERT INTO security_events(received_at, device_id, event_type, severity, details, routine) VALUES (?,?,?,?,?,?)",
+                (now, device_id, event_type, severity, json.dumps(details or {}), 1 if routine else 0),
             )
+
+    def prune_routine_events(self, keep: int, consumed_upto: float) -> int:
+        """Delete routine rejection rows beyond the newest `keep`, but only rows with id <= `consumed_upto` (already read
+        by the trust engine). High-value rows are never touched. Returns the number of rows deleted."""
+        with self._lock, self._db:
+            row = self._db.execute("SELECT id FROM security_events WHERE routine=1 ORDER BY id DESC LIMIT 1 OFFSET ?",
+                                   (keep,)).fetchone()
+            if row is None:
+                return 0
+            limit = min(row["id"], consumed_upto)
+            return self._db.execute("DELETE FROM security_events WHERE routine=1 AND id<=?", (limit,)).rowcount
+
+    def count_events(self, routine: bool | None = None) -> int:
+        q = "SELECT COUNT(*) AS n FROM security_events" + ("" if routine is None else " WHERE routine=?")
+        with self._lock:
+            return self._db.execute(q, () if routine is None else (1 if routine else 0,)).fetchone()["n"]
 
     def list_events(self, limit: int = 100) -> list[dict]:
         with self._lock:
