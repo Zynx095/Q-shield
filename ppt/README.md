@@ -2,8 +2,9 @@
 
 ## FINAL deck for Quant-A-Maze 3.O (use this one)
 
-**`final/Q-SHIELD_QuantAMaze3.0_Final.pptx`**, with **`.pdf`**: 24 slides on the official Quant-A-Maze 3.O
-template (`Quant-A-Maze.pptx`). The template asks for the PDF to be uploaded.
+**`final/Q-SHIELD_QuantAMaze3.0_Final.pptx`**, with **`.pdf`**: 12 slides (the submission limit is 10 to 12) on the
+official Quant-A-Maze 3.O template (`Quant-A-Maze.pptx`). The template asks for the PDF to be uploaded. The builder
+refuses to produce more than 12 slides.
 
 - **Template.** Every slide is a clone of one of the template's own pages, so the NITTE, Quant-A-Maze and Q-BITS
   logos, the orange band, the halftone strip and the bottom band are the organisers' artwork. The six official
