@@ -482,11 +482,38 @@ export function connectionView({ device = null, state = null, events = [], now =
  * gateway's own verdict label ("ML-DSA-65:vision-1" for a verified signature; null when posted with the ingest
  * token). Synthetic detections (attack simulation) are flagged, never passed off as camera output.
  */
+const CAMERA_REASON = {
+  dark_frame: "dark, scene not visible", flat_frame: "no texture: covered or facing a blank surface",
+  overexposed_frame: "overexposed: blinded by a light", no_frames: "no frames from the source",
+  identical_frames: "the same frame repeated", viewpoint_shift: "scene shifted in the image",
+  scene_replaced: "none of the reference scene left", view_altered: "scene no longer matches the reference",
+  low_light: "low light, scene still visible", blurred: "fine detail lost (blur)", normal_frames: "normal frames again",
+};
+const PROXIMITY = { subject_too_close: "too close to the camera", rapid_approach: "approaching the camera fast" };
+const pct = (x) => `${Math.round(x * 100)}%`;
+
+// What a camera-health report or a proximity heuristic measured, in words (null for an ordinary detection).
+function measured(o, details, health) {
+  if (health) {
+    const r = CAMERA_REASON[details.reason] || (details.reason ? String(details.reason).replace(/_/g, " ") : null);
+    const shift = Number.isFinite(details.shift_x) && Number.isFinite(details.shift_y)
+      && (details.shift_x || details.shift_y) ? `, moved ${pct(Math.abs(details.shift_x))} ${details.shift_x < 0 ? "left" : "right"} and ${pct(Math.abs(details.shift_y))} ${details.shift_y < 0 ? "up" : "down"}` : "";
+    const held = Number.isFinite(details.held_s) ? ` for ${Math.round(details.held_s)} s` : "";
+    return r ? `${r}${shift}${held}` : null;
+  }
+  const p = PROXIMITY[o.anomaly_reason];
+  if (!p) return null;
+  const area = Number.isFinite(details.area_fraction) ? `: box covers ${pct(details.area_fraction)} of the frame` : "";
+  const growth = Number.isFinite(details.growth) ? `, grew x${details.growth} in ${details.over_s} s` : "";
+  return `Image-space heuristic, ${p}${area}${growth} (not a distance)`;
+}
+
 export function observationView(o) {
   const auth = o.auth || null;
   const [alg, signer] = auth && auth.includes(":") ? auth.split(":", 2) : [auth, null];
   const health = o.event_type === "camera_health";
   const details = o.details || {};
+  const proximity = !health && !!PROXIMITY[o.anomaly_reason];
   return {
     key: o.observation_id,
     ts: o.received_at,
@@ -496,6 +523,9 @@ export function observationView(o) {
     confidence: health || !Number.isFinite(o.confidence) ? null : o.confidence,
     zone: o.zone ? `${o.zone.replace(/_/g, " ")}${o.zone_kind && !o.zone.includes(o.zone_kind) ? ` (${o.zone_kind})` : ""}` : null,
     rule: o.anomaly ? (o.anomaly_reason || "rule matched").replace(/_/g, " ") : null,
+    measured: measured(o, details, health),
+    heuristic: proximity,
+    fault: health && !!o.anomaly,
     model: o.model ? `${o.model.name} ${o.model.version}` : null,
     signed: !!(alg && /ML-DSA/i.test(alg)),
     alg, signer,
@@ -520,6 +550,7 @@ export function visionStatus(observations, now) {
     total: views.length,
     signed: views.filter((v) => v.signed).length,
     rules: views.filter((v) => v.rule).length,
+    heuristics: views.filter((v) => v.heuristic).length,
   };
 }
 
@@ -558,6 +589,10 @@ const CASE_SIGNAL = {
   visual_rule_violation: ["visual", "Signed camera observation: restricted-zone rule matched (ML-DSA)"],
   camera_obstructed: ["visual", "Signed camera-health report: lens obstructed"],
   camera_source_lost: ["visual", "Signed camera-health report: video source lost"],
+  camera_frozen: ["visual", "Signed camera-health report: the same frame repeated (feed frozen)"],
+  camera_view_changed: ["visual", "Signed camera-health report: the view no longer matches its reference (camera moved)"],
+  camera_degraded: ["visual", "Signed camera-health report: image degraded (low light or blur)"],
+  subject_proximity: ["visual", "Signed observation: a subject very close to the camera (image-space heuristic, not a distance)"],
 };
 const MODALITY_TEXT = { PHYSICAL: "physical (authenticated device report)", VISUAL: "visual (signed camera observation)",
   SENSOR: "sensor (authenticated device report)" };

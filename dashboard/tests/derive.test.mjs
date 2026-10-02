@@ -316,3 +316,28 @@ test("a coalesced flood record says how many rejections it stands for", () => {
   assert.match(it.sub, /297 similar rejected messages were coalesced into this record\./);
   assert.equal(it.rejected, true);
 });
+
+test("camera-health reports and proximity heuristics say what was measured, never a distance", () => {
+  const moved = observationView({ observation_id: "v", received_at: 9, event_type: "camera_health", anomaly: true,
+    anomaly_reason: "camera_view_changed", auth: "ML-DSA-65:vision-1",
+    details: { state: "view_changed", reason: "viewpoint_shift", shift_x: -0.188, shift_y: 0, held_s: 2.2 } });
+  assert.equal(moved.title, "Camera health: view changed");
+  assert.equal(moved.measured, "scene shifted in the image, moved 19% left and 0% down for 2 s");
+  assert.equal(moved.fault, true);
+  assert.equal(moved.rule, "camera view changed");
+  const near = observationView({ observation_id: "p", received_at: 10, event_type: "visual_observation", object: "person",
+    confidence: 0.88, anomaly: true, anomaly_reason: "rapid_approach", auth: "ML-DSA-65:vision-1",
+    details: { area_fraction: 0.2, growth: 6.67, over_s: 0.8 } });
+  assert.equal(near.heuristic, true);
+  assert.equal(near.rule, "rapid approach");
+  assert.match(near.measured, /^Image-space heuristic, approaching the camera fast: box covers 20% of the frame, grew x6.67 in 0.8 s \(not a distance\)$/);
+  assert.doesNotMatch(near.measured, /\b(cm|metre|meter)s?\b/);
+  const frozen = observationView({ observation_id: "f", received_at: 11, event_type: "camera_health", anomaly: true,
+    details: { state: "frozen", reason: "identical_frames" } });
+  assert.equal(frozen.measured, "the same frame repeated");
+  const vs = visionStatus([near, moved].map((v) => ({ observation_id: v.key, received_at: v.ts, event_type: v.health ? "camera_health" : "visual_observation",
+    anomaly: true, anomaly_reason: v.health ? "camera_view_changed" : "rapid_approach", details: v.health ? { state: "view_changed" } : {} })), 12);
+  assert.equal(vs.heuristics, 1);
+  assert.equal(vs.rules, 2);
+  assert.equal(vs.camera.state, "view_changed");
+});

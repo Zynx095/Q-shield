@@ -56,8 +56,9 @@ function pipeline(p, latestModel, transport) {
 }
 
 const CAMERA = {
-  ok: ["ok", "Reporting clear frames"], obstructed: ["crit", "Obstructed: lens covered or too dark"],
-  source_lost: ["crit", "Source lost: no frames"],
+  ok: ["ok", "Reporting clear frames"], obstructed: ["crit", "Obstructed: lens covered, blank or blinded"],
+  source_lost: ["crit", "Source lost: no frames"], frozen: ["crit", "Frozen: the same frame repeated"],
+  view_changed: ["crit", "View changed: the camera was moved"], degraded: ["warn", "Degraded: low light or blur"],
 };
 const TRANSPORT = { secure: "inside the ML-KEM session", signed: "direct signed POST", token: "ingest token" };
 
@@ -96,7 +97,7 @@ function observationsPanel() {
             <span class="obs-time num" title="Received ${ago(now - o.ts)}">${clock(o.ts)}</span>
             <div class="obs-body">
               <div class="obs-title">${o.title}${o.confidence !== null ? html` <span class="caption num">confidence ${fixed(o.confidence, 2)}</span>` : ""}${many ? html` <span class="caption">${o.deviceId}</span>` : ""}</div>
-              <div class="obs-sub">${[o.zone, o.rule ? `rule matched: ${o.rule}` : null, o.model].filter(Boolean).join("; ")}</div>
+              <div class="obs-sub">${[o.measured, o.zone, o.rule && !o.measured ? `rule matched: ${o.rule}` : null, o.model].filter(Boolean).join("; ")}</div>
             </div>
             <span class="obs-tags">${o.signed ? html`<span class="tag pqc" title="Verified ${o.alg} signature by ${o.signer}">${o.alg}</span>` : html`<span class="tag" title="Posted with the ingest token, not signed">Unsigned</span>`}${o.transport === "secure" ? html` <span class="tag pqc" title="Arrived inside an ML-KEM-768 session, AES-256-GCM encrypted">ML-KEM session</span>` : ""}${o.synthetic ? html` ${simTag("A synthetic detection from the attack simulation, signed with the real vision key; not camera output")}` : ""}</span>
           </li>`)}</ol>
