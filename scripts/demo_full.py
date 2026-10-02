@@ -277,15 +277,24 @@ class Demo:
         after = listing()
         obs = after[: max(0, len(after) - before)]          # newest first
         visual = [o for o in obs if o.get("event_type") == "visual_observation"]
-        rules = [o for o in visual if o.get("anomaly")]
+        near = [o for o in visual if o.get("anomaly_reason") in ("subject_too_close", "rapid_approach")]
+        rules = [o for o in visual if o.get("anomaly") and o not in near]
         health = [o for o in obs if o.get("event_type") == "camera_health"]
         self.say(f"{n} frames processed (after a {cam.warmup_frames if isinstance(cam.source, int) else 0}-frame camera warm-up), "
-                 f"{len(obs)} signed observations accepted over the ML-KEM session: {len(visual) - len(rules)} clear, "
-                 f"{len(rules)} restricted-zone rule match(es), {len(health)} camera-health report(s)")
+                 f"{len(obs)} signed observations accepted over the ML-KEM session: {len(visual) - len(rules) - len(near)} clear, "
+                 f"{len(rules)} restricted-zone rule match(es), {len(near)} proximity heuristic(s), "
+                 f"{len(health)} camera-health report(s)")
         if rules:
             self.say(c("y", "   REAL detection: the camera saw a person in the restricted zone (right half of the frame). That is "
                             "genuine evidence, so trust drops now and it can correlate with other evidence inside the 60 s window. "
                             "Keep that half of the view clear during this step for the scripted story."))
+        for o in near:
+            d = o.get("details") or {}
+            self.say(c("y", f"   REAL image-space heuristic: {o['anomaly_reason'].replace('_', ' ')}, a person's box covered "
+                            f"{round(100 * (d.get('area_fraction') or 0))}% of the frame. Not a distance; a small trust penalty."))
+        for o in health:
+            d = o.get("details") or {}
+            self.say(c("y", f"   REAL camera-health report: {d.get('state')} ({d.get('reason')})"))
         st = sink.status()
         if st["rejected"] or st["queued"] or st["last_error"]:   # say why observations are missing, if they are
             self.say(c("y", f"   transport: {st['sessions_established']} ML-KEM session(s), {st['delivered']} delivered, "
@@ -294,8 +303,8 @@ class Demo:
             if o.get("event_type") == "camera_health":       # by protocol: no object/confidence, only details.state
                 self.say(c("d", f"  camera health: {(o.get('details') or {}).get('state')} auth={o.get('auth', '')[:18]}"))
                 continue
-            self.say(c("d", f"  {o.get('object')} conf {o.get('confidence') or 0:.2f} rule_violation={o.get('anomaly')} "
-                            f"auth={o.get('auth', '')[:18]}"))
+            self.say(c("d", f"  {o.get('object')} conf {o.get('confidence') or 0:.2f} "
+                            f"{o.get('anomaly_reason') or 'clear'} auth={o.get('auth', '')[:18]}"))
 
     def show_chain(self) -> None:
         v = self.op.get("/api/v1/evidence/verify").json()
