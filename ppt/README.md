@@ -28,6 +28,25 @@ refuses to produce more than 12 slides.
 - The earlier decks below (`final/Q-SHIELD_FINAL_PRESENTATION.pptx`, `final/Q-SHIELD_QuantAMaze3.0_Submission.pptx`,
   and the September 24 decks) are superseded. They describe earlier phases.
 
+## Q-Hack India 2026 deck (Ramaiah Institute of Technology)
+
+**`final/Ramaiah_Hackathon/Q-SHIELD_QHackIndia2026.pptx`**, with **`.pdf`**: 12 slides on the official Q-Hack India
+2026 template (`Q-Hack_India26.pptx`).
+- **Template.** Every slide is a clone of a template page: its grey or lilac background, the sponsor logos, the
+  clouds, the bird illustrations, the pink section pill and the footer. The template's ten section titles are kept word
+  for word. Two extra slides continue "Implementation and Architecture", for 12 in total. Text uses the template's
+  embedded IBM Plex Sans.
+- **Fields to fill.** Team name, team lead name and track are `[ to fill ]`. The problem statement title is the
+  Q-SHIELD title.
+- **"Why Quantum?"** It says plainly that Q-SHIELD runs no quantum circuits or quantum hardware: quantum computing is
+  the threat model, and post-quantum cryptography is the answer.
+- **Rebuild:**
+  ```
+  python ppt/tools/qhack_deck/build.py
+  powershell -File ppt/tools/render_deck.ps1 -Pptx ppt/final/Ramaiah_Hackathon/Q-SHIELD_QHackIndia2026.pptx -OutDir ppt/final/Ramaiah_Hackathon/preview -Pdf ppt/final/Ramaiah_Hackathon/Q-SHIELD_QHackIndia2026.pdf
+  ```
+  The builder never touches the Quant-A-Maze deck.
+
 ---
 
 ## Earlier material (superseded; kept for reference)
