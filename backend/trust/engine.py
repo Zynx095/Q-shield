@@ -22,7 +22,12 @@ from backend.trust.model import (
 
 EPS = 1e-9
 PERSISTENT = [f.value for f in Factor if f is not Factor.NETWORK]
-_MODALITY_OF = {Kind.PHYSICAL_TAMPER: "PHYSICAL", Kind.SENSOR_OUT_OF_RANGE: "SENSOR", Kind.VISUAL_RULE_VIOLATION: "VISUAL"}
+_MODALITY_OF = {Kind.PHYSICAL_TAMPER: "PHYSICAL", Kind.SENSOR_OUT_OF_RANGE: "SENSOR", Kind.VISUAL_RULE_VIOLATION: "VISUAL",
+                Kind.CAMERA_OBSTRUCTED: "VISUAL", Kind.CAMERA_FROZEN: "VISUAL", Kind.CAMERA_VIEW_CHANGED: "VISUAL"}
+# Signed camera interference is VISUAL modality evidence (spec section 9). Source loss, degradation and proximity are not.
+CAMERA_INTERFERENCE = frozenset({Kind.CAMERA_OBSTRUCTED, Kind.CAMERA_FROZEN, Kind.CAMERA_VIEW_CHANGED})
+CAMERA_KINDS = frozenset({Kind.CAMERA_OBSTRUCTED, Kind.CAMERA_SOURCE_LOST, Kind.CAMERA_FROZEN, Kind.CAMERA_VIEW_CHANGED,
+                          Kind.CAMERA_DEGRADED})
 
 
 def _round_half_up(x: float) -> int:
@@ -351,7 +356,7 @@ class TrustEngine:
             return True
         if k is Kind.VISUAL_RULE_VIOLATION:
             return sig.auth is Auth.SIGNER_MLDSA and sig.confidence >= self.cfg.confidence_floor
-        if k in (Kind.CAMERA_OBSTRUCTED, Kind.CAMERA_SOURCE_LOST):
+        if k in (Kind.CAMERA_SOURCE_LOST,) or k in CAMERA_INTERFERENCE:
             return sig.auth is Auth.SIGNER_MLDSA
         return False
 
@@ -438,11 +443,11 @@ class TrustEngine:
             dt.integrity_mismatch = sig.value["mismatch"]
             return Factor.CONFIG.value
 
-        if k in (Kind.VISUAL_RULE_VIOLATION, Kind.VISUAL_CLEAR, Kind.CAMERA_OBSTRUCTED, Kind.CAMERA_SOURCE_LOST, Kind.CAMERA_OK):
+        if k in (Kind.VISUAL_RULE_VIOLATION, Kind.VISUAL_CLEAR, Kind.CAMERA_OK, Kind.SUBJECT_PROXIMITY) or k in CAMERA_KINDS:
             dt.available.add(Factor.VISUAL.value)
             if k is Kind.CAMERA_OK:
-                dt.episodes.pop("camera_obstructed", None)
-                dt.episodes.pop("camera_source_lost", None)
+                for ck in CAMERA_KINDS:
+                    dt.episodes.pop(ck.value, None)
                 return Factor.VISUAL.value
             if k is Kind.VISUAL_CLEAR:
                 return Factor.VISUAL.value
@@ -457,9 +462,18 @@ class TrustEngine:
                 add = self._episode(dt, key, impact, ts)
                 if c >= cfg.correlation_min_confidence and sig.auth is Auth.SIGNER_MLDSA:
                     dt.modality_last["VISUAL"] = (ts, sig.signal_id)
+            elif k is Kind.SUBJECT_PROXIMITY:                  # image-space heuristic: small, never modality evidence
+                if sig.confidence < cfg.confidence_floor:
+                    self._note(sig, "below_confidence_floor_no_impact", confidence=sig.confidence)
+                    return Factor.VISUAL.value
+                impact = cfg.penalty_points(k) * m_auth
+                detail["impact_points"] = round(impact, 6)
+                add = self._episode(dt, f"proximity|{sig.value.get('reason')}", impact, ts)
             else:
                 impact = cfg.penalty_points(k) * m_auth
                 add = self._episode(dt, k.value, impact, ts)
+                if k in CAMERA_INTERFERENCE and sig.auth is Auth.SIGNER_MLDSA:
+                    dt.modality_last["VISUAL"] = (ts, sig.signal_id)
             if add > 0:
                 self._add_penalty(dt, Factor.VISUAL.value, add)
                 dt.last_violation_ts = ts

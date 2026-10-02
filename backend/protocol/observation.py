@@ -35,9 +35,13 @@ class ZoneKind(str, Enum):
 
 
 class CameraState(str, Enum):
+    """Camera health as the vision service reports it (ai/vision/health.py documents each state)."""
     OK = "ok"
-    OBSTRUCTED = "obstructed"
-    SOURCE_LOST = "source_lost"
+    OBSTRUCTED = "obstructed"        # no usable image: covered, facing a blank surface, or blinded
+    SOURCE_LOST = "source_lost"      # no frames (unplugged, driver failure)
+    FROZEN = "frozen"                # the same frame repeated: stuck or substituted feed
+    VIEW_CHANGED = "view_changed"    # the scene no longer matches the reference view: camera moved or redirected
+    DEGRADED = "degraded"            # still sees, poorly: low light or blur
 
 
 class ModelInfo(BaseModel):
@@ -118,7 +122,7 @@ class Observation(BaseModel):
                 raise ValueError("camera_health must not carry object/confidence")
             state = self.details.get("state")
             if state not in {s.value for s in CameraState}:
-                raise ValueError("camera_health requires details.state in ok|obstructed|source_lost")
+                raise ValueError("camera_health requires details.state in " + "|".join(s.value for s in CameraState))
         if (self.zone is None) != (self.zone_kind is None):
             raise ValueError("zone and zone_kind must be set together")
         if self.anomaly and not self.anomaly_reason:

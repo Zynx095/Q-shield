@@ -25,6 +25,10 @@ DEFAULT_PENALTIES = {
     Kind.INTEGRITY_MISMATCH: (Factor.CONFIG, "HIGH"),
     Kind.CAMERA_OBSTRUCTED: (Factor.VISUAL, "HIGH"),
     Kind.CAMERA_SOURCE_LOST: (Factor.VISUAL, "MEDIUM"),
+    Kind.CAMERA_FROZEN: (Factor.VISUAL, "HIGH"),          # as severe as an obstruction: the live scene is not shown
+    Kind.CAMERA_VIEW_CHANGED: (Factor.VISUAL, "HIGH"),    # as severe as an obstruction: the protected view is not watched
+    Kind.CAMERA_DEGRADED: (Factor.VISUAL, "MEDIUM"),      # reduced evidence quality, not proof of interference
+    Kind.SUBJECT_PROXIMITY: (Factor.VISUAL, "LOW"),       # image-space heuristic
     Kind.AUTH_MISBEHAVIOR: (Factor.IDENTITY, "HIGH"),
     Kind.MALFORMED_PAYLOAD: (Factor.IDENTITY, "MEDIUM"),
 }

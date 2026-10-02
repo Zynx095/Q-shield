@@ -50,7 +50,11 @@ class Kind(str, Enum):
     VISUAL_CLEAR = "visual_clear"
     CAMERA_OBSTRUCTED = "camera_obstructed"
     CAMERA_SOURCE_LOST = "camera_source_lost"
+    CAMERA_FROZEN = "camera_frozen"                  # the same frame repeated: stuck or substituted feed
+    CAMERA_VIEW_CHANGED = "camera_view_changed"      # scene no longer matches the reference view
+    CAMERA_DEGRADED = "camera_degraded"              # low light or blur: still sees, poorly
     CAMERA_OK = "camera_ok"
+    SUBJECT_PROXIMITY = "subject_proximity"          # image-space heuristic: too close / rapid approach
     INVALID_TAG = "invalid_tag"
     INVALID_SIGNATURE = "invalid_signature"
     AUTH_PROFILE_MISMATCH = "auth_profile_mismatch"
@@ -74,7 +78,11 @@ REQUIRED_AUTH: dict[Kind, frozenset[Auth]] = {
     Kind.VISUAL_CLEAR: frozenset({_S, _T}),
     Kind.CAMERA_OBSTRUCTED: frozenset({_S, _T}),
     Kind.CAMERA_SOURCE_LOST: frozenset({_S, _T}),
+    Kind.CAMERA_FROZEN: frozenset({_S, _T}),
+    Kind.CAMERA_VIEW_CHANGED: frozenset({_S, _T}),
+    Kind.CAMERA_DEGRADED: frozenset({_S, _T}),
     Kind.CAMERA_OK: frozenset({_S, _T}),
+    Kind.SUBJECT_PROXIMITY: frozenset({_S, _T}),
     Kind.INVALID_TAG: frozenset({_U}),
     Kind.INVALID_SIGNATURE: frozenset({_U}),
     Kind.AUTH_PROFILE_MISMATCH: frozenset({_U}),
@@ -131,7 +139,7 @@ class Signal:
         if c is not None:
             if isinstance(c, bool) or not isinstance(c, (int, float)) or not math.isfinite(c) or not (0.0 <= c <= 1.0):
                 raise SignalRejected("bad_confidence", str(c))
-        if self.kind is Kind.VISUAL_RULE_VIOLATION and c is None:
+        if self.kind in (Kind.VISUAL_RULE_VIOLATION, Kind.SUBJECT_PROXIMITY) and c is None:
             raise SignalRejected("missing_confidence")
         if self.kind in LEVEL_FIELD and not isinstance(self.value.get(LEVEL_FIELD[self.kind]), bool):
             raise SignalRejected("bad_level_value", f"{self.kind.value} needs boolean '{LEVEL_FIELD[self.kind]}'")

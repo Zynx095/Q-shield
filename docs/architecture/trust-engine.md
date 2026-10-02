@@ -40,7 +40,10 @@ Trust is assigned to **the security state of one enrolled device identity** (e.g
 | `integrity_mismatch` (level) | self-reported `fw_version`/`cfg_hash` differs from a *configured* expectation | telemetry + expectation config | `DEVICE_HMAC` | N + G | **unavailable unless expectations are configured**; self-reported, not proof |
 | `visual_rule_violation` (called `visual_anomaly` until Phase 4.1) | observation with `anomaly=true`, i.e. a detection that **matched a configured rule**; carries detector `confidence` in [0,1] | vision service observations | `SIGNER_MLDSA` (full weight) or `TOKEN_ONLY` (half weight) | N | yes (real webcam) |
 | `camera_obstructed` / `camera_source_lost` | camera-health observation (`state` obstructed / source_lost) | vision service | `SIGNER_MLDSA` or `TOKEN_ONLY` | N | yes |
-| `visual_clear` / `camera_ok` | non-anomalous observation / camera restored | vision service | `SIGNER_MLDSA` or `TOKEN_ONLY` | E (marks visual evidence available; ends an episode) | yes |
+| `camera_frozen` / `camera_view_changed` (Phase 17) | camera-health observation (`state` frozen / view_changed): the same frame repeated (stuck or substituted feed); the scene no longer matches the reference view (camera turned, tilted, pointed elsewhere, or a large object placed in front) | vision service (`ai/vision/health.py`) | `SIGNER_MLDSA` or `TOKEN_ONLY` | N | yes (synthetic-frame tests; a static-scene check on a built-in laptop camera; not validated against staged physical tampering) |
+| `camera_degraded` (Phase 17) | camera-health observation (`state` degraded): low light with the reference scene still visible, or blur | vision service | `SIGNER_MLDSA` or `TOKEN_ONLY` | N (small) | yes (as above) |
+| `subject_proximity` (Phase 17) | visual observation with `anomaly_reason` `subject_too_close` or `rapid_approach`: **image-space heuristics** (a detected subject's bounding-box share of the frame, and its growth), not a distance | vision service (`ai/vision/proximity.py`) | `SIGNER_MLDSA` or `TOKEN_ONLY` | N (small) | yes (synthetic tests only) |
+| `visual_clear` / `camera_ok` | non-anomalous observation / camera restored | vision service | `SIGNER_MLDSA` or `TOKEN_ONLY` | E (marks visual evidence available; `camera_ok` ends every camera episode) | yes |
 | `invalid_tag`, `invalid_signature`, `auth_profile_mismatch` | authentication failure | gateway security events | `UNAUTHENTICATED` | N (pressure) | yes |
 | `device_replay`, `observation_replay`, `handshake_replay` | counter/observation/nonce replay | gateway security events | `UNAUTHENTICATED` | N (pressure) + G (repeated) | yes |
 | `stale_observation` | signed timestamp outside the freshness window | gateway | `UNAUTHENTICATED` | N (pressure, small) | yes |
@@ -89,6 +92,10 @@ Severity scale (factor points, applied to `p_i`; labels are only names for these
 | `visual_rule_violation` | visual | `100 · c^2 · m_auth` | CRITICAL x confidence | 900 | see section 10; per-episode maximum |
 | `camera_obstructed` | visual | 60 | HIGH | 900 | per episode |
 | `camera_source_lost` | visual | 30 | MEDIUM | 900 | per episode |
+| `camera_frozen` | visual | 60 | HIGH | 900 | per episode; the camera no longer shows the live scene: as severe as an obstruction |
+| `camera_view_changed` | visual | 60 | HIGH | 900 | per episode; the protected view is no longer watched: as severe as an obstruction |
+| `camera_degraded` | visual | 30 | MEDIUM | 900 | per episode; evidence quality is reduced, which is not proof of interference: the severity of a lost source |
+| `subject_proximity` | visual | `10 · m_auth` | LOW | 900 | per episode per reason; a heuristic; no impact below the confidence floor (0.30) |
 | `auth_misbehavior` | identity_crypto | 60 | HIGH | 1800 | authenticated misbehaviour |
 | `malformed_payload` | identity_crypto | 30 | MEDIUM | 1800 | authenticated sender |
 
@@ -189,7 +196,7 @@ For every persistent penalty `x` in {`p_i`, `q`} with half-life `h`:
 
 ### 6.3 Holds, episodes and duplicates
 - **Level signals** (tamper, sensor, integrity) are episodes: the penalty is applied once when the condition becomes true; repeated identical reports only refresh the hold. The condition clearing ends the episode; a new episode applies a new penalty.
-- **Visual/camera episodes**: observations of the same `(kind, zone, object)` within 30 s form one episode; the episode's applied penalty is the **maximum** impact seen (only the increase over what was already applied is added), so a vision service repeating an anomaly every 5 s is not counted repeatedly.
+- **Visual/camera episodes**: observations of the same `(kind, zone, object)` within 30 s form one episode; the episode's applied penalty is the **maximum** impact seen (only the increase over what was already applied is added), so a vision service repeating an anomaly every 5 s is not counted repeatedly. Camera-health kinds form one episode per kind, proximity one per reason; `camera_ok` ends every camera episode, so a camera that is covered again after it was restored is a new episode and is penalised again.
 - **Duplicates**: a signal id seen before is ignored (no penalty, counted). The id is derived from the gateway record (`event:<id>`, `obs:<observation_id>`, `msg:<id>`), so re-processing cannot double count.
 - **Discrete violations** (replays, invalid signatures) each count, but only through the bounded pressure term or a factor clamp.
 
@@ -226,7 +233,7 @@ Additional rules: QUARANTINED is **sticky**: a rising score never leaves it (TD-
 
 Rules (all in `backend/trust/state_machine.py` / `engine.py`, tested in `tests/trust/test_recovery_semantics.py`):
 1. **Entry** to RECOVERING is only an explicit, validated request (reason + evidence id) from QUARANTINED, and never for a revoked device (revocation needs re-enrolment). No score requirement.
-2. **RECOVERING and VERIFIED hold regardless of score.** They return to QUARANTINED automatically only on (a) revocation, or (b) a fresh **authenticated** report that a fault is present: tamper active, sensor out of range, integrity mismatch, `auth_misbehavior`, `malformed_payload`, or a signed (`SIGNER_MLDSA`) rule violation / camera obstruction / source loss. Unauthenticated pressure and token-only observations can never trigger it (they must not be able to knock a device out of recovery). An explicit failed-check request (`→ QUARANTINED`) is always allowed.
+2. **RECOVERING and VERIFIED hold regardless of score.** They return to QUARANTINED automatically only on (a) revocation, or (b) a fresh **authenticated** report that a fault is present: tamper active, sensor out of range, integrity mismatch, `auth_misbehavior`, `malformed_payload`, or a signed (`SIGNER_MLDSA`) rule violation / camera obstruction / source loss / frozen feed / changed view (Phase 17). A degraded image or a proximity heuristic is not a fault report: neither says the remediation failed. Unauthenticated pressure and token-only observations can never trigger it (they must not be able to knock a device out of recovery). An explicit failed-check request (`→ QUARANTINED`) is always allowed.
 3. **Fresh authenticated evidence keeps crediting time in every state**, including QUARANTINED and RECOVERING (`credit_clock`, decay of penalties and pressure). The score therefore ramps up without changing the state; in QUARANTINED it can reach 100 and the state still stays QUARANTINED (sticky).
 4. **VERIFIED → RECOVERED needs `score ≥ 50`** (dynamic trust must have left the quarantine range). **RECOVERED → TRUSTED needs `score ≥ 85`** (the hysteresis re-entry value); **RECOVERED → SUSPICIOUS needs `score ≥ 50`**. Otherwise the request is rejected with `IllegalTransition` and the state is unchanged. RECOVERED is never promoted automatically; it falls back to QUARANTINED automatically if the score drops below 50.
 5. The engine has **no recovery timeout** and never resets or forgives a penalty on request: there is no API to clear penalties. Only credited authenticated evidence lowers them.
@@ -256,6 +263,13 @@ A level modality (`PHYSICAL`, `SENSOR`) is *present* while its episode is active
 - tamper plus any other modality: **`confirmed_incident`** (cap 30).
 The incident is a *record* (`incident_id`, class, member signal ids) attached to the trust change. It adds **no extra penalty**: each modality penalises its own distinct factor once (a person, a tamper report and a vibration excursion are three different underlying observations, not one counted three times); the incident only imposes the cap. The same observation never counts as two modalities.
 
+**The camera as part of the security boundary (Phase 17).** A **signed** (`SIGNER_MLDSA`) report that the camera is `obstructed`, `frozen` or its view `view_changed` also makes the `VISUAL` modality present: the camera's view of the protected area has been interfered with, which is visual evidence in the same sense as a rule match. No new class, cap or threshold is introduced; the rules above apply unchanged, so:
+- camera interference alone: its visual penalty only (60 points on the visual factor, about 9 points of score with full coverage): **never an incident, never quarantine**;
+- tamper plus camera interference within 60 s (someone blinds or turns the camera and opens the enclosure): **`confirmed_incident`** (cap 30, QUARANTINED), exactly as tamper plus a signed rule violation;
+- sensor excursion plus camera interference: **`correlated_incident`** (cap 55);
+- camera interference plus a rule violation: still **one** modality (the same camera, the same signer), so a compromised vision key alone still cannot open an incident.
+**Not** modality evidence: `source_lost` (indistinguishable from a USB or driver fault), `degraded` (lighting or focus), the proximity heuristics, and any token-only report. They keep their own small penalties.
+
 ## 10. Confidence
 `visual_rule_violation` impact = `100 · c^2 · m_auth`, `c` = detector confidence, `m_auth` = 1.0 for `SIGNER_MLDSA`, 0.5 for `TOKEN_ONLY`. Detections with `c < 0.30` (floor, design choice) are recorded with impact 0. Examples: `c = 0.51` -> 26; `c = 0.99` -> 98 (factor points). Confidence scales the **magnitude** only: it can neither create trust nor bypass authenticity (an unauthenticated source cannot deliver a visual anomaly at all; section 12), and a high-confidence but token-only observation counts at half weight and never confirms an incident. `c` outside [0,1] or non-finite is rejected.
 
@@ -279,6 +293,7 @@ Every state or score change produces one **`TrustChange`** record:
 |---|---|---|
 | tamper, sensor values, fw/cfg hash | device HMAC (message integrity + credential possession) | **self-reported by the device**; a compromised device can lie; firmware/config hashes are evidence, **not proof** of integrity |
 | visual anomaly, camera health | ML-DSA signature of the vision service (or ingest token) | **inferred by AI**; authenticity says who produced it, not that the detector is right |
+| camera interference (frozen, view changed, degraded), proximity | ML-DSA signature of the vision service (or ingest token) | **inferred from image statistics and image-space heuristics** (`ai/vision/health.py`, `ai/vision/proximity.py`); no distance is measured; thresholds unvalidated |
 | invalid tag/signature, replay, staleness | none (that is the point) | **locally generated** by the gateway from rejected input; attacker-influenceable, hence the pressure bound |
 | revoked, staleness cap | gateway records/clock | **configuration/locally derived** |
 | sensor limits, integrity expectations | operator configuration | **configuration-derived** (no digital twin yet) |
@@ -298,6 +313,7 @@ Evaluates trust from **available signals**. It does not detect every compromise,
 | Compromised gateway host | out of scope; engine and evidence are on the compromised host |
 | Sensor spoofing | undetectable without physical cross-checks; only configured limits and cross-modal correlation help |
 | Physical tampering | only if the device reports it; a tamper that also disables reporting is invisible except via staleness |
+| Camera blinded, turned, frozen or replaced (Phase 17) | reported by the vision service from image statistics, signed; penalised alone, and confirms an incident together with a tamper report; an attacker who changes the view slowly enough to stay under the thresholds, or before the reference view is learned, is not detected |
 | Trust griefing by network attacker | bounded to `q ≤ 25` -> SUSPICIOUS at worst, never QUARANTINED |
 | AI false positives/negatives | unmeasured; false positives lower trust (bounded by confidence and episodes); false negatives leave trust unchanged |
 | Silent attacker | staleness lowers network factor and caps at 79; no recovery without authenticated evidence |
@@ -322,6 +338,8 @@ Baseline trusted device; single low-severity anomaly; high-confidence and low-co
 **Spec/code refinements found while implementing** (folded into the text above): active episodes block their own factor's decay; a record starts at the first accepted signal; only material changes emit events. Phase 4.1 corrections: the exact pipeline is now normative (section 4.7); `RECOVERING`/`VERIFIED` no longer regress on a low score alone (section 7.1); explicit transitions have score guards; the signal `visual_anomaly` was renamed `visual_rule_violation` (terminology only).
 
 **Measured cost** (`scripts/bench_trust.py`, `docs/results/trust_bench.json`; one Windows laptop, single device, in-memory SQLite): `TrustEngine.apply` about 53 us mean / 73 us p99; `process_pending` after one new gateway record about 0.7 ms mean / 1.3 ms p99; batch throughput about 6.7k records/s. These are processing costs of this code on one machine, not end-to-end detection latency and not a real-time guarantee.
+
+**IMPLEMENTED (Phase 17): the camera as part of the security boundary.** New signal kinds `camera_frozen`, `camera_view_changed`, `camera_degraded` and `subject_proximity` (section 3), their penalties (section 4.4), camera interference as `VISUAL` modality evidence (section 9) and as a recovery fault (section 7.1). Tests: `tests/trust/test_camera_boundary.py` (engine) and `tests/ai/test_camera_security.py` (the vision side).
 
 **DESIGNED, NOT IMPLEMENTED:** digital-twin-derived expectations, evidence-chain anchoring of trust events (Phase 8), network-behaviour signals, per-source rate limiting in front of the gateway, multi-process/multi-gateway coordination (the service assumes one process owns the DB).
 
@@ -352,7 +370,7 @@ There is **no externally grounded numeric trust parameter** in this specificatio
 - Phase 3 PQC benchmark (`docs/results/pqc-benchmark.json`): cost of the cryptography only.
 
 **C. Current prototype design parameters** (author's choices with a stated rationale; all in `backend/trust/config.py`; none validated):
-severity scale 0/10/30/60/100 (roughly geometric); per-signal points (section 4.4); visual impact `100·c²` with exponent 2, floor 0.30, token-only multiplier 0.5, correlation minimum confidence 0.5; pressure points 10/8/4, pressure cap 25 (chosen so `100 − 25 = 75 ≥ 50`), pressure half-life 600 s; cap ceilings 0/30/55/55/65/65/70/79 and their holds 1800/900/900/900/900 credited s; half-lives 3600/1800/3600/900/1800 s; credit cap 45 s; episode gap 30 s; correlation window 60 s; replay threshold 3 in 600 s; staleness ramp 15 → 150 s and stale cap after 45 s; hysteresis +5; recovery guards 50 / 85 (section 7.1); duplicate-id memory 5000.
+severity scale 0/10/30/60/100 (roughly geometric); per-signal points (section 4.4); visual impact `100·c²` with exponent 2, floor 0.30, token-only multiplier 0.5, correlation minimum confidence 0.5; pressure points 10/8/4, pressure cap 25 (chosen so `100 − 25 = 75 ≥ 50`), pressure half-life 600 s; cap ceilings 0/30/55/55/65/65/70/79 and their holds 1800/900/900/900/900 credited s; camera severities (Phase 17: frozen and view changed HIGH like an obstruction, degraded MEDIUM like a lost source, proximity LOW) and the choice that signed camera interference is `VISUAL` modality evidence; half-lives 3600/1800/3600/900/1800 s; credit cap 45 s; episode gap 30 s; correlation window 60 s; replay threshold 3 in 600 s; staleness ramp 15 → 150 s and stale cap after 45 s; hysteresis +5; recovery guards 50 / 85 (section 7.1); duplicate-id memory 5000.
 
 **D. Future parameters requiring empirical tuning** (and the data that would be needed):
 
@@ -364,5 +382,6 @@ severity scale 0/10/30/60/100 (roughly geometric); per-signal points (section 4.
 | half-lives, holds, credit cap | recovery speed (section 7.1 ramp of about 30-80 minutes) versus attacker "wait it out" risk | recovery drills with real hardware, operator requirements |
 | staleness ramp 15/45/150 s, offline timeout | real ESP32 reporting cadence and Wi-Fi jitter | ESP32 heartbeat logs |
 | correlation window 60 s | physical-to-visual delay of a real tamper | staged physical tests |
+| camera-health thresholds (`ai/vision/config.py` `HealthConfig`: sustain 2 s, similarity 0.7, shift 10 %, frozen 10 frames over 3 s, blur 0.2, low light 0.6) and proximity thresholds (`ProximityConfig`: 35 % of the frame, growth x2 in 2 s) | false-alarm and miss rates for the deployed camera, lens, lighting and scene | staged covering, turning, freezing and approach tests with the deployed camera; a day of normal footage for false alarms |
 | coverage policy (nothing today) | whether TRUSTED should require a minimum coverage (section 4.7, implication 1) | design decision plus review, not data alone |
 | sensor limits, expected firmware/config | per-deployment | digital twin / configuration management (later phase) |

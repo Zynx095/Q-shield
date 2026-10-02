@@ -118,6 +118,11 @@ def _parse_iso(ts: str) -> float | None:
         return None
 
 
+CAMERA_STATE_KIND = {"ok": Kind.CAMERA_OK, "obstructed": Kind.CAMERA_OBSTRUCTED, "source_lost": Kind.CAMERA_SOURCE_LOST,
+                     "frozen": Kind.CAMERA_FROZEN, "view_changed": Kind.CAMERA_VIEW_CHANGED, "degraded": Kind.CAMERA_DEGRADED}
+PROXIMITY_REASONS = frozenset({"subject_too_close", "rapid_approach"})   # ai/vision/proximity.py
+
+
 def from_observation(row, cfg: TrustConfig) -> Adapted:
     body = _json(row["body"], None)
     if not isinstance(body, dict):
@@ -138,13 +143,16 @@ def from_observation(row, cfg: TrustConfig) -> Adapted:
         return Adapted([Signal(sid, dev, Kind.STALE_OBSERVATION, ts, auth, source_ref=ref)], device_id=dev)   # not scored
     et = body.get("event_type")
     if et == "visual_observation":
+        if body.get("anomaly") is True and body.get("anomaly_reason") in PROXIMITY_REASONS:
+            return Adapted([Signal(sid, dev, Kind.SUBJECT_PROXIMITY, ts, auth, confidence=body.get("confidence"),
+                                   value={"reason": body["anomaly_reason"], "object": body.get("object")}, source_ref=ref)], device_id=dev)
         if body.get("anomaly") is True:
             return Adapted([Signal(sid, dev, Kind.VISUAL_RULE_VIOLATION, ts, auth, confidence=body.get("confidence"),
                                    value={"zone": body.get("zone"), "object": body.get("object")}, source_ref=ref)], device_id=dev)
         return Adapted([Signal(sid, dev, Kind.VISUAL_CLEAR, ts, auth, confidence=body.get("confidence"), source_ref=ref)], device_id=dev)
     if et == "camera_health":
         state = (body.get("details") or {}).get("state")
-        kind = {"obstructed": Kind.CAMERA_OBSTRUCTED, "source_lost": Kind.CAMERA_SOURCE_LOST, "ok": Kind.CAMERA_OK}.get(state)
+        kind = CAMERA_STATE_KIND.get(state)
         if kind is None:
             return Adapted([], f"unknown_camera_state:{state}")
         return Adapted([Signal(sid, dev, kind, ts, auth, source_ref=ref)], device_id=dev)
