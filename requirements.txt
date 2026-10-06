@@ -1,0 +1,7 @@
+# Slim set for the Vercel deployment (no vision/torch; full list in backend/requirements.txt).
+fastapi==0.136.1
+pydantic==2.13.5
+httpx==0.28.1
+python-dotenv==1.0.1
+pqcrypto==1.0.0
+cryptography==47.0.0

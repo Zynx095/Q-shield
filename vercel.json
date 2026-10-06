@@ -1,0 +1,5 @@
+{
+  "redirects": [{ "source": "/", "destination": "/dashboard/", "permanent": false }],
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }],
+  "functions": { "api/index.py": { "includeFiles": "{backend,dashboard,config}/**" } }
+}
